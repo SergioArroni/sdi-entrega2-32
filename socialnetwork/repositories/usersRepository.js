@@ -13,6 +13,17 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
+    }, deleteUser: async function (filter, options) {
+        try {
+            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
+            const database = client.db("Cluster0");
+            const collectionName = 'users';
+            const songsCollection = database.collection(collectionName);
+            const result = await songsCollection.deleteOne(filter, options);
+            return result;
+        } catch (error) {
+            throw (error);
+        }
     }, findUser: async function (filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));

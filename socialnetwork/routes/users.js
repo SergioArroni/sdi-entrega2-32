@@ -1,6 +1,33 @@
 module.exports = function (app, usersRepository) {
     app.get('/users', function (req, res) {
-        res.send('lista de usuarios');
+        let author = req.session.user
+        usersRepository.getUsers({}, {}).then(users => {
+            res.render("users/users.twig", {users: users});
+        }).catch(error => {
+            res.send("Se ha producido un error al listar los usuarios:" + error)
+        });
+    })
+    app.post('/users', function (req, res) {
+        let author = req.session.user
+        usersRepository.getUsers({}, {}).then(users => {
+            for (let i = 0; i < users.length; i++){
+                if (String(users[i]._id).includes(req.body)) {
+                    usersRepository.deleteUser(users[i], {}).then(result => {
+                        if (result == null || result.deletedCount == 0) {
+                            res.send("No se ha podido eliminar el usuario: " + req.body[0]);
+                        } else {
+                            res.redirect("/users");
+                        }
+                    }).catch(error => {
+                        res.send("Se ha producido un error al listar los usuarios:" + error)
+                    });
+                }
+            }
+        }).catch(error => {
+            res.send("Se ha producido un error al listar los usuarios:" + error)
+        });
+
+
     })
     app.get('/users/logout', function (req, res) {
         req.session.user = null;
@@ -22,9 +49,9 @@ module.exports = function (app, usersRepository) {
                     res.redirect("/users/login" + "?message=Email o password incorrecto" + "&messageType=alert-danger ");
                 } else {
                     req.session.user = user.email;
-                    if(user.rol === "Admin"){
-                        res.redirect("/");
-                    }else{
+                    if (user.rol === "Admin") {
+                        res.redirect("/users");
+                    } else {
                         res.redirect("/");
                     }
                 }
