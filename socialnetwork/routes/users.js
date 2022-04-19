@@ -7,7 +7,7 @@ module.exports = function (app, usersRepository) {
         res.send("El usuario se ha desconectado correctamente");
     })
     app.get('/users/login', function (req, res) {
-        res.render("users/login.twig");
+        res.render("users/register.twig");
     })
     app.post('/users/login', function (req, res) {
             let securePassword = app.get("crypto").createHmac('sha256', app.get('clave'))
@@ -31,7 +31,7 @@ module.exports = function (app, usersRepository) {
         }
     )
     app.get('/users/signup', function (req, res) {
-        res.render("users/signup.twig");
+        res.render("users/login.twig");
     })
     app.post('/users/signup', function (req, res) {
         if(req.body.password.equals(req.body.repeatPassword)) {
