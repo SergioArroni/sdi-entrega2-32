@@ -6,6 +6,9 @@ var logger = require('morgan');
 
 var app = express();
 
+let jwt = require('jsonwebtoken');
+app.set('jwt', jwt);
+
 let expressSession = require('express-session');
 app.use(expressSession({
     secret: 'abcdefg', resave: true, saveUninitialized: true
@@ -28,7 +31,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 var indexRouter = require('./routes');
 
 const {MongoClient, ObjectId} = require("mongodb");
-const url = 'mongodb+srv://admin:admin@cluster0.a1mrh.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
+const url = 'mongodb+srv://admin:admin@cluster0.a1mrh.mongodb.net/Cluster0?retryWrites=true&w=majority';
 app.set('connectionStrings', url);
 
 const userSessionRouter = require('./routes/userSessionRouter');
@@ -37,8 +40,12 @@ app.use("/users/list", userSessionRouter);
 const usersRepository = require("./repositories/usersRepository.js");
 usersRepository.init(app, MongoClient);
 
+const friendsRepository = require("./repositories/friendsRepository.js");
+friendsRepository.init(app, MongoClient);
+
 
 require("./routes/users.js")(app, usersRepository);
+require("./routes/api/socialNetworkAPI")(app, usersRepository, friendsRepository);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -51,6 +58,10 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
+
+const userTokenRouter = require('./routes/userTokenRouter.js');
+app.use("/api/v1.0/friendlist", userTokenRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
