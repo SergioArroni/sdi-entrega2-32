@@ -37,7 +37,6 @@ app.use("/users/list", userSessionRouter);
 const usersRepository = require("./repositories/usersRepository.js");
 usersRepository.init(app, MongoClient);
 
-
 require("./routes/users.js")(app, usersRepository);
 
 // view engine setup
