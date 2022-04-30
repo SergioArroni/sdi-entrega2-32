@@ -6,6 +6,16 @@ var logger = require('morgan');
 
 var app = express();
 
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Allow-Methods", "POST, GET, DELETE, UPDATE, PUT");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type,Accept, token");
+    // Debemos especificar todas las headers que se aceptan. Content-Type , token
+    next();
+});
+
+
 let jwt = require('jsonwebtoken');
 app.set('jwt', jwt);
 
@@ -29,6 +39,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 var indexRouter = require('./routes');
+
+const userTokenRouter = require('./routes/userTokenRouter.js');
+app.use("/api/v1.0/message", userTokenRouter);
+app.use("/api/v1.0/friendlist", userTokenRouter);
 
 const {MongoClient, ObjectId} = require("mongodb");
 const url = 'mongodb+srv://admin:admin@cluster0.a1mrh.mongodb.net/Cluster0?retryWrites=true&w=majority';
@@ -58,10 +72,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-
-const userTokenRouter = require('./routes/userTokenRouter.js');
-app.use("/api/v1.0/friendlist", userTokenRouter);
-
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

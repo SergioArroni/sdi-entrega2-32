@@ -8,8 +8,8 @@ module.exports = {
             const database = client.db("Cluster0");
             const collectionName = 'friends';
             const purchasesCollection = database.collection(collectionName);
-            const purchases = await purchasesCollection.find(filter1, options).toArray();
-            const purchases2 = await purchasesCollection.find(filter2, options).toArray();
+            const purchases = await purchasesCollection.find(filter1, options).sort({"name": 1}).toArray();
+            const purchases2 = await purchasesCollection.find(filter2, options).sort({"name": 1}).toArray();
             const totalPurchases = purchases.concat(purchases2);
             return totalPurchases;
         } catch (error) {

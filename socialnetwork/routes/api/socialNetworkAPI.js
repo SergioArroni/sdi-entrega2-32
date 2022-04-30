@@ -3,8 +3,7 @@ module.exports = function (app, usersRepository, friendsRepository) {
 
     app.get("/api/v1.0/friendlist", function (req, res) {
         let user = res.user;
-        console.log(user);
-        let filter = {email: req.body.email}
+        let filter = {email: user}
         let options = {};
         usersRepository.getUsers(filter, options).then(user => {
             let id = user[0]._id;
@@ -83,7 +82,8 @@ module.exports = function (app, usersRepository, friendsRepository) {
     });
 
     app.post("/api/v1.0/message/:id", function (req, res) {
-        let filter = {email: req.body.email}
+        let user = res.user;
+        let filter = {email: user}
         let options = {};
         usersRepository.getUsers(filter, options).then(user => {
             let id = user[0]._id;
@@ -132,7 +132,8 @@ module.exports = function (app, usersRepository, friendsRepository) {
     });
 
     app.get("/api/v1.0/message/list/:id", function (req, res) {
-        let filter = {email: req.body.email}
+        let user = res.user;
+        let filter = {email: user}
         let options = {};
         usersRepository.getUsers(filter, options).then(user => {
             let id = user[0]._id;
