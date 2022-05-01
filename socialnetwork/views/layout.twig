@@ -5,9 +5,10 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    {% block scripts %} {% endblock %}
+    {% block scripts %}
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    {% endblock %}
 </head>
 <body>
 
@@ -24,34 +25,37 @@
         </div>
         <div class="collapse navbar-collapse" id="myNavbar">
             <ul class="nav navbar-nav">
-                <li id="myshop" class="active"><a href="/shop">Tienda</a></li>
-                <li id="mypublication"><a href="/publications">Publicaciones</a></li>
-                <li id="mybuy"><a href="/purchases">Compras</a></li>
+                {% if session.user %}
+                    {% if session.user.rol == 'Admin' %}
+                        <li id="users" class="active"><a href="/users">Users</a></li>
+                    {% endif %}
+                {% endif %}
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="/users/login"><span class="glyphicon glyphicon-user"></span>Identifícate</a></li>
                 <li><a href="/users/register"><span class="glyphicon glyphicon-log-in"></span>Registrate</a></li>
-                <li><a href="/users/logout"><span class="glyphicon glyphicon-log-out"></span>Cerrar sesión</a></li>
+                {% if session.user %}
+                    <li><a href="/users/logout"><span class="glyphicon glyphicon-log-out"></span>Cerrar sesión</a></li>
+                {% endif %}
             </ul>
         </div>
     </div>
 </nav>
 
 <div class="container">
-    <div class="container">
-        <script> let params = new URLSearchParams(location.search);
-            let message = params.get("message");
-            let messageType = params.get("messageType");
-            if (message != null && message != "") {
-                if (messageType == "") {
-                    messageType = 'alert-info';
-                }
-                $(".container").append("<div class='alert " + messageType + "'>" + message + " </div>");
+    <script> let params = new URLSearchParams(location.search);
+        let message = params.get("message");
+        let messageType = params.get("messageType");
+        if (message != null && message != "") {
+            if (messageType == "") {
+                messageType = 'alert-info';
             }
-        </script>
+            $(".container").append("<div class='alert " + messageType + "'>" + message + " </div>");
+        }
+    </script>
+    {% block main_container %}
         <!-- Contenido -->
-        {% block main_container %}
-        {% endblock %}</div>
+    {% endblock %}
 </div>
 
 </body>
