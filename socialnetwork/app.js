@@ -57,7 +57,6 @@ usersRepository.init(app, MongoClient);
 const friendsRepository = require("./repositories/friendsRepository.js");
 friendsRepository.init(app, MongoClient);
 
-
 require("./routes/users.js")(app, usersRepository);
 require("./routes/api/socialNetworkAPI")(app, usersRepository, friendsRepository);
 
