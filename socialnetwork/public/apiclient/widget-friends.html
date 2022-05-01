@@ -1,0 +1,49 @@
+<div id="widget-songs" >
+    <button class="btn" onclick="loadSongs()" >Actualizar</button>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>Título</th>
+            <th>Género</th>
+            <th>Precio</th>
+            <th class="col-md-1"></th>
+        </tr>
+        </thead>
+        <tbody id="songsTableBody"></tbody>
+    </table>
+</div>
+<script>
+    var users;
+    function loadSongs() {
+        $.ajax({
+            url: URLbase + "/friendlist",
+            type: "GET",
+            data: {},
+            dataType: 'json',
+            headers: {"token": token},
+            success: function (response) {
+                users = response.users;
+                updateSongsTable(users);
+            },
+            error: function (error) {
+                $("#main-container").load("widget-login.html");
+            }
+        });
+    }
+    function updateSongsTable(users) {
+        $("#songsTableBody").empty(); // Vaciar la tabla
+        for (let i = 0; i < users.length; i++) {
+            $("#songsTableBody").append(
+                "<tr id=" + users[i]._id + ">" +
+                "<td>" + users[i].email + "</td>" +
+                "<td>" + users[i].name + "</td>" +
+                "<td>" + users[i].surname + "</td>" +
+                "<td>" +
+                "</td>" +
+                "</tr>");
+            // Mucho cuidado con las comillas del eliminarCancion
+            //la id tiene que ir entre comillas ' '
+        }
+    }
+    loadSongs();
+</script>
