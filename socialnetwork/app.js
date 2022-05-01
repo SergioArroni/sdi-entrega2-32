@@ -6,6 +6,19 @@ var logger = require('morgan');
 
 var app = express();
 
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Allow-Methods", "POST, GET, DELETE, UPDATE, PUT");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type,Accept, token");
+    // Debemos especificar todas las headers que se aceptan. Content-Type , token
+    next();
+});
+
+
+let jwt = require('jsonwebtoken');
+app.set('jwt', jwt);
+
 let expressSession = require('express-session');
 app.use(expressSession({
     secret: 'abcdefg', resave: true, saveUninitialized: true
@@ -27,8 +40,12 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 var indexRouter = require('./routes');
 
+const userTokenRouter = require('./routes/userTokenRouter.js');
+app.use("/api/v1.0/message", userTokenRouter);
+app.use("/api/v1.0/friendlist", userTokenRouter);
+
 const {MongoClient, ObjectId} = require("mongodb");
-const url = 'mongodb+srv://admin:admin@cluster0.a1mrh.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
+const url = 'mongodb+srv://admin:admin@cluster0.a1mrh.mongodb.net/Cluster0?retryWrites=true&w=majority';
 app.set('connectionStrings', url);
 
 const userSessionRouter = require('./routes/userSessionRouter');
@@ -37,7 +54,11 @@ app.use("/users/list", userSessionRouter);
 const usersRepository = require("./repositories/usersRepository.js");
 usersRepository.init(app, MongoClient);
 
+const friendsRepository = require("./repositories/friendsRepository.js");
+friendsRepository.init(app, MongoClient);
+
 require("./routes/users.js")(app, usersRepository);
+require("./routes/api/socialNetworkAPI")(app, usersRepository, friendsRepository);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
