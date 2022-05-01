@@ -1,0 +1,35 @@
+{% extends "../layout.twig" %}
+{% block title %}Usuarios de la aplicación{% endblock %} {% block main_container %}
+    <h2>Usuarios de la aplicación</h2>
+    <div class="table-responsive">
+        <form method="post" action="/users">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Name</th>
+                    <th>Surname</th>
+                    <th class="col-md-1"></th>
+                </tr>
+                </thead>
+                <tbody> {% for user in users %}
+                    <tr>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.surname }}</td>
+                        <td>
+                            <input type="checkbox" name={{ user._id }} value={{ user._id }}>Eliminar</input><br>
+                        </td>
+                    </tr>
+                {% endfor %} </tbody>
+            </table>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-primary">Eliminar usuarios seleccionados</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+{% endblock %}
