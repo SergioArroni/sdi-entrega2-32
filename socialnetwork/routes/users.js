@@ -1,34 +1,54 @@
 module.exports = function (app, usersRepository) {
     app.get('/users', function (req, res) {
-        let author = req.session.user
-        usersRepository.getUsers({}, {}).then(users => {
-            res.render("users/users.twig", {users: users});
-        }).catch(error => {
-            res.send("Se ha producido un error al listar los usuarios:" + error)
-        });
+        let userA = req.session.user
+        if (userA.rol == 'Admin') {
+            usersRepository.getUsers({}, {}).then(users => {
+                let usuariosNormales = [];
+
+                for (let i = 0; i < users.length; i++) {
+                    if (users[i].rol != 'Admin') {
+                        usuariosNormales.push(users[i]);
+                    }
+                }
+
+                res.render("users/users.twig", {users: usuariosNormales});
+            }).catch(error => {
+                res.send("Se ha producido un error al listar los usuarios:" + error)
+            });
+        } else {
+            req.session.user = null;
+            res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
+        }
     })
     app.post('/users', function (req, res) {
-        let author = req.session.user
-        usersRepository.getUsers({}, {}).then(users => {
-            for (let i = 0; i < users.length; i++){
-                if (String(users[i]._id).includes(req.body)) {
-                    usersRepository.deleteUser(users[i], {}).then(result => {
-                        if (result == null || result.deletedCount == 0) {
-                            res.send("No se ha podido eliminar el usuario: " + req.body[0]);
-                        } else {
-                            res.redirect("/users");
+            let userA = req.session.user
+            if (userA.rol == 'Admin') {
+                usersRepository.getUsers({}, {}).then(users => {
+                        for (let i = 0; i < Object.keys(req.body).length; i++) {
+                            for (let j = 0; j < users.length; j++) {
+                                if (req.body[users[j]._id]) {
+                                    let filter = {_id: users[j]._id};
+                                    usersRepository.findDeleteUser(filter, {}).then(result => {
+                                        if (result == null || result.deletedCount == 0) {
+                                            res.send("No se ha podido eliminar el usuario: " + users[j]._id);
+                                        }
+                                    }).catch(error => {
+                                        res.send("Se ha producido un error al borrar algun usuario:" + error)
+                                    });
+                                }
+                            }
                         }
-                    }).catch(error => {
-                        res.send("Se ha producido un error al listar los usuarios:" + error)
-                    });
-                }
+                    }
+                ).catch(error => {
+                    res.send("Se ha producido un error al listar los usuarios:" + error)
+                });
+                res.redirect("/users");
+            } else {
+                req.session.user = null;
+                res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
             }
-        }).catch(error => {
-            res.send("Se ha producido un error al listar los usuarios:" + error)
-        });
-
-
-    })
+        }
+    )
     app.get('/users/logout', function (req, res) {
         req.session.user = null;
         res.send("El usuario se ha desconectado correctamente");
@@ -48,7 +68,7 @@ module.exports = function (app, usersRepository) {
                     req.session.user = null;
                     res.redirect("/users/login" + "?message=Email o password incorrecto" + "&messageType=alert-danger ");
                 } else {
-                    req.session.user = user.email;
+                    req.session.user = user;
                     if (user.rol === "Admin") {
                         res.redirect("/users");
                     } else {
@@ -74,7 +94,10 @@ module.exports = function (app, usersRepository) {
                 if (req.body.password === req.body.repeatPassword) {
                     let securePassword = app.get("crypto").createHmac('sha256', app.get('clave')).update(req.body.password).digest('hex');
                     let user = {
-                        email: req.body.email, name: req.body.name, surname: req.body.surname, password: securePassword
+                        email: req.body.email,
+                        name: req.body.name,
+                        surname: req.body.surname,
+                        password: securePassword
                     }
                     usersRepository.insertUser(user).then(userId => {
                         res.redirect("/users/login");
