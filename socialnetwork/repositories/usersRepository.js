@@ -103,5 +103,42 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
+    }, getUsersPg: async function (filter, options, page) {
+        try {
+            const limit = 4;
+            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
+            const database = client.db("Cluster0");
+            const collectionName = 'users';
+            const usersCollection = database.collection(collectionName);
+            const usersCollectionCount = await usersCollection.count();
+            const cursor = usersCollection.find(filter, options).skip((page - 1) * limit).limit(limit)
+            const users = await cursor.toArray();
+            const result = {users: users, total: usersCollectionCount};
+            return result;
+        } catch (error) {
+            throw (error);
+        }
+    }, getFriendsPg: async function(ids, page) {
+        let users = new Array();
+        let usersCollectionCount;
+        const limit = 5;
+        for (let i = 0; i < ids.length; i++) {
+            try {
+                let filter = {_id: ids[i]};
+                let options = {};
+                const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
+                const database = client.db("Cluster0");
+                const collectionName = 'users';
+                const usersCollection = database.collection(collectionName);
+                usersCollectionCount = await usersCollection.count();
+                const user = await usersCollection.findOne(filter, options);
+                users.push(user);
+            } catch (error) {
+                throw (error);
+            }
+        }
+        const cursor = users.slice((page - 1) * limit, limit + 1)
+        const result = {users: cursor, total: usersCollectionCount};
+        return result;
     }
 };
