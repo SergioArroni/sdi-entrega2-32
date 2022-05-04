@@ -1,6 +1,6 @@
 module.exports = function (app, usersRepository) {
     app.get('/users', function (req, res) {
-        let author = req.session.user
+        let author = req.session.user;
         usersRepository.getUsers({}, {}).then(users => {
             res.render("users/users.twig", {users: users});
         }).catch(error => {
@@ -8,7 +8,7 @@ module.exports = function (app, usersRepository) {
         });
     })
     app.post('/users', function (req, res) {
-        let author = req.session.user
+        let author = req.session.user;
         usersRepository.getUsers({}, {}).then(users => {
             for (let i = 0; i < users.length; i++){
                 if (String(users[i]._id).includes(req.body)) {
@@ -52,7 +52,7 @@ module.exports = function (app, usersRepository) {
                     if (user.rol === "Admin") {
                         res.redirect("/users");
                     } else {
-                        res.redirect("/");
+                        res.redirect("/users/listUsers");
                     }
                 }
             }).catch(error => {
@@ -60,10 +60,29 @@ module.exports = function (app, usersRepository) {
                 res.redirect("/users/login" + "?message=Se ha producido un error al buscar el usuario" + "&messageType=alert-danger ");
             })
         }
-    )
+    );
     app.get('/users/register', function (req, res) {
         res.render("users/register.twig");
-    })
+    });
+    app.get("/users/listUsers",function (req,res){
+        var criterio={};
+        if(req.session.busqueda!=null){
+            criterio={
+                $or: [{"email": {$regex: ".*" + req.session.busqueda + ".*", $options: "i"}},
+                {"name": {$regex: ".*" + req.session.busqueda + ".*", $options: "i"}}]
+            };
+        }
+        var pg=parseInt(req.query.pg);
+        if(req.query.pg==null || isNaN(pg)){
+            pg=1;
+        }
+        usersRepository.getUsers({}, {}).then(users => {
+            res.render("users/listUsers.twig", {users: users});
+        }).catch(error => {
+            res.send("Se ha producido un error al listar los usuarios:" + error)
+        });
+
+    });
     app.post('/users/register', function (req, res) {
         let filter = {
             email: req.body.email

@@ -1,0 +1,47 @@
+{% extends "../layout.twig" %}
+
+{% block title %}Listado de todos los usuarios{% endblock %}
+
+{% block main_container %}
+    <h2>Listado de todos los usuarios</h2>
+
+    <!-- Sistema de busqueda -->
+    <div class="row">
+        <div id="custom-search-input">
+            <form method="get" action="/users/listUsers">
+                <div class="input-group col-xs-8 col-sm-6 col-md-4 col-lg-5 pull-left">
+                    <input id="inputSearchText" type="text" class="search-query form-control"
+                    placeholder="Buscar por nombre de usuario" name="busqueda"/>
+                    <span class="input-group-btn">
+                        <button id="buttonBusqueda" class="btn" type="submit">
+                            <span class="glyphicon glyphicon-search"></span>
+                        </button>
+                    </span>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thread>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellidos</th>
+                    <th>Email</th>
+                </tr>
+            </thread>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    {% if user.email != "admin@email.com" %}
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.surname }}</td>
+                    <td>{{ user.email }}</td>
+                    {% endif %}
+                </tr>
+                {%  endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include "../pagination.twig" with {url: "/users/listUsers"} %}
+{% endblock %}
