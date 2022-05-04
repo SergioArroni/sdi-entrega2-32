@@ -57,7 +57,10 @@ usersRepository.init(app, MongoClient);
 const friendsRepository = require("./repositories/friendsRepository.js");
 friendsRepository.init(app, MongoClient);
 
-require("./routes/users.js")(app, usersRepository);
+const publicationsRepository = require("./repositories/publicationsRepository.js");
+publicationsRepository.init(app, MongoClient);
+
+require("./routes/users.js")(app, usersRepository, friendsRepository, publicationsRepository);
 require("./routes/api/socialNetworkAPI")(app, usersRepository, friendsRepository);
 
 // view engine setup
