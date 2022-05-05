@@ -11,12 +11,14 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                         usuariosNormales.push(users[i]);
                     }
                 }
-
+                //logger.debug("/users GET request, render users/users.twig");
                 res.render("users/users.twig", {users: usuariosNormales});
             }).catch(error => {
+                //logger.error("Error, Se ha producido un error al listar los usuarios");
                 res.send("Se ha producido un error al listar los usuarios:" + error)
             });
         } else {
+            //logger.error("Error, No puedes acceder a esa pagina sin permisos");
             req.session.user = null;
             res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
         }
@@ -31,9 +33,11 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                                     let filter = {_id: users[j]._id};
                                     usersRepository.findDeleteUser(filter, {}).then(result => {
                                         if (result == null || result.deletedCount == 0) {
+                                            //logger.error("Error, No se ha podido eliminar el usuario" + users[j]._id);
                                             res.send("No se ha podido eliminar el usuario: " + users[j]._id);
                                         }
                                     }).catch(error => {
+                                        //logger.error("Error, Se ha producido un error al borrar algun usuario");
                                         res.send("Se ha producido un error al borrar algun usuario:" + error)
                                     });
                                 }
@@ -41,10 +45,13 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                         }
                     }
                 ).catch(error => {
+                    //logger.error("Error, Se ha producido un error al listar los usuarios");
                     res.send("Se ha producido un error al listar los usuarios:" + error)
                 });
+                //logger.debug("/users POST request, redirect /users");
                 res.redirect("/users");
             } else {
+                //logger.error("Error, No puedes acceder a esa pagina sin permisos");
                 req.session.user = null;
                 res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
             }
@@ -52,9 +59,11 @@ module.exports = function (app, usersRepository, friendsRepository, publications
     )
     app.get('/users/logout', function (req, res) {
         req.session.user = null;
+        //logger.debug("/users/logout' GET request");
         res.send("El usuario se ha desconectado correctamente");
     })
     app.get('/users/login', function (req, res) {
+        //logger.debug("/users/login GET request, users/login.twig");
         res.render("users/login.twig");
     })
     app.post('/users/login', function (req, res) {
@@ -66,23 +75,28 @@ module.exports = function (app, usersRepository, friendsRepository, publications
             let options = {};
             usersRepository.findUser(filter, options).then(user => {
                 if (user == null) {
+                    //logger.error("Error, Email o password incorrecto");
                     req.session.user = null;
                     res.redirect("/users/login" + "?message=Email o password incorrecto" + "&messageType=alert-danger ");
                 } else {
                     req.session.user = user;
                     if (user.rol === "Admin") {
+                        //logger.debug("/users/login POST request, redirect /users");
                         res.redirect("/users");
                     } else {
+                        //logger.debug("/users/login POST request, redirect /users/friends");
                         res.redirect("/users/friends");
                     }
                 }
             }).catch(error => {
+                //logger.error("Error, Se ha producido un error al buscar el usuario");
                 req.session.user = null;
                 res.redirect("/users/login" + "?message=Se ha producido un error al buscar el usuario" + "&messageType=alert-danger ");
             })
         }
     )
     app.get('/users/register', function (req, res) {
+        //logger.debug("/users/register GET request, render users/register.twig");
         res.render("users/register.twig");
     })
     app.post('/users/register', function (req, res) {
@@ -101,21 +115,25 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                         password: securePassword
                     }
                     usersRepository.insertUser(user).then(userId => {
+                        //logger.debug("/users/register POST request, redirect /users/login");
                         res.redirect("/users/login");
                     }).catch(error => {
+                        //logger.error("Error, Se ha producido un error al registrar el usuario");
                         res.redirect("/users/register" + "?message=Se ha producido un error al registrar el usuario" + "&messageType=alert-danger ");
                     });
                 } else {
+                    //logger.error("Error, Las dos contraseñas no coinciden");
                     res.redirect("/users/register" + "?message=Las dos contraseñas no coinciden" + "&messageType=alert-danger ");
                 }
             } else {
+                //logger.error("Error, Este email ya esta vinculado con un usuario");
                 res.redirect("/users/register" + "?message=Este email ya esta vinculado con un usuario" + "&messageType=alert-danger ");
             }
         }).catch(error => {
+            //logger.error("Error, Se ha producido un error al buscar el usuario");
             req.session.user = null;
             res.redirect("/users/login" + "?message=Se ha producido un error al buscar el usuario" + "&messageType=alert-danger ");
         })
-
     });
 
     app.get('/users/friends', function (req, res) {
@@ -157,14 +175,18 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                         pages: pages,
                         currentPage: page
                     }
+                    //logger.debug("/users/friends GET request, render users/friends.twig");
                     res.render("users/friends.twig", response);
                 }).catch(error => {
+                    //logger.error("Error, Se ha producido un error al cargar la lista de amigos");
                     res.send("Se ha producido un error al cargar la lista de amigos:" + error)
                 });
             }).catch(error => {
+                //logger.error("Error, Se ha producido un error al cargar la lista de amigos");
                 res.send("Se ha producido un error al cargar la lista de amigos:" + error)
             });
         } else {
+            //logger.error("Error, No puedes acceder a esa pagina sin permisos");
             req.session.user = null;
             res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
         }
@@ -173,8 +195,10 @@ module.exports = function (app, usersRepository, friendsRepository, publications
     app.get('/users/create/publication', function (req, res) {
         let userA = req.session.user
         if (userA.rol != 'Admin') {
+            //logger.debug("/users/create/publication GET request, render publications/createPublication.twig");
             res.render("publications/createPublication.twig");
         } else {
+            //logger.error("Error, No puedes acceder a esa pagina sin permisos");
             req.session.user = null;
             res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
         }
@@ -198,11 +222,14 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                 fecha: insertFecha
             }
             publicationsRepository.insertPublicaction(publication).then(publicationId => {
+                //logger.debug("/users/publications POST request, redirect /users/publications");
                 res.redirect("/users/publications");
             }).catch(error => {
+                //logger.error("Error, se ha producido un error al registrar el usuario");
                 res.redirect("/users/register" + "?message=Se ha producido un error al registrar el usuario" + "&messageType=alert-danger ");
             });
         } else {
+            //logger.error("Error, No puedes acceder a esa pagina sin permisos");
             req.session.user = null;
             res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
         }
@@ -233,8 +260,10 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                 currentPage: page,
                 userid: req.params.id
             }
+            //logger.debug("/users/friends/publications/:id GET request, render publications/friendPublications.twig");
             res.render("publications/friendPublications.twig", response);
         }).catch(error => {
+            //logger.error("Error, Se ha producido un error al listar las canciones del usuario");
             res.send("Se ha producido un error al listar las canciones del usuario " + error)
         });
 
