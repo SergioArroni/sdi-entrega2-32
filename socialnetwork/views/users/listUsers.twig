@@ -11,9 +11,9 @@
             <form method="get" action="/users/listUsers">
                 <div class="input-group col-xs-8 col-sm-6 col-md-4 col-lg-5 pull-left">
                     <input id="inputSearchText" type="text" class="search-query form-control"
-                    placeholder="Buscar por nombre de usuario" name="busqueda"/>
+                    placeholder="Buscar por nombre de usuario" name="search"/>
                     <span class="input-group-btn">
-                        <button id="buttonBusqueda" class="btn" type="submit">
+                        <button class="btn" type="submit">
                             <span class="glyphicon glyphicon-search"></span>
                         </button>
                     </span>
@@ -44,5 +44,18 @@
         </table>
     </div>
 
+    <!-- Paginación mostrar la actual y 2 anteriores y dos siguientes -->
+    <div class="row text-center">
+        <ul class="pagination">
+            {% for page in pages %}
+                <li class="page-item" id="pi-{{ page }}">
+                    <a class="page-link" href="/users/listUsers?page={{ page }}">{{ page }}</a>
+                </li>
+            {% endfor %}
+            <script>
+                $("#pi-" + "{{ currentPage }}").addClass("active");
+            </script>
+        </ul>
+    </div>
 
 {% endblock %}
