@@ -1,5 +1,5 @@
 module.exports = {
-    mongoClient: null, app: null, init: function (app, mongoClient) {
+    mongoClient: null, app: null, init: function (app, mongoClient,) {
         this.mongoClient = mongoClient;
         this.app = app;
     }, insertPublicaction: async function (publication) {
@@ -7,10 +7,12 @@ module.exports = {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
             const collectionName = 'publications';
-            const usersCollection = database.collection(collectionName);
-            const result = await usersCollection.insertOne(publication);
+            const publicationCollection = database.collection(collectionName);
+            const result = await publicationCollection.insertOne(publication);
+            //this.logger.debug("insertPublicaction request");
             return result.insertedId;
         } catch (error) {
+            //this.logger.error("Error, insertPublicaction");
             throw (error);
         }
     }, getPublications: async function (filter, options) {
@@ -18,10 +20,12 @@ module.exports = {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
             const collectionName = 'publications';
-            const purchasesCollection = database.collection(collectionName);
-            const purchases = await purchasesCollection.find(filter, options).toArray();
-            return purchases;
+            const publicationCollection = database.collection(collectionName);
+            const publications = await publicationCollection.find(filter, options).toArray();
+            //this.logger.debug("getPublications request");
+            return publications;
         } catch (error) {
+            //this.logger.error("Error, getPublications");
             throw (error);
         }
     }, getPublicationsPg: async function (filter, options, page) {
@@ -35,8 +39,10 @@ module.exports = {
             const cursor = publicationsCollection.find(filter, options).skip((page - 1) * limit).limit(limit)
             const publications = await cursor.toArray();
             const result = {publications: publications, total: publicationsCollectionCount};
+            //this.logger.debug("getPublicationsPg request");
             return result;
         } catch (error) {
+            //this.logger.error("Error, getPublicationsPg");
             throw (error);
         }
     },

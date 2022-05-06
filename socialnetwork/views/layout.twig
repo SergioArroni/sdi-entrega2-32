@@ -30,6 +30,7 @@
                         <li id="users" class="active"><a href="/users">Users</a></li>
                     {% endif %}
                 {% endif %}
+
                 {% if session.user %}
                     {% if session.user.rol == 'User' %}
                         <li id="users" class="active"><a href="/users/friends">Amigos</a></li>
@@ -39,6 +40,7 @@
             <ul class="nav navbar-nav navbar-right">
                 <li><a href="/users/login"><span class="glyphicon glyphicon-user"></span>Identifícate</a></li>
                 <li><a href="/users/register"><span class="glyphicon glyphicon-log-in"></span>Registrate</a></li>
+
                 {% if req.session.user != undefined %}
                     <li><a href="/users/logout"><span class="glyphicon glyphicon-log-out"></span>Cerrar sesión</a></li>
                 {% endif %}
