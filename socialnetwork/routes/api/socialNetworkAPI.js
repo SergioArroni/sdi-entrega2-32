@@ -22,21 +22,21 @@ module.exports = function (app, usersRepository, friendsRepository) {
                     }
                 }
                 usersRepository.getFriends(ids).then(users =>{
-                    //logger.debug("/api/v1.0/friendlist GET request, 200");
+
                     res.status(200);
                     res.send({users: users});
                 }).catch(error => {
-                    //logger.error("Error, Se ha producido un error al cargar los usuarios, 500");
+
                     res.status(500);
                     res.json({ error: "Se ha producido un error al cargar los usuarios." })
                 });
             }).catch(error => {
-                //logger.error("Error, Se ha producido un error al cargar los usuarios, 500");
+
                 res.status(500);
                 res.json({ error: "Se ha producido un error al cargar los usuarios." })
             });
         }).catch(error => {
-            //logger.error("Error, Se ha producido un error al cargar los usuarios, 500");
+
             res.status(500);
             res.json({ error: "Se ha producido un error al cargar los usuarios." })
         });
@@ -53,7 +53,7 @@ module.exports = function (app, usersRepository, friendsRepository) {
             let options = {}
             usersRepository.findUser(filter, options).then(user => {
                 if (user == null) {
-                    //logger.error("Error, Usuario no identificado, 401");
+
                     req.status(401);
                     res.json({
                         message: "Usuario no identificado",
@@ -63,7 +63,7 @@ module.exports = function (app, usersRepository, friendsRepository) {
                     let token = app.get('jwt').sign(
                         {user: user.email, time: Date.now() / 1000},
                         "secreto");
-                    //logger.debug("/api/v1.0/users/login POST request, 200");
+
                     res.status(200);
                     res.json({
                         message: "Usuario autorizado",
@@ -72,7 +72,7 @@ module.exports = function (app, usersRepository, friendsRepository) {
                     });
                 }
             }).catch(error => {
-                //logger.error("Error, Se ha producido un error al verificar credenciales, 401");
+
                 res.status(401);
                 res.json({
                     message: "Se ha producido un error al verificar credenciales",
@@ -80,7 +80,7 @@ module.exports = function (app, usersRepository, friendsRepository) {
                 })
             })
         } catch(e){
-            //logger.error("Error, Se ha producido un error al verificar credenciales, 500");
+
             res.status(500);
             res.json({
                 message: "Se ha producido un error al verificar credenciales",
@@ -94,7 +94,7 @@ module.exports = function (app, usersRepository, friendsRepository) {
         let filter = {email: user}
         let options = {};
         if (req.body.text.trim() == "") {
-            //logger.error("Error, El texto no puede ser vacío, 409");
+
             res.status(409);
             res.json({error: "El texto no puede ser vacío"});
         } else{
@@ -116,11 +116,11 @@ module.exports = function (app, usersRepository, friendsRepository) {
                             }
                             usersRepository.insertMessage(message, function (messageId) {
                                 if (messageId === null) {
-                                    //logger.error("Error, Se ha producido un error al enviar el mensaje, 409");
+
                                     res.status(409);
                                     res.json({error: "No se ha podido enviar el mensaje."});
                                 } else {
-                                    //logger.debug("/api/v1.0/message/:id POST request, 201");
+
                                     res.status(201);
                                     res.json({
                                         message: "Mensaje enviado correctamente.",
@@ -129,22 +129,22 @@ module.exports = function (app, usersRepository, friendsRepository) {
                                 }
                             });
                         } else {
-                            //logger.error("Error, No sois amigos, 422");
+
                             res.status(422);
                             res.json({error: "No sois amigos."})
                         }
                     } else {
-                        //logger.error("Error, No sois amigos, 422");
+
                         res.status(422);
                         res.json({error: "No sois amigos."})
                     }
                 }).catch(error => {
-                    //logger.error("Error, Se ha producido un error al enviar el mensaje, 500");
+
                     res.status(500);
                     res.json({error: "Se ha producido un error al enviar el mensaje."})
                 });
             }).catch(error => {
-                //logger.error("Error, Se ha producido un error al enviar el mensaje, 500");
+
                 res.status(500);
                 res.json({error: "Se ha producido un error al enviar el mensaje."})
             });
@@ -165,27 +165,27 @@ module.exports = function (app, usersRepository, friendsRepository) {
                 let sonAmigos = friend[0].accept;
                 if(sonAmigos) {
                     usersRepository.getMessages(filter1, filter2, options).then(messages => {
-                        //logger.debug("/api/v1.0/message/list/:id GET request, 200");
+
                         res.status(200);
                         res.send({messages: messages});
                     }).catch(error => {
-                        //logger.error("Error, Se ha producido un error al cargar los usuarios, 500");
+
                         res.status(500);
                         res.json({error: "Se ha producido un error al cargar los usuarios."})
                     });
                 }
                 else{
-                    //logger.error("Error, No sois amigos, 422");
+
                     res.status(422);
                     res.json({ error: "No sois amigos." })
                 }
             }).catch(error => {
-                //logger.error("Error, Se ha producido un error al enviar el mensaje, 500");
+
                 res.status(500);
                 res.json({ error: "Se ha producido un error al enviar el mensaje." })
             });
         }).catch(error => {
-            //logger.error("Error, Se ha producido un error al enviar el mensaje, 500");
+
             res.status(500);
             res.json({ error: "Se ha producido un error al enviar el mensaje." })
         });
