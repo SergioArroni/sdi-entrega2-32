@@ -9,10 +9,8 @@ module.exports = {
             const collectionName = 'users';
             const usersCollection = database.collection(collectionName);
             const users = await usersCollection.find(filter, options).toArray();
-
             return users;
         } catch (error) {
-
             throw (error);
         }
     }, deleteUser: async function (filter, options) {
@@ -22,10 +20,8 @@ module.exports = {
             const collectionName = 'users';
             const usersCollection = database.collection(collectionName);
             const result = await usersCollection.deleteOne(filter, options);
-
             return result;
         } catch (error) {
-
             throw (error);
         }
     }, findDeleteUser: async function (filter, options) {
@@ -35,10 +31,8 @@ module.exports = {
             const collectionName = 'users';
             const usersCollection = database.collection(collectionName);
             const result = await songsCollection.findOneAndDelete(filter, options);
-
             return result;
         } catch (error) {
-
             throw (error);
         }
     }, findUser: async function (filter, options) {
@@ -48,10 +42,8 @@ module.exports = {
             const collectionName = 'users';
             const usersCollection = database.collection(collectionName);
             const user = await usersCollection.findOne(filter, options);
-
             return user;
         } catch (error) {
-
             throw (error);
         }
     }, getFriends: async function(ids) {
@@ -65,10 +57,8 @@ module.exports = {
                 const collectionName = 'users';
                 const usersCollection = database.collection(collectionName);
                 const user = await usersCollection.findOne(filter, options);
-
                 users.push(user);
             } catch (error) {
-
                 throw (error);
             }
         }
@@ -80,17 +70,14 @@ module.exports = {
                 const collectionName = 'users';
                 const usersCollection = database.collection(collectionName);
                 const result = await usersCollection.insertOne(user);
-
                 return result.insertedId;
             } catch (error) {
-
                 throw (error);
             }
         },
     insertMessage: async function (message, callbackFunction) {
         this.mongoClient.connect(this.app.get('connectionStrings'), function (err, dbClient) {
             if (err) {
-
                 callbackFunction(null)
             } else {
                 const database = dbClient.db("Cluster0");
@@ -100,7 +87,6 @@ module.exports = {
                     .then(result => callbackFunction(result.insertedId))
                     .then(() => dbClient.close())
                     .catch(err => callbackFunction({error: err.message}));
-
             }
         });
     },
@@ -113,10 +99,8 @@ module.exports = {
             const message = await messagesCollection.find(filter1, options).toArray();
             const message2 = await messagesCollection.find(filter2, options).toArray();
             const totalMessages = message.concat(message2);
-
             return totalMessages;
         } catch (error) {
-
             throw (error);
         }
     }, getUsersPg: async function (filter, options, page) {
@@ -130,10 +114,8 @@ module.exports = {
             const cursor = usersCollection.find(filter, options).skip((page - 1) * limit).limit(limit)
             const users = await cursor.toArray();
             const result = {users: users, total: usersCollectionCount};
-
             return result;
         } catch (error) {
-
             throw (error);
         }
     }, getFriendsPg: async function(ids, page) {
@@ -151,9 +133,7 @@ module.exports = {
                 usersCollectionCount = await usersCollection.count();
                 const user = await usersCollection.findOne(filter, options);
                 users.push(user);
-
             } catch (error) {
-
                 throw (error);
             }
         }

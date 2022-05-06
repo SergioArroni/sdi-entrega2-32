@@ -22,21 +22,17 @@ module.exports = function (app, usersRepository, friendsRepository) {
                     }
                 }
                 usersRepository.getFriends(ids).then(users =>{
-
                     res.status(200);
                     res.send({users: users});
                 }).catch(error => {
-
                     res.status(500);
                     res.json({ error: "Se ha producido un error al cargar los usuarios." })
                 });
             }).catch(error => {
-
                 res.status(500);
                 res.json({ error: "Se ha producido un error al cargar los usuarios." })
             });
         }).catch(error => {
-
             res.status(500);
             res.json({ error: "Se ha producido un error al cargar los usuarios." })
         });
@@ -53,7 +49,6 @@ module.exports = function (app, usersRepository, friendsRepository) {
             let options = {}
             usersRepository.findUser(filter, options).then(user => {
                 if (user == null) {
-
                     req.status(401);
                     res.json({
                         message: "Usuario no identificado",
@@ -63,7 +58,6 @@ module.exports = function (app, usersRepository, friendsRepository) {
                     let token = app.get('jwt').sign(
                         {user: user.email, time: Date.now() / 1000},
                         "secreto");
-
                     res.status(200);
                     res.json({
                         message: "Usuario autorizado",
@@ -72,7 +66,6 @@ module.exports = function (app, usersRepository, friendsRepository) {
                     });
                 }
             }).catch(error => {
-
                 res.status(401);
                 res.json({
                     message: "Se ha producido un error al verificar credenciales",
@@ -80,7 +73,6 @@ module.exports = function (app, usersRepository, friendsRepository) {
                 })
             })
         } catch(e){
-
             res.status(500);
             res.json({
                 message: "Se ha producido un error al verificar credenciales",
@@ -94,7 +86,6 @@ module.exports = function (app, usersRepository, friendsRepository) {
         let filter = {email: user}
         let options = {};
         if (req.body.text.trim() == "") {
-
             res.status(409);
             res.json({error: "El texto no puede ser vacío"});
         } else{
@@ -116,11 +107,9 @@ module.exports = function (app, usersRepository, friendsRepository) {
                             }
                             usersRepository.insertMessage(message, function (messageId) {
                                 if (messageId === null) {
-
                                     res.status(409);
                                     res.json({error: "No se ha podido enviar el mensaje."});
                                 } else {
-
                                     res.status(201);
                                     res.json({
                                         message: "Mensaje enviado correctamente.",
@@ -129,22 +118,18 @@ module.exports = function (app, usersRepository, friendsRepository) {
                                 }
                             });
                         } else {
-
                             res.status(422);
                             res.json({error: "No sois amigos."})
                         }
                     } else {
-
                         res.status(422);
                         res.json({error: "No sois amigos."})
                     }
                 }).catch(error => {
-
                     res.status(500);
                     res.json({error: "Se ha producido un error al enviar el mensaje."})
                 });
             }).catch(error => {
-
                 res.status(500);
                 res.json({error: "Se ha producido un error al enviar el mensaje."})
             });
@@ -165,27 +150,22 @@ module.exports = function (app, usersRepository, friendsRepository) {
                 let sonAmigos = friend[0].accept;
                 if(sonAmigos) {
                     usersRepository.getMessages(filter1, filter2, options).then(messages => {
-
                         res.status(200);
                         res.send({messages: messages});
                     }).catch(error => {
-
                         res.status(500);
                         res.json({error: "Se ha producido un error al cargar los usuarios."})
                     });
                 }
                 else{
-
                     res.status(422);
                     res.json({ error: "No sois amigos." })
                 }
             }).catch(error => {
-
                 res.status(500);
                 res.json({ error: "Se ha producido un error al enviar el mensaje." })
             });
         }).catch(error => {
-
             res.status(500);
             res.json({ error: "Se ha producido un error al enviar el mensaje." })
         });
