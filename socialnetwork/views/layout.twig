@@ -33,6 +33,7 @@
 
                 {% if session.user %}
                     {% if session.user.rol == 'User' %}
+                        <li id="users" class="active"><a href="/users/listUsers">Usuarios</a></li>
                         <li id="users" class="active"><a href="/users/friends">Amigos</a></li>
                     {% endif %}
                 {% endif %}

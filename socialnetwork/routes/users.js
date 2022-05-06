@@ -85,7 +85,7 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                         res.redirect("/users");
                     } else {
                         //logger.debug("/users/login POST request, redirect /users/friends");
-                        res.redirect("/users/friends");
+                        res.redirect("/users/listUsers");
                     }
                 }
             }).catch(error => {
