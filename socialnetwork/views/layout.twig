@@ -29,10 +29,11 @@
                         <li id="users" class="active"><a href="/users">Users</a></li>
                     {% endif %}
                 {% endif %}
-
                 {% if session %}
                     {% if session.rol == 'User' %}
                         <li id="users" class="active"><a href="/users/friends">Amigos</a></li>
+                        <li id="users" class="active"><a href="/users/create/publication">Crear publicación</a></li>
+                        <li id="users" class="active"><a href="/users/publications">Publicaciones propias</a></li>
                     {% endif %}
                 {% endif %}
             </ul>

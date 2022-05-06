@@ -120,7 +120,6 @@ module.exports = {
         }
     }, getFriendsPg: async function(ids, page) {
         let users = new Array();
-        let usersCollectionCount;
         const limit = 5;
         for (let i = 0; i < ids.length; i++) {
             try {
@@ -130,15 +129,14 @@ module.exports = {
                 const database = client.db("Cluster0");
                 const collectionName = 'users';
                 const usersCollection = database.collection(collectionName);
-                usersCollectionCount = await usersCollection.count();
                 const user = await usersCollection.findOne(filter, options);
                 users.push(user);
             } catch (error) {
                 throw (error);
             }
         }
-        const cursor = users.slice((page - 1) * limit, limit + 1)
-        const result = {users: cursor, total: usersCollectionCount};
+        const cursor = users.slice((page - 1) * limit, limit + 1);
+        const result = {users: cursor, total: users.length};
         return result;
     }
 };
