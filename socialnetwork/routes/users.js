@@ -161,8 +161,8 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                     page = 1;
                 }
                 usersRepository.getFriendsPg(ids, page).then(result => {
-                    let lastPage = result.total / 4;
-                    if (result.total % 4 > 0) { // Sobran decimales
+                    let lastPage = result.total / 5;
+                    if (result.total % 5 > 0) { // Sobran decimales
                         lastPage = lastPage + 1;
                     }
                     let pages = []; // paginas mostrar
@@ -174,7 +174,8 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                     let response = {
                         users: result.users,
                         pages: pages,
-                        currentPage: page
+                        currentPage: page,
+                        session: req.session.user
                     }
 
                     res.render("users/friends.twig", response);
@@ -196,8 +197,8 @@ module.exports = function (app, usersRepository, friendsRepository, publications
     app.get('/users/create/publication', function (req, res) {
         let userA = req.session.user
         if (userA.rol != 'Admin') {
-
-            res.render("publications/createPublication.twig" , {session: userA});
+            //logger.debug("/users/create/publication GET request, render publications/createPublication.twig");
+            res.render("publications/createPublication.twig", {session: req.session.user});
         } else {
 
             req.session.user = null;
@@ -240,50 +241,30 @@ module.exports = function (app, usersRepository, friendsRepository, publications
         let userA = req.session.user
         let id = new ObjectID(userA._id);
         let idFriend = new ObjectID(req.params.id);
-        let filter1 = {id_from: id};
-        let filter2 = {id_to: id};
-        let options = {};
-        let aux = false;
-        friendsRepository.getFriends(filter1, filter2, options).then(friends => {
-            for (let i = 0; i < friends.length; i++) {
-                if (("" + friends[i].id_from === req.params.id || "" + friends[i].id_to === req.params.id) && friends[i].accept) {
-                    aux = true;
-                    break;
+        let filter = {user: idFriend}
+        let options = {}
+        let page = parseInt(req.query.page); // Es String !!!
+        if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") {
+            page = 1;
+        }
+        publicationsRepository.getPublicationsPg(filter, options, page).then(result => {
+            let lastPage = result.total / 5;
+            console.log(lastPage)
+            if (result.total % 5 > 0) { // Sobran decimales
+                lastPage = lastPage + 1;
+            }
+            let pages = []; // paginas mostrar
+            for (let i = page - 2; i <= page + 2; i++) {
+                if (i > 0 && i <= lastPage) {
+                    pages.push(i);
                 }
             }
-            if (aux) {
-                let filter = {user: idFriend}
-                let options = {}
-                let page = parseInt(req.query.page); // Es String !!!
-                if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") {
-                    page = 1;
-                }
-                publicationsRepository.getPublicationsPg(filter, options, page).then(result => {
-                    let lastPage = result.total / 4;
-                    if (result.total % 4 > 0) { // Sobran decimales
-                        lastPage = lastPage + 1;
-                    }
-                    let pages = []; // paginas mostrar
-                    for (let i = page - 2; i <= page + 2; i++) {
-                        if (i > 0 && i <= lastPage) {
-                            pages.push(i);
-                        }
-                    }
-                    let response = {
-                        publications: result.publications,
-                        pages: pages,
-                        currentPage: page,
-                        userid: req.params.id
-                    }
-
-                    res.render("publications/friendPublications.twig", response);
-                }).catch(error => {
-
-                    res.send("Se ha producido un error al listar las canciones del usuario " + error)
-                });
-            } else {
-                req.session.user = null;
-                res.redirect("/users/login" + "?message=No tienes amigos" + "&messageType=alert-danger ");
+            let response = {
+                publications: result.publications,
+                pages: pages,
+                currentPage: page,
+                userid: req.params.id,
+                session: req.session.user
             }
         }).catch(error => {
             res.send("Se ha producido un error al listar los amigos " + error)
