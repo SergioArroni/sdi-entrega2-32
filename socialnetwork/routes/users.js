@@ -160,8 +160,8 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                     page = 1;
                 }
                 usersRepository.getFriendsPg(ids, page).then(result => {
-                    let lastPage = result.total / 4;
-                    if (result.total % 4 > 0) { // Sobran decimales
+                    let lastPage = result.total / 5;
+                    if (result.total % 5 > 0) { // Sobran decimales
                         lastPage = lastPage + 1;
                     }
                     let pages = []; // paginas mostrar
@@ -244,8 +244,9 @@ module.exports = function (app, usersRepository, friendsRepository, publications
             page = 1;
         }
         publicationsRepository.getPublicationsPg(filter, options, page).then(result => {
-            let lastPage = result.total / 4;
-            if (result.total % 4 > 0) { // Sobran decimales
+            let lastPage = result.total / 5;
+            console.log(lastPage)
+            if (result.total % 5 > 0) { // Sobran decimales
                 lastPage = lastPage + 1;
             }
             let pages = []; // paginas mostrar
