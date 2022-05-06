@@ -25,13 +25,13 @@
         </div>
         <div class="collapse navbar-collapse" id="myNavbar">
             <ul class="nav navbar-nav">
-                {% if session.user %}
-                    {% if session.user.rol == 'Admin' %}
+                {% if session.user != null %}
+                    {% if session.rol == 'Admin' %}
                         <li id="users" class="active"><a href="/users">Users</a></li>
                     {% endif %}
                 {% endif %}
-                {% if session.user %}
-                    {% if session.user.rol == 'User' %}
+                {% if session.user != null %}
+                    {% if session.rol == 'User' %}
                         <li id="users" class="active"><a href="/users/friends">Amigos</a></li>
                     {% endif %}
                 {% endif %}

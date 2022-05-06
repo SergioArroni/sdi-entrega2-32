@@ -18,6 +18,7 @@ module.exports = function (app, usersRepository, friendsRepository, publications
             });
         } else {
             req.session.user = null;
+            req.session.rol = null;
             res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
         }
     })
@@ -46,12 +47,14 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                 res.redirect("/users");
             } else {
                 req.session.user = null;
+                req.session.rol = null;
                 res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
             }
         }
     )
     app.get('/users/logout', function (req, res) {
         req.session.user = null;
+        req.session.rol = null;
         res.send("El usuario se ha desconectado correctamente");
     })
     app.get('/users/login', function (req, res) {
@@ -67,9 +70,11 @@ module.exports = function (app, usersRepository, friendsRepository, publications
             usersRepository.findUser(filter, options).then(user => {
                 if (user == null) {
                     req.session.user = null;
+                    req.session.rol = null;
                     res.redirect("/users/login" + "?message=Email o password incorrecto" + "&messageType=alert-danger ");
                 } else {
-                    req.session.user = user;
+                    req.session.user = user.email;
+                    req.session.rol = user.rol;
                     if (user.rol === "Admin") {
                         res.redirect("/users");
                     } else {
@@ -78,6 +83,7 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                 }
             }).catch(error => {
                 req.session.user = null;
+                req.session.rol = null;
                 res.redirect("/users/login" + "?message=Se ha producido un error al buscar el usuario" + "&messageType=alert-danger ");
             })
         }
@@ -113,6 +119,7 @@ module.exports = function (app, usersRepository, friendsRepository, publications
             }
         }).catch(error => {
             req.session.user = null;
+            req.session.rol = null;
             res.redirect("/users/login" + "?message=Se ha producido un error al buscar el usuario" + "&messageType=alert-danger ");
         })
 
@@ -166,6 +173,7 @@ module.exports = function (app, usersRepository, friendsRepository, publications
             });
         } else {
             req.session.user = null;
+            req.session.rol = null;
             res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
         }
     })
@@ -176,6 +184,7 @@ module.exports = function (app, usersRepository, friendsRepository, publications
             res.render("publications/createPublication.twig");
         } else {
             req.session.user = null;
+            req.session.rol = null;
             res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
         }
     })
@@ -204,6 +213,7 @@ module.exports = function (app, usersRepository, friendsRepository, publications
             });
         } else {
             req.session.user = null;
+            req.session.rol = null;
             res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
         }
     })
