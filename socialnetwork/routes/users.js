@@ -104,8 +104,7 @@ module.exports = function (app, usersRepository, friendsRepository, publications
            usersRepository.getUsers({}, {}).then(users => {
                for(let i=0;i<users.length;i++){
                    if(users[i].email===req.session.user.email){
-
-                       users[i]="";
+                       users.splice(i,1);
                    }
                }
                res.render("users/listUsers.twig", {users: users});
