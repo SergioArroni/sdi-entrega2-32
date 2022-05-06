@@ -41,12 +41,13 @@
     if ( Cookies.get('token') != null ){
         token = Cookies.get('token');
         $( "#main-container" ).load("widget-friends.html");
-        if ( Cookies.get('token') != null ){
-            token = Cookies.get('token');
-            $( "#main-container" ).load("widget-songs.html");
-        }else {
-            $( "#main-container" ).load("widget-login.html");
+        let url = new URL(window.location.href);
+        let w = url.searchParams.get("w");
+
+        if (w == "chat") {
+            $("#main-container").load("widget-chat.html");
         }
+
     }else {
         $( "#main-container" ).load("widget-login.html");
     }
