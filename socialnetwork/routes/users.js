@@ -173,7 +173,8 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                     let response = {
                         users: result.users,
                         pages: pages,
-                        currentPage: page
+                        currentPage: page,
+                        session: req.session.user
                     }
                     //logger.debug("/users/friends GET request, render users/friends.twig");
                     res.render("users/friends.twig", response);
@@ -196,7 +197,7 @@ module.exports = function (app, usersRepository, friendsRepository, publications
         let userA = req.session.user
         if (userA.rol != 'Admin') {
             //logger.debug("/users/create/publication GET request, render publications/createPublication.twig");
-            res.render("publications/createPublication.twig");
+            res.render("publications/createPublication.twig", {session: req.session.user});
         } else {
             //logger.error("Error, No puedes acceder a esa pagina sin permisos");
             req.session.user = null;
@@ -259,7 +260,8 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                 publications: result.publications,
                 pages: pages,
                 currentPage: page,
-                userid: req.params.id
+                userid: req.params.id,
+                session: req.session.user
             }
             //logger.debug("/users/friends/publications/:id GET request, render publications/friendPublications.twig");
             res.render("publications/friendPublications.twig", response);
