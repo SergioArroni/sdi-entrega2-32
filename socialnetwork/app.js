@@ -85,7 +85,7 @@ const userTokenRouter = require('./routes/userTokenRouter.js');
 app.use("/api/v1.0/message", userTokenRouter);
 app.use("/api/v1.0/friendlist", userTokenRouter);
 
-const userSessionRouter = require('./routes/userSessionRouter');
+const userSessionRouter = require('./routes/userSessionRouter.js');
 app.use("/users/list", userSessionRouter);
 
 const usersRepository = require("./repositories/usersRepository.js");
