@@ -100,22 +100,20 @@ module.exports = function (app, usersRepository, friendsRepository, publications
         res.render("users/register.twig");
     });
     app.get("/users/listUsers",function (req,res){
-        var criterio={};
-        if(req.session.busqueda!=null){
-            criterio={
-                $or: [{"email": {$regex: ".*" + req.session.busqueda + ".*", $options: "i"}},
-                {"name": {$regex: ".*" + req.session.busqueda + ".*", $options: "i"}}]
-            };
-        }
-        var pg=parseInt(req.query.pg);
-        if(req.query.pg==null || isNaN(pg)){
-            pg=1;
-        }
-        usersRepository.getUsers({}, {}).then(users => {
-            res.render("users/listUsers.twig", {users: users});
-        }).catch(error => {
-            res.send("Se ha producido un error al listar los usuarios:" + error)
-        });
+
+           usersRepository.getUsers({}, {}).then(users => {
+               for(let i=0;i<users.length;i++){
+                   if(users[i].email===req.session.user.email){
+
+                       users[i]="";
+                   }
+               }
+               res.render("users/listUsers.twig", {users: users});
+           }).catch(error => {
+               res.send("Se ha producido un error al listar los usuarios:" + error)
+           });
+
+
 
     });
     app.post('/users/register', function (req, res) {
