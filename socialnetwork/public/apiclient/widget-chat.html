@@ -1,0 +1,45 @@
+<div id="widget-chat">
+
+    <div class="container">
+        <h2>Nuevo mensaje</h2>
+        <form class="form-horizontal" method="post" action="/comments/{{ song._id }}"  enctype="multipart/form-data">
+            <div class="form-group">
+                <label class="control-label col-sm-2" for="texto">Texto:</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="texto" name="texto" placeholder="Contenido del mensaje" required />
+                </div>
+            </div>
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="button" class="btn btn-primary" id="boton-add"
+                onclick="addMessage()">Enviar</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<script>
+    window.history.pushState("", "", "/apiclient/client.html?w=chat");
+    var messages;
+
+    function addMessage() {
+        $.ajax({
+            url: URLbase + "/message",
+            type: "POST",
+            data: {
+                text: $("#texto").val()
+            },
+            dataType: 'json',
+            headers: {"token": token},
+            success: function (response) {
+                console.log(response); // <-- Prueba
+                // En principio no habria que poner esto:
+                $("#main-container").load("widget-chat.html");
+            },
+            error: function (error) {
+                $("#main-container").load("widget-login.html");
+            }
+        });
+    }
+
+</script>

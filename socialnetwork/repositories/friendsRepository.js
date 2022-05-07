@@ -7,11 +7,11 @@ module.exports = {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
             const collectionName = 'friends';
-            const purchasesCollection = database.collection(collectionName);
-            const purchases = await purchasesCollection.find(filter1, options).sort({"name": 1}).toArray();
-            const purchases2 = await purchasesCollection.find(filter2, options).sort({"name": 1}).toArray();
-            const totalPurchases = purchases.concat(purchases2);
-            return totalPurchases;
+            const friendsCollection = database.collection(collectionName);
+            const friends = await friendsCollection.find(filter1, options).sort({"name": 1}).toArray();
+            const friends2 = await friendsCollection.find(filter2, options).sort({"name": 1}).toArray();
+            const totalFriends = friends.concat(friends2);
+            return totalFriends;
         } catch (error) {
             throw (error);
         }

@@ -7,9 +7,9 @@ module.exports = {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
             const collectionName = 'users';
-            const purchasesCollection = database.collection(collectionName);
-            const purchases = await purchasesCollection.find(filter, options).toArray();
-            return purchases;
+            const usersCollection = database.collection(collectionName);
+            const users = await usersCollection.find(filter, options).toArray();
+            return users;
         } catch (error) {
             throw (error);
         }
@@ -18,8 +18,8 @@ module.exports = {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
             const collectionName = 'users';
-            const songsCollection = database.collection(collectionName);
-            const result = await songsCollection.deleteOne(filter, options);
+            const usersCollection = database.collection(collectionName);
+            const result = await usersCollection.deleteOne(filter, options);
             return result;
         } catch (error) {
             throw (error);
@@ -29,7 +29,7 @@ module.exports = {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
             const collectionName = 'users';
-            const songsCollection = database.collection(collectionName);
+            const usersCollection = database.collection(collectionName);
             const result = await songsCollection.findOneAndDelete(filter, options);
             return result;
         } catch (error) {
@@ -82,8 +82,8 @@ module.exports = {
             } else {
                 const database = dbClient.db("Cluster0");
                 const collectionName = 'messages';
-                const songsCollection = database.collection(collectionName);
-                songsCollection.insertOne(message)
+                const messageCollection = database.collection(collectionName);
+                messageCollection.insertOne(message)
                     .then(result => callbackFunction(result.insertedId))
                     .then(() => dbClient.close())
                     .catch(err => callbackFunction({error: err.message}));
@@ -107,17 +107,17 @@ module.exports = {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
             const collectionName = 'messages';
-            const purchasesCollection = database.collection(collectionName);
-            const purchases = await purchasesCollection.find(filter1, options).toArray();
-            const purchases2 = await purchasesCollection.find(filter2, options).toArray();
-            const totalPurchases = purchases.concat(purchases2);
-            return totalPurchases;
+            const messagesCollection = database.collection(collectionName);
+            const message = await messagesCollection.find(filter1, options).toArray();
+            const message2 = await messagesCollection.find(filter2, options).toArray();
+            const totalMessages = message.concat(message2);
+            return totalMessages;
         } catch (error) {
             throw (error);
         }
     }, getUsersPg: async function (filter, options, page) {
         try {
-            const limit = 4;
+            const limit = 5;
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
             const collectionName = 'users';
@@ -125,14 +125,32 @@ module.exports = {
             const usersCollectionCount = await usersCollection.count();
             const cursor = usersCollection.find(filter, options).skip((page - 1) * limit).limit(limit)
             const users = await cursor.toArray();
+
             const result = {users: users, total: usersCollectionCount};
             return result;
         } catch (error) {
             throw (error);
         }
-    }, getFriendsPg: async function(ids, page) {
+    },getAllUsersPg: async function (filter, options, page, actualUser) {
+        try {
+            const limit = 5;
+            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
+            const database = client.db("Cluster0");
+            const collectionName = 'users';
+            const usersCollection = database.collection(collectionName);
+            const usersCollectionCount = await usersCollection.count();
+            const cursor = usersCollection.find(filter, options).skip((page - 1) * limit).limit(limit)
+            const users = await cursor.toArray();
+            users.splice();
+            const result = {users: users, total: usersCollectionCount};
+            //this.logger.debug("getUsersPg request");
+            return result;
+        } catch (error) {
+            //this.logger.error("Error, getUsersPg");
+            throw (error);
+        }
+    },getFriendsPg: async function(ids, page) {
         let users = new Array();
-        let usersCollectionCount;
         const limit = 5;
         for (let i = 0; i < ids.length; i++) {
             try {
@@ -142,15 +160,14 @@ module.exports = {
                 const database = client.db("Cluster0");
                 const collectionName = 'users';
                 const usersCollection = database.collection(collectionName);
-                usersCollectionCount = await usersCollection.count();
                 const user = await usersCollection.findOne(filter, options);
                 users.push(user);
             } catch (error) {
                 throw (error);
             }
         }
-        const cursor = users.slice((page - 1) * limit, limit + 1)
-        const result = {users: cursor, total: usersCollectionCount};
+        const cursor = users.slice((page - 1) * limit, limit + 1);
+        const result = {users: cursor, total: users.length};
         return result;
     },
     getMessage: async function (filter, options) {

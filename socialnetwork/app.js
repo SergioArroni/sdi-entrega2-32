@@ -1,10 +1,51 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
 
-var app = express();
+/*
+                                                                              ,--.
+  .--.--.                                             ,--,                  ,--.'|              ___             .---.                         ,-.
+ /  /    '.                       ,--,              ,--.'|              ,--,:  : |            ,--.'|_          /. ./|                     ,--/ /|
+|  :  /`. /    ,---.            ,--.'|              |  | :           ,`--.'`|  ' :            |  | :,'     .--'.  ' ;   ,---.    __  ,-.,--. :/ |
+;  |  |--`    '   ,'\           |  |,               :  : '           |   :  :  | |            :  : ' :    /__./ \ : |  '   ,'\ ,' ,'/ /|:  : ' /
+|  :  ;_     /   /   |   ,---.  `--'_      ,--.--.  |  ' |           :   |   \ | :   ,---.  .;__,'  / .--'.  '   \' . /   /   |'  | |' ||  '  /
+ \  \    `. .   ; ,. :  /     \ ,' ,'|    /       \ '  | |           |   : '  '; |  /     \ |  |   | /___/ \ |    ' '.   ; ,. :|  |   ,''  |  :
+  `----.   \'   | |: : /    / ' '  | |   .--.  .-. ||  | :           '   ' ;.    ; /    /  |:__,'| : ;   \  \;      :'   | |: :'  :  /  |  |   \
+  __ \  \  |'   | .; :.    ' /  |  | :    \__\/: . .'  : |__         |   | | \   |.    ' / |  '  : |__\   ;  `      |'   | .; :|  | '   '  : |. \
+ /  /`--'  /|   :    |'   ; :__ '  : |__  ," .--.; ||  | '.'|        '   : |  ; .''   ;   /|  |  | '.'|.   \    .\  ;|   :    |;  : |   |  | ' \ \
+'--'.     /  \   \  / '   | '.'||  | '.'|/  /  ,.  |;  :    ;        |   | '`--'  '   |  / |  ;  :    ; \   \   ' \ | \   \  / |  , ;   '  : |--'
+  `--'---'    `----'  |   :    :;  :    ;  :   .'   \  ,   /         '   : |      |   :    |  |  ,   /   :   '  |--"   `----'   ---'    ;  |,'
+                       \   \  / |  ,   /|  ,     .-./---`-'          ;   |.'       \   \  /    ---`-'     \   \ ;                       '--'
+                        `----'   ---`-'  `--`---'                    '---'          `----'                 '---"
+
+ */
+
+//=====MODULOS=====
+let express = require('express');
+let app = express();
+let createError = require('http-errors');
+let log4js = require('log4js');
+let jwt = require('jsonwebtoken');
+let expressSession = require('express-session');
+let path = require('path');
+let cookieParser = require('cookie-parser');
+let crypto = require('crypto');
+let bodyParser = require('body-parser');
+let fileUpload = require('express-fileupload');
+let indexRouter = require('./routes');
+const logger = require('morgan');
+log4js.configure({
+    appenders: { cheese: { type: 'file', filename: 'socialNetwork.log' } },
+    categories: { default: { appenders: ['cheese'], level: 'all' } }
+});
+
+//====VARIABLES====
+
+app.set('jwt', jwt);
+app.set('uploadPath', __dirname);
+app.set('clave', 'abcdefg');
+app.set('crypto', crypto);
+app.set('logger', log4js.getLogger('tunder'));
+
+//====INICIALIZACIÓN====
+app.use(logger('dev'));
 
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -15,40 +56,36 @@ app.use(function(req, res, next) {
     next();
 });
 
-
-let jwt = require('jsonwebtoken');
-app.set('jwt', jwt);
-
-let expressSession = require('express-session');
+//Session
 app.use(expressSession({
-    secret: 'abcdefg', resave: true, saveUninitialized: true
+    secret: 'abcdefg',
+    resave: true,
+    saveUninitialized: true
 }));
 
-let crypto = require('crypto');
-
-let fileUpload = require('express-fileupload');
 app.use(fileUpload({
     limits: {fileSize: 50 * 1024 * 1024}, createParentPath: true
 }));
-app.set('uploadPath', __dirname);
-app.set('clave', 'abcdefg');
-app.set('crypto', crypto);
 
-let bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
-var indexRouter = require('./routes');
+app.use(express.json());
+app.use(express.urlencoded({extended: false}));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
-const userTokenRouter = require('./routes/userTokenRouter.js');
-app.use("/api/v1.0/message", userTokenRouter);
-app.use("/api/v1.0/friendlist", userTokenRouter);
-
+//====MONGO====
 const {MongoClient, ObjectId} = require("mongodb");
 const url = 'mongodb+srv://admin:admin@cluster0.a1mrh.mongodb.net/Cluster0?retryWrites=true&w=majority';
 app.set('connectionStrings', url);
 
-const userSessionRouter = require('./routes/userSessionRouter');
+//====RUTAS====
+const userTokenRouter = require('./routes/userTokenRouter.js');
+app.use("/api/v1.0/message", userTokenRouter);
+app.use("/api/v1.0/friendlist", userTokenRouter);
+
+const userSessionRouter = require('./routes/userSessionRouter.js');
 app.use("/users/list", userSessionRouter);
 
 const usersRepository = require("./repositories/usersRepository.js");
@@ -67,13 +104,9 @@ require("./routes/api/socialNetworkAPI")(app, usersRepository, friendsRepository
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'twig');
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({extended: false}));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
 app.use('/', indexRouter);
+
+//====ERROR====
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -92,9 +125,10 @@ app.use(function (err, req, res, next) {
     res.render('error');
 });
 
+//====MODULE====
+
 module.exports = function (app) {
     app.get("/users", function (req, res) {
-
         let response = "";
         if (req.query.email != null && typeof (req.query.email) != "undefined")
             response = 'Email: ' + req.query.email + '<br>'
@@ -107,3 +141,21 @@ module.exports = function (app) {
 };
 
 module.exports = app;
+
+console.log("\n" +
+    "                                                                                                                                                   \n" +
+    "                                                                              ,--.                                                                 \n" +
+    "  .--.--.                                             ,--,                  ,--.'|              ___             .---.                         ,-.  \n" +
+    " /  /    '.                       ,--,              ,--.'|              ,--,:  : |            ,--.'|_          /. ./|                     ,--/ /|  \n" +
+    "|  :  /`. /    ,---.            ,--.'|              |  | :           ,`--.'`|  ' :            |  | :,'     .--'.  ' ;   ,---.    __  ,-.,--. :/ |  \n" +
+    ";  |  |--`    '   ,'\\           |  |,               :  : '           |   :  :  | |            :  : ' :    /__./ \\ : |  '   ,'\\ ,' ,'/ /|:  : ' /   \n" +
+    "|  :  ;_     /   /   |   ,---.  `--'_      ,--.--.  |  ' |           :   |   \\ | :   ,---.  .;__,'  / .--'.  '   \\' . /   /   |'  | |' ||  '  /    \n" +
+    " \\  \\    `. .   ; ,. :  /     \\ ,' ,'|    /       \\ '  | |           |   : '  '; |  /     \\ |  |   | /___/ \\ |    ' '.   ; ,. :|  |   ,''  |  :    \n" +
+    "  `----.   \\'   | |: : /    / ' '  | |   .--.  .-. ||  | :           '   ' ;.    ; /    /  |:__,'| : ;   \\  \\;      :'   | |: :'  :  /  |  |   \\   \n" +
+    "  __ \\  \\  |'   | .; :.    ' /  |  | :    \\__\\/: . .'  : |__         |   | | \\   |.    ' / |  '  : |__\\   ;  `      |'   | .; :|  | '   '  : |. \\  \n" +
+    " /  /`--'  /|   :    |'   ; :__ '  : |__  ,\" .--.; ||  | '.'|        '   : |  ; .''   ;   /|  |  | '.'|.   \\    .\\  ;|   :    |;  : |   |  | ' \\ \\ \n" +
+    "'--'.     /  \\   \\  / '   | '.'||  | '.'|/  /  ,.  |;  :    ;        |   | '`--'  '   |  / |  ;  :    ; \\   \\   ' \\ | \\   \\  / |  , ;   '  : |--'  \n" +
+    "  `--'---'    `----'  |   :    :;  :    ;  :   .'   \\  ,   /         '   : |      |   :    |  |  ,   /   :   '  |--\"   `----'   ---'    ;  |,'     \n" +
+    "                       \\   \\  / |  ,   /|  ,     .-./---`-'          ;   |.'       \\   \\  /    ---`-'     \\   \\ ;                       '--'       \n" +
+    "                        `----'   ---`-'  `--`---'                    '---'          `----'                 '---\"                                   \n" +
+    "                                                                                                                                                   \n")
