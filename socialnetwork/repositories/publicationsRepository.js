@@ -9,10 +9,8 @@ module.exports = {
             const collectionName = 'publications';
             const publicationCollection = database.collection(collectionName);
             const result = await publicationCollection.insertOne(publication);
-
             return result.insertedId;
         } catch (error) {
-
             throw (error);
         }
     }, getPublications: async function (filter, options) {
@@ -22,10 +20,8 @@ module.exports = {
             const collectionName = 'publications';
             const publicationCollection = database.collection(collectionName);
             const publications = await publicationCollection.find(filter, options).toArray();
-
             return publications;
         } catch (error) {
-
             throw (error);
         }
     }, getPublicationsPg: async function (filter, options, page) {
@@ -39,10 +35,8 @@ module.exports = {
             const cursor = publicationsCollection.find(filter, options).skip((page - 1) * limit).limit(limit)
             const publications = await cursor.toArray();
             const result = {publications: publications, total: publicationsCollectionCount.length};
-            //this.logger.debug("getPublicationsPg request");
             return result;
         } catch (error) {
-
             throw (error);
         }
     },
