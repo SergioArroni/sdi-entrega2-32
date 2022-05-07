@@ -105,7 +105,7 @@ module.exports = {
         }
     }, getUsersPg: async function (filter, options, page) {
         try {
-            const limit = 4;
+            const limit = 5;
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
             const collectionName = 'users';
@@ -113,12 +113,31 @@ module.exports = {
             const usersCollectionCount = await usersCollection.count();
             const cursor = usersCollection.find(filter, options).skip((page - 1) * limit).limit(limit)
             const users = await cursor.toArray();
+
             const result = {users: users, total: usersCollectionCount};
             return result;
         } catch (error) {
             throw (error);
         }
-    }, getFriendsPg: async function(ids, page) {
+    },getAllUsersPg: async function (filter, options, page, actualUser) {
+        try {
+            const limit = 5;
+            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
+            const database = client.db("Cluster0");
+            const collectionName = 'users';
+            const usersCollection = database.collection(collectionName);
+            const usersCollectionCount = await usersCollection.count();
+            const cursor = usersCollection.find(filter, options).skip((page - 1) * limit).limit(limit)
+            const users = await cursor.toArray();
+            users.splice();
+            const result = {users: users, total: usersCollectionCount};
+            //this.logger.debug("getUsersPg request");
+            return result;
+        } catch (error) {
+            //this.logger.error("Error, getUsersPg");
+            throw (error);
+        }
+    },getFriendsPg: async function(ids, page) {
         let users = new Array();
         const limit = 5;
         for (let i = 0; i < ids.length; i++) {
