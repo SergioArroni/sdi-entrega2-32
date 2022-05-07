@@ -90,6 +90,18 @@ module.exports = {
             }
         });
     },
+    getMessage: async function (filter, options) {
+        try {
+            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
+            const database = client.db("Cluster0");
+            const collectionName = 'messages';
+            const messagesCollection = database.collection(collectionName);
+            const message = await messagesCollection.findOne(filter, options);
+            return message;
+        } catch (error) {
+            throw (error);
+        }
+    },
     readMessage: async function (message, filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
@@ -169,17 +181,5 @@ module.exports = {
         const cursor = users.slice((page - 1) * limit, limit + 1);
         const result = {users: cursor, total: users.length};
         return result;
-    },
-    getMessage: async function (filter, options) {
-        try {
-            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
-            const database = client.db("Cluster0");
-            const collectionName = 'messages';
-            const messagesCollection = database.collection(collectionName);
-            const message = await messagesCollection.findOne(filter, options);
-            return message;
-        } catch (error) {
-            throw (error);
-        }
     }
 };
