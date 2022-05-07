@@ -52,7 +52,7 @@ module.exports = function (app, usersRepository, friendsRepository, publications
     )
     app.get('/users/logout', function (req, res) {
         req.session.user = null;
-        res.send("El usuario se ha desconectado correctamente");
+        res.redirect("/users/login");
     })
     app.get('/users/login', function (req, res) {
         res.render("users/login.twig", {session: req.session.user});
@@ -173,7 +173,7 @@ module.exports = function (app, usersRepository, friendsRepository, publications
     app.get('/users/create/publication', function (req, res) {
         let userA = req.session.user
         if (userA.rol != 'Admin') {
-            res.render("publications/createPublication.twig" , {session: userA});
+            res.render("publications/createPublication.twig", {session: userA});
         } else {
             req.session.user = null;
             res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
@@ -228,32 +228,32 @@ module.exports = function (app, usersRepository, friendsRepository, publications
             for (let i = page - 2; i <= page + 2; i++) {
                 if (i > 0 && i <= lastPage) {
                     pages.push(i);
+                } else {
+                    req.session.user = null;
+                    res.redirect("/users/login" + "?message=No tienes amigos" + "&messageType=alert-danger ");
                 }
-                publicationsRepository.getPublicationsPg(filter, options, page).then(result => {
-                    let lastPage = result.total / 4;
-                    if (result.total % 4 > 0) { // Sobran decimales
-                        lastPage = lastPage + 1;
-                    }
-                    let pages = []; // paginas mostrar
-                    for (let i = page - 2; i <= page + 2; i++) {
-                        if (i > 0 && i <= lastPage) {
-                            pages.push(i);
-                        }
-                    }
-                    let response = {
-                        publications: result.publications,
-                        pages: pages,
-                        currentPage: page,
-                        userid: req.params.id
-                    }
-                    res.render("publications/friendPublications.twig", response);
-                }).catch(error => {
-                    res.send("Se ha producido un error al listar las canciones del usuario " + error)
-                });
-            } else {
-                req.session.user = null;
-                res.redirect("/users/login" + "?message=No tienes amigos" + "&messageType=alert-danger ");
             }
+            publicationsRepository.getPublicationsPg(filter, options, page).then(result => {
+                let lastPage = result.total / 4;
+                if (result.total % 4 > 0) { // Sobran decimales
+                    lastPage = lastPage + 1;
+                }
+                let pages = []; // paginas mostrar
+                for (let i = page - 2; i <= page + 2; i++) {
+                    if (i > 0 && i <= lastPage) {
+                        pages.push(i);
+                    }
+                }
+                let response = {
+                    publications: result.publications,
+                    pages: pages,
+                    currentPage: page,
+                    userid: req.params.id
+                }
+                res.render("publications/friendPublications.twig", response);
+            }).catch(error => {
+                res.send("Se ha producido un error al listar las canciones del usuario " + error)
+            });
             let response = {
                 publications: result.publications,
                 pages: pages,

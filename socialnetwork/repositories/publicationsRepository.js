@@ -34,7 +34,7 @@ module.exports = {
             const publicationsCollectionCount = await publicationsCollection.find(filter, options).toArray();
             const cursor = publicationsCollection.find(filter, options).skip((page - 1) * limit).limit(limit)
             const publications = await cursor.toArray();
-            const result = {publications: publications, total: publicationsCollectionCount};
+            const result = {publications: publications, total: publicationsCollectionCount.length};
             return result;
         } catch (error) {
             throw (error);
