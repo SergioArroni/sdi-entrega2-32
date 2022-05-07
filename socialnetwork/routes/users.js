@@ -11,7 +11,6 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                         usuariosNormales.push(users[i]);
                     }
                 }
-
                 res.render("users/users.twig", {users: usuariosNormales, session: userA});
             }).catch(error => {
                 res.send("Se ha producido un error al listar los usuarios:" + error)
@@ -23,27 +22,30 @@ module.exports = function (app, usersRepository, friendsRepository, publications
     })
     app.post('/users/list', function (req, res) {
             let userA = req.session.user
+            let idBorrar = [];
             if (userA.rol == 'Admin') {
                 usersRepository.getUsers({}, {}).then(users => {
                         for (let i = 0; i < Object.keys(req.body).length; i++) {
                             for (let j = 0; j < users.length; j++) {
                                 if (req.body[users[j]._id]) {
-                                    let filter = {_id: users[j]._id};
-                                    usersRepository.findDeleteUser(filter, {}).then(result => {
-                                        if (result == null || result.deletedCount == 0) {
-                                            res.send("No se ha podido eliminar el usuario: " + users[j]._id);
-                                        }
-                                    }).catch(error => {
-                                        res.send("Se ha producido un error al borrar algun usuario:" + error)
-                                    });
+                                    idBorrar.push(users[j]._id);
                                 }
                             }
                         }
                     }
                 ).catch(error => {
-                    res.send("Se ha producido un error al listar los usuarios:" + error)
+                    res.redirect("/" + "?message=Se ha producido un error al listar los usuarios" + "&messageType=alert-danger ");
                 });
-                res.redirect("/users/list");
+                for (let w = 0; w < idBorrar.length; w++) {
+                    usersRepository.findDeleteUser({_id: idBorrar[w]._id}, {}).then(result => {
+                        if (result == null || result.deletedCount == 0) {
+                            res.redirect("/" + "?message=No se ha podido eliminar el usuario" + "&messageType=alert-danger ");
+                        }
+                    }).catch(error => {
+                        res.redirect("/" + "?message=Se ha producido un error al borrar algun usuario" + "&messageType=alert-danger ");
+                    });
+                }
+                res.redirect("/");
             } else {
                 req.session.user = null;
                 res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
@@ -86,44 +88,42 @@ module.exports = function (app, usersRepository, friendsRepository, publications
     app.get('/users/register', function (req, res) {
         res.render("users/register.twig", {session: req.session.user});
     });
-    app.get("/users/listUsers",function (req,res){
-        let filter={};
-        let options={sort:{name:1}};
-        if(req.query.search!=null && typeOf(req.query.search)!=="undefined" && req.query.search!=""){
-            filter={"name":{$regex: ".*"+req.query.search+".*"}};
+    app.get("/users/listUsers", function (req, res) {
+        let filter = {};
+        let options = {sort: {name: 1}};
+        if (req.query.search != null && typeOf(req.query.search) !== "undefined" && req.query.search != "") {
+            filter = {"name": {$regex: ".*" + req.query.search + ".*"}};
         }
-        let page=parseInt(req.query.page);
-        if(typeof req.query.page === "undefined" || req.query.page===null || req.query.page === "0"){
-            page=1;
+        let page = parseInt(req.query.page);
+        if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") {
+            page = 1;
         }
-        usersRepository.getAllUsersPg(filter,options,page,req.session.user).then(result=>{
+        usersRepository.getAllUsersPg(filter, options, page, req.session.user).then(result => {
 
-            let lastPage=(result.total-2)/5;
-            if((result.total-2)%5>0){
-                lastPage=lastPage+1;
+            let lastPage = (result.total - 2) / 5;
+            if ((result.total - 2) % 5 > 0) {
+                lastPage = lastPage + 1;
             }
-            let pages=[];
-            for(let i=page-2;i<=page+2;i++){
-                if(i>0 && i<=lastPage){
+            let pages = [];
+            for (let i = page - 2; i <= page + 2; i++) {
+                if (i > 0 && i <= lastPage) {
                     pages.push(i);
                 }
             }
-            for(let i=0;i<result.users.length;i++){
-                if(result.users[i].email===req.session.user.email){
-                    result.users.splice(i,1);
+            for (let i = 0; i < result.users.length; i++) {
+                if (result.users[i].email === req.session.user.email) {
+                    result.users.splice(i, 1);
                 }
             }
-            let response={
+            let response = {
                 users: result.users,
-                pages:pages,
-                currentPage:page
+                pages: pages,
+                currentPage: page
             }
             res.render("users/listUsers.twig", response);
         }).catch(error => {
             res.send("Se ha producido un error al listar los usuarios:" + error)
         });
-
-
 
 
     });
