@@ -1,11 +1,11 @@
 <div id="widget-songs" >
-    <button class="btn" onclick="loadSongs()" >Actualizar</button>
+    <button class="btn" onclick="loadFriends()" >Actualizar</button>
     <table class="table table-hover">
         <thead>
         <tr>
-            <th>Título</th>
-            <th>Género</th>
-            <th>Precio</th>
+            <th>Email</th>
+            <th>Name</th>
+            <th>Surname</th>
             <th class="col-md-1"></th>
         </tr>
         </thead>
@@ -14,7 +14,7 @@
 </div>
 <script>
     var users;
-    function loadSongs() {
+    function loadFriends() {
         $.ajax({
             url: URLbase + "/friendlist",
             type: "GET",
@@ -23,14 +23,14 @@
             headers: {"token": token},
             success: function (response) {
                 users = response.users;
-                updateSongsTable(users);
+                updateFriendsTable(users);
             },
             error: function (error) {
                 $("#main-container").load("widget-login.html");
             }
         });
     }
-    function updateSongsTable(users) {
+    function updateFriendsTable(users) {
         $("#songsTableBody").empty(); // Vaciar la tabla
         for (let i = 0; i < users.length; i++) {
             $("#songsTableBody").append(
@@ -41,9 +41,7 @@
                 "<td>" +
                 "</td>" +
                 "</tr>");
-            // Mucho cuidado con las comillas del eliminarCancion
-            //la id tiene que ir entre comillas ' '
         }
     }
-    loadSongs();
+    loadFriends();
 </script>
