@@ -1,4 +1,4 @@
-<div id="widget-songs" >
+<div id="widget-friends" >
     <button class="btn" onclick="loadFriends()" >Actualizar</button>
     <table class="table table-hover">
         <thead>
@@ -6,10 +6,11 @@
             <th>Email</th>
             <th>Name</th>
             <th>Surname</th>
+            <th>Messages</th>
             <th class="col-md-1"></th>
         </tr>
         </thead>
-        <tbody id="songsTableBody"></tbody>
+        <tbody id="friendsTableBody"></tbody>
     </table>
 </div>
 <script>
@@ -31,17 +32,51 @@
         });
     }
     function updateFriendsTable(users) {
-        $("#songsTableBody").empty(); // Vaciar la tabla
+        $("#friendsTableBody").empty(); // Vaciar la tabla
         for (let i = 0; i < users.length; i++) {
-            $("#songsTableBody").append(
-                "<tr id=" + users[i]._id + ">" +
-                "<td>" + users[i].email + "</td>" +
-                "<td>" + users[i].name + "</td>" +
-                "<td>" + users[i].surname + "</td>" +
-                "<td>" +
-                "</td>" +
-                "</tr>");
+            getLastMessage(users[i])
+                .then((response) => {
+                    var m;
+                    if (response != undefined)
+                        m = response.text
+                    else
+                        m = "No hay mensajes"
+                    $("#friendsTableBody").append(
+                        "<tr id=" + users[i]._id + ">" +
+                        "<td>" + users[i].email + "</td>" +
+                        "<td>" + users[i].name + "</td>" +
+                        "<td>" + users[i].surname + "</td>" +
+                        "<td><a onclick=widgetChat()>" + m + "</a></td>" +
+                        "<td>" +
+                        "</td>" +
+                        "</tr>");
+                }).catch((error) => {
+                    console.log(error)
+                })
         }
     }
     loadFriends();
+
+    function getLastMessage(user){
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: URLbase + "/message/list/"+user._id,
+                type: "GET",
+                data: {},
+                dataType: 'json',
+                headers: {"token": token},
+                success: function (response) {
+                   var len = response.messages.length;
+                   resolve(response.messages[len-1]);
+                },
+                error: function (error) {
+                    reject(error)
+                },
+            });
+        })
+    }
+
+    function widgetChat(){
+        $( "#main-container" ).load( "widget-chat.html");
+    }
 </script>
