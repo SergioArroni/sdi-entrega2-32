@@ -76,7 +76,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 //====MONGO====
-const {MongoClient, ObjectId} = require("mongodb");
+const {MongoClient} = require("mongodb");
 const url = 'mongodb+srv://admin:admin@cluster0.a1mrh.mongodb.net/Cluster0?retryWrites=true&w=majority';
 app.set('connectionStrings', url);
 
@@ -86,7 +86,7 @@ app.use("/api/v1.0/message", userTokenRouter);
 app.use("/api/v1.0/friendlist", userTokenRouter);
 
 const userSessionRouter = require('./routes/userSessionRouter.js');
-app.use("/users/list", userSessionRouter);
+//app.use("/users/list", userSessionRouter);
 
 const usersRepository = require("./repositories/usersRepository.js");
 usersRepository.init(app, MongoClient);
