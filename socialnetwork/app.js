@@ -76,7 +76,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 //====MONGO====
-const {MongoClient, ObjectId} = require("mongodb");
+const {MongoClient} = require("mongodb");
 const url = 'mongodb+srv://admin:admin@cluster0.a1mrh.mongodb.net/Cluster0?retryWrites=true&w=majority';
 app.set('connectionStrings', url);
 
@@ -97,7 +97,13 @@ friendsRepository.init(app, MongoClient);
 const publicationsRepository = require("./repositories/publicationsRepository.js");
 publicationsRepository.init(app, MongoClient);
 
+const invitacionRepository = require("./repositories/invitacionRepository.js");
+invitacionRepository.init(app, MongoClient);
+
 require("./routes/users.js")(app, usersRepository, friendsRepository, publicationsRepository);
+require("./routes/invitaciones.js")(app, invitacionRepository, friendsRepository,usersRepository);
+
+require("./routes/publications.js")(app, publicationsRepository);
 require("./routes/api/socialNetworkAPI")(app, usersRepository, friendsRepository);
 
 // view engine setup
@@ -128,7 +134,7 @@ app.use(function (err, req, res, next) {
 //====MODULE====
 
 module.exports = function (app) {
-    app.get("/users", function (req, res) {
+    app.get("/users/listAdmin", function (req, res) {
         let response = "";
         if (req.query.email != null && typeof (req.query.email) != "undefined")
             response = 'Email: ' + req.query.email + '<br>'

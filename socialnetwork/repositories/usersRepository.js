@@ -1,3 +1,4 @@
+const {all} = require("express/lib/application");
 module.exports = {
     mongoClient: null, app: null, init: function (app, mongoClient) {
         this.mongoClient = mongoClient;
@@ -30,7 +31,7 @@ module.exports = {
             const database = client.db("Cluster0");
             const collectionName = 'users';
             const usersCollection = database.collection(collectionName);
-            const result = await songsCollection.findOneAndDelete(filter, options);
+            const result = await usersCollection.findOneAndDelete(filter, options);
             return result;
         } catch (error) {
             throw (error);
@@ -127,7 +128,7 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    }, getUsersPg: async function (filter, options, page) {
+    },getAllUsersPg: async function (filter, page,user,funcion) {
         try {
             const limit = 5;
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
@@ -135,30 +136,26 @@ module.exports = {
             const collectionName = 'users';
             const usersCollection = database.collection(collectionName);
             const usersCollectionCount = await usersCollection.count();
-            const cursor = usersCollection.find(filter, options).skip((page - 1) * limit).limit(limit)
+
+
+            const cursor = usersCollection.find(filter);
             const users = await cursor.toArray();
 
-            const result = {users: users, total: usersCollectionCount};
-            return result;
+            for(let i=0;i<users.length;i++){
+                if(users[i].email===user.email){
+                    users.splice(i,1);
+                }else if(users[i].email==='admin@email.com'){
+                    users.splice(i,1);
+                }
+            }
+            const allusers=users;
+            const usersFilter=users.slice((page-1) * limit, (page * limit));
+
+            const result = {users: usersFilter, total: usersCollectionCount};
+            funcion(result,allusers);
+
+
         } catch (error) {
-            throw (error);
-        }
-    },getAllUsersPg: async function (filter, options, page, actualUser) {
-        try {
-            const limit = 5;
-            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
-            const database = client.db("Cluster0");
-            const collectionName = 'users';
-            const usersCollection = database.collection(collectionName);
-            const usersCollectionCount = await usersCollection.count();
-            const cursor = usersCollection.find(filter, options).skip((page - 1) * limit).limit(limit)
-            const users = await cursor.toArray();
-            users.splice();
-            const result = {users: users, total: usersCollectionCount};
-            //this.logger.debug("getUsersPg request");
-            return result;
-        } catch (error) {
-            //this.logger.error("Error, getUsersPg");
             throw (error);
         }
     },getFriendsPg: async function(ids, page) {

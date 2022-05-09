@@ -15,6 +15,42 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    }
+    },getAllFriends: async function (){
+        try {
+            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
+            const database = client.db("Cluster0");
+            const collectionName = 'friends';
+            const friendsCollection = database.collection(collectionName);
+            const friends=friendsCollection.find({});
+            const totalFriends = await friends.toArray();
+            return totalFriends;
+        } catch (error) {
+            throw (error);
+        }
+    },comprobarAmistad: async  function (filter){
+            try {
+                const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
+                const database = client.db("Cluster0");
+                const collectionName = 'friends';
+                const friendsCollection = database.collection(collectionName);
+                const friends = friendsCollection.find(filter);
+                const totalFriends=await  friends.toArray();
+                return totalFriends.length>0;
+            } catch (error) {
+                throw (error);
+            }
+        }, insertarAmigos: async function (id_from,id_to) {
+        try {
+            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
+            const database = client.db("Cluster0");
+            const collectionName = 'friends';
+            const friendsCollection = database.collection(collectionName);
+            var friend={id_from: id_from, id_to:id_to};
+            const result=await friendsCollection.insertOne(friend);
 
+            return result.insertedId;
+        } catch (error) {
+            throw (error);
+        }
+    }
     };
