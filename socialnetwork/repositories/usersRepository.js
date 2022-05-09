@@ -31,7 +31,7 @@ module.exports = {
             const database = client.db("Cluster0");
             const collectionName = 'users';
             const usersCollection = database.collection(collectionName);
-            const result = await songsCollection.findOneAndDelete(filter, options);
+            const result = await usersCollection.findOneAndDelete(filter, options);
             return result;
         } catch (error) {
             throw (error);

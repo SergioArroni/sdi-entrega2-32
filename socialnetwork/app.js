@@ -86,7 +86,7 @@ app.use("/api/v1.0/message", userTokenRouter);
 app.use("/api/v1.0/friendlist", userTokenRouter);
 
 const userSessionRouter = require('./routes/userSessionRouter.js');
-//app.use("/users/list", userSessionRouter);
+app.use("/users/list", userSessionRouter);
 
 const usersRepository = require("./repositories/usersRepository.js");
 usersRepository.init(app, MongoClient);
@@ -132,7 +132,7 @@ app.use(function (err, req, res, next) {
 //====MODULE====
 
 module.exports = function (app) {
-    app.get("/users", function (req, res) {
+    app.get("/users/listAdmin", function (req, res) {
         let response = "";
         if (req.query.email != null && typeof (req.query.email) != "undefined")
             response = 'Email: ' + req.query.email + '<br>'
