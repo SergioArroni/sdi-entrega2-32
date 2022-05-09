@@ -4,11 +4,10 @@ module.exports=function (app,invitacionRepository,friendsRepository,usersReposit
         let filter1={$or:[
                 {$and: [{"id_from": req.session.user._id}, {"id_to": req.params.id}]},
                 {$and: [{"id_to": req.session.user._id}, {"id_from": req.params.id}]}
-            ]}
-        console.log(req.session.user._id);
+            ]};
         friendsRepository.comprobarAmistad(filter1).then(boolAmigos=>{
             if(boolAmigos){
-                res.redirect("/listInvitaciones" + "?mensaje=Ya es amigo de esa persona" + "&tipoMensaje=alert-danger ");
+                res.send("Ya son amigos");
             }else{
                 let filter2={$or:[
                         {$and: [{"id_from": req.session.user._id}, {"id_to": req.params.id}]},
@@ -16,7 +15,7 @@ module.exports=function (app,invitacionRepository,friendsRepository,usersReposit
                     ]}
                 invitacionRepository.comprobarInvitacion(filter2).then(hayInvitacion=>{
                     if(hayInvitacion) {
-                        res.redirect("/users/listUsers" + "?mensaje=Hay invitaciones pendientes entre usted y esa persona" + "&tipoMensaje=alert-danger ");
+                        res.send("Ya hay invitacion");
                     }else{
                         invitacionRepository.insertarInvitacion(req.session.user._id,req.params.id).then(idInvitacion=>{
                             if(idInvitacion!==null)
@@ -59,6 +58,50 @@ module.exports=function (app,invitacionRepository,friendsRepository,usersReposit
               }
                res.render("invitaciones/listInvitaciones.twig", response);
            });
+       });
+    });
+
+    app.get("/invitaciones/aceptar/:id",function (req,res){
+       let filter={"_id": req.params.id};
+       usersRepository.getUsers(filter,{}).then(users=>{
+          let filter2=  {$and: [
+              {id_to:req.session.user._id},
+              {id_from:req.params.id}
+          ]};
+          invitacionRepository.getInvitaciones(filter2).then(invitaciones=> {
+              if (invitaciones.length == 0){
+                res.send("No hay invitaciones");
+              }
+              let filter1={$or:[
+                  {$and: [{"id_from": req.session.user._id}, {"id_to": req.params.id}]},
+                  {$and: [{"id_to": req.session.user._id}, {"id_from": req.params.id}]}
+              ]};
+             friendsRepository.comprobarAmistad(filter1).then(boolAmigos=>{
+                 if (!boolAmigos){
+                     friendsRepository.insertarAmigos(req.session.user._id,req.params.id).then(idAmigo=>{
+                         if(idAmigo==null)
+                             res.send("Error al aceptar la peticion de amistad");
+                        let filter4={$or: [
+                            {$and: [
+                                {"id_from": req.session.user._id},
+                                {"id_to":req.params.id}
+                            ]},
+                            {$and: [
+                                {"id_to": req.session.user._id},
+                                {"id_from":req.params.id}
+                            ]}
+                        ]};
+                        invitacionRepository.eliminarInvitacion(filter4).then(invitaciones=>{
+                            if (invitaciones == null) {
+                                res.send("No hay invitacion para eliminar");
+                            } else {
+                                res.redirect("/invitaciones/listInvitaciones?mensaje=Invitación aceptada correctamente&tipoMensaje=alert-success");
+                            }
+                         });
+                     });
+                 }
+             });
+          });
        });
     });
 }

@@ -39,5 +39,18 @@ module.exports = {
             } catch (error) {
                 throw (error);
             }
+        }, insertarAmigos: async function (id_from,id_to) {
+        try {
+            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
+            const database = client.db("Cluster0");
+            const collectionName = 'friends';
+            const friendsCollection = database.collection(collectionName);
+            var friend={id_from: id_from, id_to:id_to};
+            const result=await friendsCollection.insertOne(friend);
+
+            return result.insertedId;
+        } catch (error) {
+            throw (error);
         }
+    }
     };

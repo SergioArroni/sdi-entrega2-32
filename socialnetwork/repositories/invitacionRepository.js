@@ -45,5 +45,30 @@ module.exports = {
             throw (error);
         }
 
+    }, getInvitaciones: async  function (filter){
+        try {
+            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
+            const database = client.db("Cluster0");
+            const collectionName = 'invitaciones';
+            const invitacionesCollection = database.collection(collectionName);
+
+            const invitaciones=invitacionesCollection.find(filter);
+            const result=await invitaciones.toArray();
+            return result;
+        } catch (error) {
+            throw (error);
+        }
+    }, eliminarInvitacion: async  function (filter){
+        try {
+            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
+            const database = client.db("Cluster0");
+            const collectionName = 'invitaciones';
+            const invitacionesCollection = database.collection(collectionName);
+
+            const result=invitacionesCollection.remove(filter);
+            return result;
+        } catch (error) {
+            throw (error);
+        }
     }
 };
