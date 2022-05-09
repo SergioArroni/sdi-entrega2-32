@@ -90,15 +90,17 @@ module.exports = function (app, usersRepository, friendsRepository, publications
     });
     app.get("/users/listUsers", function (req, res) {
         let filter = {};
-        if (req.query.search != null) {
-            filter={$or: [{"name": {$regex: ".*" + req.query.search + ".*"}},
-                    {"surname": {$regex: ".*" + req.query.search + ".*"}},
-                    {"email": {$regex: ".*" + req.query.search + ".*"}}]};
+        let searchText=req.query.search;
+        if (searchText != null) {
+            filter={$or: [{"name": {$regex: ".*" + searchText + ".*"}},
+                    {"surname": {$regex: ".*" + searchText + ".*"}},
+                    {"email": {$regex: ".*" + searchText + ".*"}}]};
         }
         let page = parseInt(req.query.page);
         if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") {
             page = 1;
         }
+
         usersRepository.getAllUsersPg(filter,page,req.session.user, function(result, usuarios){
             let lastPage=(usuarios.length)/5;
             if((usuarios.length)%5>0){
@@ -111,18 +113,23 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                 }
             }
 
-            let response={
-                users: result.users,
-                pages:pages,
-                currentPage:page,
-                search:req.query.search
-            }
-            res.render("users/listUsers.twig", response);
+            friendsRepository.getAllFriends().then(amigos=>{
+                let response={
+                    users: result.users,
+                    friends:amigos,
+                    search:searchText,
+                    pages:pages,
+                    currentPage:page
+                }
+                res.render("users/listUsers.twig", response);
+            })
+
         }).catch(error => {
             res.send("Se ha producido un error al listar los usuarios:" + error)
         });
 
     });
+
     app.post('/users/register', function (req, res) {
         let filter = {
             email: req.body.email

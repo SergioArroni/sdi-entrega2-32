@@ -28,6 +28,7 @@
                     <th>Nombre</th>
                     <th>Apellidos</th>
                     <th>Email</th>
+                    <th>Solicitar amistad</th>
                 </tr>
             </thread>
             <tbody>
@@ -37,6 +38,10 @@
                     <td>{{ user.name }}</td>
                     <td>{{ user.surname }}</td>
                     <td>{{ user.email }}</td>
+
+                        <td>
+                            <a class="btn btn-primary" href="/users/invitar/{{ user._id }}">Agregar amigo</a>
+                        </td>
                     {% endif %}
                 </tr>
                 {%  endfor %}
@@ -45,11 +50,14 @@
     </div>
 
     <!-- Paginación mostrar la actual y 2 anteriores y dos siguientes -->
+    {%  if search!=null %}
+        {% set search="&search="+ search %}
+    {%  endif %}
     <div class="row text-center">
         <ul class="pagination">
             {% for page in pages %}
                 <li class="page-item" id="pi-{{ page }}">
-                    <a class="page-link" href="/users/listUsers?page={{ page }}">{{ page }}</a>
+                    <a class="page-link" href="/users/listUsers?page={{ page }}{{ search }}">{{ page }}</a>
                 </li>
             {% endfor %}
             <script>
