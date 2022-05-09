@@ -1,0 +1,52 @@
+{% extends "../layout.twig" %}
+
+{% block title %}Listado de todos los usuarios{% endblock %}
+
+{% block main_container %}
+    <h2>Listado de tus invitaciones de amistad</h2>
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thread>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellidos</th>
+                    <th>Aceptar amistad</th>
+                </tr>
+            </thread>
+            <tbody>
+            {% for invitacion in invitaciones %}
+                {% for user in users %}
+                    {% if invitacion.id_from == user._id %}
+                        <tr>
+                            <td>{{ user.name }}</td>
+                            <td>{{ user.surname }}</td>
+                            <td>
+                                <a class="btn btn-primary" href="/invitaciones/aceptar/{{ invitacion.id_from }}">Aceptar amigo</a>
+                            </td>
+                    {% endif %}
+                {% endfor %}
+                </tr>
+            {%  endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginación mostrar la actual y 2 anteriores y dos siguientes -->
+    {%  if search!=null %}
+        {% set search="&search="+ search %}
+    {%  endif %}
+    <div class="row text-center">
+        <ul class="pagination">
+            {% for page in pages %}
+                <li class="page-item" id="pi-{{ page }}">
+                    <a class="page-link" href="/invitaciones/listInvitaciones?page={{ page }}{{ search }}">{{ page }}</a>
+                </li>
+            {% endfor %}
+            <script>
+                $("#pi-" + "{{ currentPage }}").addClass("active");
+            </script>
+        </ul>
+    </div>
+
+{% endblock %}

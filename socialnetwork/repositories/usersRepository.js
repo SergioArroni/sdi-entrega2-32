@@ -128,7 +128,7 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    },getAllUsersPg: async function (filter, options, page,user) {
+    },getAllUsersPg: async function (filter, page,user,funcion) {
         try {
             const limit = 5;
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
@@ -138,7 +138,7 @@ module.exports = {
             const usersCollectionCount = await usersCollection.count();
 
 
-            const cursor = usersCollection.find(filter, options);
+            const cursor = usersCollection.find(filter);
             const users = await cursor.toArray();
 
             for(let i=0;i<users.length;i++){
@@ -148,15 +148,12 @@ module.exports = {
                     users.splice(i,1);
                 }
             }
-            if(page==1){
-                const usersFilter=users.slice((page-1) * limit, (page * limit) + 1);
-                const result = {users: usersFilter, total: usersCollectionCount};
-                return result;
-            }else{
-                const usersFilter=users.slice((page-1) * limit, (page * limit));
-                const result = {users: usersFilter, total: usersCollectionCount};
-                return result;
-            }
+            const allusers=users;
+            const usersFilter=users.slice((page-1) * limit, (page * limit));
+
+            const result = {users: usersFilter, total: usersCollectionCount};
+            funcion(result,allusers);
+
 
         } catch (error) {
             throw (error);
