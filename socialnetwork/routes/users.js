@@ -1,6 +1,7 @@
 const {ObjectID} = require("mongodb");
 module.exports = function (app, usersRepository, friendsRepository, publicationsRepository) {
-    app.get('/users/list', function (req, res) {
+    app.get('/users/listAdmin' +
+        '', function (req, res) {
         let userA = req.session.user
         if (userA.rol == 'Admin') {
             usersRepository.getUsers({}, {}).then(users => {
@@ -11,7 +12,8 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                         usuariosNormales.push(users[i]);
                     }
                 }
-                res.render("users/users.twig", {users: usuariosNormales, session: userA});
+
+                res.render("users/users.twig", {users: usuariosNormales});
             }).catch(error => {
                 res.send("Se ha producido un error al listar los usuarios:" + error)
             });
@@ -20,31 +22,29 @@ module.exports = function (app, usersRepository, friendsRepository, publications
             res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
         }
     })
-    app.post('/users/list', function (req, res) {
+    app.post('/users/listAdmin', function (req, res) {
             let userA = req.session.user
-            let idBorrar = [];
             if (userA.rol == 'Admin') {
                 usersRepository.getUsers({}, {}).then(users => {
                         for (let i = 0; i < Object.keys(req.body).length; i++) {
                             for (let j = 0; j < users.length; j++) {
                                 if (req.body[users[j]._id]) {
-                                    idBorrar.push(users[j]._id);
+                                    let filter = {_id: users[j]._id};
+                                    usersRepository.findDeleteUser(filter, {}).then(result => {
+                                        if (result == null || result.deletedCount == 0) {
+                                            res.send("No se ha podido eliminar el usuario: " + users[j]._id);
+                                        }
+                                    }).catch(error => {
+                                        res.send("Se ha producido un error al borrar algun usuario:" + error)
+                                    });
                                 }
                             }
                         }
                     }
                 ).catch(error => {
-                    res.redirect("/" + "?message=Se ha producido un error al listar los usuarios" + "&messageType=alert-danger ");
+                    res.send("Se ha producido un error al listar los usuarios:" + error)
                 });
-                for (let w = 0; w < idBorrar.length; w++) {
-                    usersRepository.findDeleteUser({_id: idBorrar[w]._id}, {}).then(result => {
-                        if (result == null || result.deletedCount == 0) {
-                            res.redirect("/" + "?message=No se ha podido eliminar el usuario" + "&messageType=alert-danger ");
-                        }
-                    }).catch(error => {
-                        res.redirect("/" + "?message=Se ha producido un error al borrar algun usuario" + "&messageType=alert-danger ");
-                    });
-                }
+
                 res.redirect("/");
             } else {
                 req.session.user = null;
@@ -73,7 +73,7 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                 } else {
                     req.session.user = user;
                     if (user.rol === "Admin") {
-                        res.redirect("/users/list");
+                        res.redirect("/users/listAdmin");
                     } else {
 
                         res.redirect("/users/listUsers");
