@@ -14,12 +14,12 @@ import java.util.List;
 class SdiEntrega132ApplicationTests {
     static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
     //static String Geckodriver ="C:\\nada.exe;
-    //static String GeckodriverHugo ="C:\\Users\\Hugo\\Desktop\\TERCER_CURSO_INGENIERIA\\SDI\\PRACTICA\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
+    static String GeckodriverHugo ="C:\\Users\\Hugo\\Desktop\\TERCER_CURSO_INGENIERIA\\SDI\\PRACTICA\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
     //static String GeckodriverAndrea = "C:\\Users\\ANDREA DELGADO\\Documents\\CURSO 2021-2022\\CUATRI 2\\SDI\\geckodriver.exe";
-    static String GeckodriverSergio = "C:\\Dev\\tools\\selenium\\geckodriver-v0.30.0-win64.exe";
+    //static String GeckodriverSergio = "C:\\Dev\\tools\\selenium\\geckodriver-v0.30.0-win64.exe";
 
     //Común a Windows y a MACOSX
-    static WebDriver driver = getDriver(PathFirefox, GeckodriverSergio);
+    static WebDriver driver = getDriver(PathFirefox, GeckodriverHugo);
     static String URL = "http://localhost:8081";
 
     public static WebDriver getDriver(String PathFirefox, String Geckodriver) {
@@ -199,6 +199,80 @@ class SdiEntrega132ApplicationTests {
         PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
 
         SeleniumUtils.idIsNotPresentOnPage(driver, "logout_button");
+    }
+
+    // PR23. Mostrar el listado de amigos de un usuario. Comprobar que el listado contiene los amigos que deben ser
+    @Test
+    @Order(23)
+    public void PR23() {
+        PO_NavView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
+
+        // Se despliega el menú de amigos, y se clica en lista de amigos
+        PO_PrivateView.click(driver, "//a[contains(@href, '/users/friends')]", 0);
+
+        SeleniumUtils.textIsPresentOnPage(driver, "user02@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver, "Lucas");
+        SeleniumUtils.textIsPresentOnPage(driver, "Preso");
+        SeleniumUtils.textIsPresentOnPage(driver, "Sergio");
+        SeleniumUtils.textIsPresentOnPage(driver, "Deus");
+        PO_NavView.clickOption(driver, "logout", "class", "btn btn-primary");
+    }
+
+    // PR24. Crear una publicación y comprobar que se ha creado correctamente
+    @Test
+    @Order(24)
+    public void PR24() {
+        PO_NavView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "user03@email.com", "user03");
+
+        // Entramos en la ventana de creación
+        PO_PrivateView.click(driver, "//a[contains(@href, '/users/create/publication')]", 0);
+
+        // Añadimos un título
+        List<WebElement> title = SeleniumUtils.waitLoadElementsBy(driver, "id", "titulo", PO_View.getTimeout());
+        title.get(0).sendKeys("Prueba título");
+
+        // Añadimos el contenido
+        List<WebElement> content = PO_View.checkElementBy(driver, "id", "texto");
+        content.get(0).sendKeys("Prueba contenido");
+
+        // Confirmamos
+        content = PO_View.checkElementBy(driver, "id", "enviar");
+        content.get(0).click();
+
+        //Hay que comprobar que se añade
+    }
+
+    // PR27. Probar que se muestran todas las publicaciones de un amigo
+    @Test
+    @Order(27)
+    public void PR27() {
+        PO_NavView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
+
+        // Se despliega el menú de amigos, y se clica en lista de amigos
+        PO_PrivateView.click(driver, "//a[contains(@href, '/users/friends')]", 0);
+
+        PO_PrivateView.click(driver, "//a[contains(@href, '/users/friends/publications/626b9b0958be38a6ca85cdbd')]", 0);
+
+        SeleniumUtils.textIsPresentOnPage(driver, "Fri May 06 2022");
+        SeleniumUtils.textIsPresentOnPage(driver, "Manolo");
+        SeleniumUtils.textIsPresentOnPage(driver, "Bombo");
+    }
+
+    // PR28. Probar que no se puede acceder a las publicaciones de un usuario por URL sin ser su amigo
+    @Test
+    @Order(28)
+    public void PR28() {
+        PO_NavView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "user04@email.com", "user04");
+
+        driver.get("http://localhost:8081/users/friends/publications/626b9b0958be38a6ca85cdbd");
+
+        // Comprobamos que no hay publicaciones
+
+
     }
 /**
     //[Prueba11] Mostrar el listado de usuarios y comprobar que se muestran todos los que existen en el sistema
