@@ -161,7 +161,7 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    }getFriendsPg: async function(ids, page) {
+    },getFriendsPg: async function(ids, page) {
         let users = new Array();
         const limit = 5;
         for (let i = 0; i < ids.length; i++) {
