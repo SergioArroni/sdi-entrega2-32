@@ -114,7 +114,8 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                 let response={
                     users: result.users,
                     pages:pages,
-                    currentPage:page
+                    currentPage:page,
+                    session: req.session.user
                 }
                 res.render("users/listUsers.twig", response);
             }).catch(error => {
@@ -236,7 +237,7 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                 fecha: insertFecha
             }
             publicationsRepository.insertPublicaction(publication).then(publicationId => {
-                res.redirect("/users/publications");
+                res.redirect("/users/friends");
             }).catch(error => {
                 res.redirect("/users/register" + "?message=Se ha producido un error al registrar el usuario" + "&messageType=alert-danger ");
             });
@@ -256,24 +257,9 @@ module.exports = function (app, usersRepository, friendsRepository, publications
         if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") {
             page = 1;
         }
-        publicationsRepository.getPublicationsPg(filter, options, page).then(result => {
-            let lastPage = result.total / 5;
-            console.log(lastPage)
-            if (result.total % 5 > 0) { // Sobran decimales
-                lastPage = lastPage + 1;
-            }
-            let pages = []; // paginas mostrar
-            for (let i = page - 2; i <= page + 2; i++) {
-                if (i > 0 && i <= lastPage) {
-                    pages.push(i);
-                } else {
-                    req.session.user = null;
-                    res.redirect("/users/login" + "?message=No tienes amigos" + "&messageType=alert-danger ");
-                }
-            }
             publicationsRepository.getPublicationsPg(filter, options, page).then(result => {
-                let lastPage = result.total / 4;
-                if (result.total % 4 > 0) { // Sobran decimales
+                let lastPage = result.total / 5;
+                if (result.total % 5 > 0) { // Sobran decimales
                     lastPage = lastPage + 1;
                 }
                 let pages = []; // paginas mostrar
@@ -286,21 +272,12 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                     publications: result.publications,
                     pages: pages,
                     currentPage: page,
-                    userid: req.params.id
+                    userid: req.params.id,
+                    session: req.session.user
                 }
                 res.render("publications/friendPublications.twig", response);
             }).catch(error => {
-                res.send("Se ha producido un error al listar las canciones del usuario " + error)
+                res.send("Se ha producido un error al listar las publicaciones de un amigo " + error)
             });
-            let response = {
-                publications: result.publications,
-                pages: pages,
-                currentPage: page,
-                userid: req.params.id,
-                session: req.session.user
-            }
-        }).catch(error => {
-            res.send("Se ha producido un error al listar los amigos " + error)
-        })
     })
 }
