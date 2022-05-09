@@ -26,7 +26,7 @@ module.exports = {
         }
     }, getPublicationsPg: async function (filter, options, page) {
         try {
-            const limit = 2;
+            const limit = 5;
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
             const collectionName = 'publications';
