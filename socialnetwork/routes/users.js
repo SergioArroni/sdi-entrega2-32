@@ -112,7 +112,6 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                     pages.push(i);
                 }
             }
-            console.log(req.session.user);
             friendsRepository.getAllFriends().then(amigos=>{
                 let response={
                     users: result.users,

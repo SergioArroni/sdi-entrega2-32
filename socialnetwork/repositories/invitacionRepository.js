@@ -27,19 +27,23 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    }, getAllInvitacionesPg : async function (filter,pg, funcion) {
+    }, getAllInvitacionesPg : async function (filter,page, funcion) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
             const collectionName = 'invitaciones';
             const invitacionesCollection = database.collection(collectionName);
-            const invitacionesCount = invitacionesCollection.count();
-            const invitaciones = invitacionesCollection.find(filter).skip((pg - 1) * 5).limit(5);
-            const result = await invitaciones.toArray();
+            //const invitacionesCount = invitacionesCollection.count();
+            const cursor = invitacionesCollection.find(filter);
+            const invitaciones = await cursor.toArray();
+            const allInvitaciones=invitaciones;
+            const invitacionesPg=invitaciones.slice((page-1) * 5, (page * 5));
 
-            return funcion(invitaciones, invitacionesCount);
+            funcion(invitacionesPg,allInvitaciones);
+            //return funcion(result, invitacionesCount);
         } catch (error) {
             throw (error);
         }
+
     }
 };

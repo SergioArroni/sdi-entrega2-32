@@ -16,7 +16,7 @@ module.exports=function (app,invitacionRepository,friendsRepository,usersReposit
                     ]}
                 invitacionRepository.comprobarInvitacion(filter2).then(hayInvitacion=>{
                     if(hayInvitacion) {
-                        res.redirect("/listInvitaciones" + "?mensaje=Hay invitaciones pendientes entre usted y esa persona" + "&tipoMensaje=alert-danger ");
+                        res.redirect("/users/listUsers" + "?mensaje=Hay invitaciones pendientes entre usted y esa persona" + "&tipoMensaje=alert-danger ");
                     }else{
                         invitacionRepository.insertarInvitacion(req.session.user._id,req.params.id).then(idInvitacion=>{
                             if(idInvitacion!==null)
@@ -31,15 +31,16 @@ module.exports=function (app,invitacionRepository,friendsRepository,usersReposit
 
     });
 
-    app.get("users/listInvitaciones",function (req, res){
-       let filter={id_to:req.session.user};
+    app.get("/invitaciones/listInvitaciones",function (req, res){
+       let filter={id_to:req.session.user._id};
        let page = parseInt(req.query.page);
        if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") {
            page = 1;
        }
-       invitacionRepository.getAllInvitacionesPg(filter,page,function (invitaciones, totalInvitaciones){
-           let lastPage=(totalInvitaciones)/5;
-           if((totalInvitaciones)%5>0){
+       invitacionRepository.getAllInvitacionesPg(filter,page,function (invitaciones, allInvitaciones){
+
+           let lastPage=(allInvitaciones.length)/5;
+           if((allInvitaciones.length)%5>0){
                lastPage=lastPage+1;
            }
            let pages=[];
@@ -53,9 +54,10 @@ module.exports=function (app,invitacionRepository,friendsRepository,usersReposit
                   users:users,
                   invitaciones:invitaciones,
                   pages:pages,
-                  currentPage:page
+                  currentPage:page,
+                  session:req.session.user
               }
-               res.render("users/listInvitaciones.twig", response);
+               res.render("invitaciones/listInvitaciones.twig", response);
            });
        });
     });

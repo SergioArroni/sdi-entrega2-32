@@ -22,9 +22,10 @@
                             <td>{{ user.name }}</td>
                             <td>{{ user.surname }}</td>
                             <td>
-                                <a class="btn btn-primary" href="/users/aceptar/{{ invitacion.id_from }}">Aceptar amigo</a>
+                                <a class="btn btn-primary" href="/invitaciones/aceptar/{{ invitacion.id_from }}">Aceptar amigo</a>
                             </td>
                     {% endif %}
+                {% endfor %}
                 </tr>
             {%  endfor %}
             </tbody>
@@ -39,7 +40,7 @@
         <ul class="pagination">
             {% for page in pages %}
                 <li class="page-item" id="pi-{{ page }}">
-                    <a class="page-link" href="/users/listUsers?page={{ page }}{{ search }}">{{ page }}</a>
+                    <a class="page-link" href="/invitaciones/listInvitaciones?page={{ page }}{{ search }}">{{ page }}</a>
                 </li>
             {% endfor %}
             <script>
