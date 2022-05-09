@@ -28,10 +28,8 @@
 
 </div>
 <script>
-    setInterval(myTimer, 300);
-    function myTimer() {
-        loadMessages();
-    }
+    setInterval(loadMessages, 300);
+
     var messages
     function loadMessages() {
         console.log(URLbase + "/message/list/"+currentFriendID)
@@ -47,25 +45,47 @@
                 updateChatTable(messages);
             },
             error: function (error) {
-                $("#main-container").load("widget-login.html");
+
+            }
+        });
+    }
+    function readMessage(messageID) {
+        $.ajax({
+            url: URLbase + "/message/"+messageID,
+            type: "PUT",
+            data: {},
+            dataType: 'json',
+            headers: {"token": token},
+            success: function (response) {
+            },
+            error: function (error) {
+
             }
         });
     }
     function updateChatTable(messages) {
         $("#chatTableBody").empty(); // Vaciar la tabla
 
+        let leido = ""
         for (let i = 0; i < messages.length; i++) {
             if (messages[i].id_to == currentFriendID) {
+                if (messages[i].saw)
+                    leido = "<br>leído"
                 $("#chatTableBody").append(
                     "<tr style='padding:5em;' id=" + messages[i]._id + " >" +
                     "<td style='border: none'>" +
                     "</td>" +
-                    "<td style=\"border-radius: 15px;border:none;background-color:#00FFFF;text-align:right\">" + messages[i].text+"<br>"+messages[i].date + "</td>" +
+                    "<td style=\"border-radius: 15px;border:none;background-color:#00FFFF;text-align:right\">" + messages[i].text+"<br><span style=\"color:gray;font-size: 0.8em;\">"+messages[i].date + leido + "</span></td>" +
                     "</tr>");
             } else {
+                if (messages[i].saw) {
+                    leido = "<br>leído"
+                } else {
+                    readMessage(messages[i]._id)
+                }
                 $("#chatTableBody").append(
                     "<tr style='padding:5em;' id=" + messages[i]._id + ">" +
-                    "<td style=\"border-radius: 15px;border:none;background-color:#F0D7EE;text-align:left\">" + messages[i].text+"<br>"+messages[i].date + "</td>" +
+                    "<td style=\"border-radius: 15px;border:none;background-color:#F0D7EE;text-align:left\">" + messages[i].text+"<br><span style=\"color:gray;font-size: 0.8em;\">"+messages[i].date + leido + "</span></td>" +
                     "<td style='border: none'>" +
                     "</td>" +
                     "</tr>");
