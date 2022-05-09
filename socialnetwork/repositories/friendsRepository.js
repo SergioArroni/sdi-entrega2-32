@@ -11,10 +11,8 @@ module.exports = {
             const friends = await friendsCollection.find(filter1, options).sort({"name": 1}).toArray();
             const friends2 = await friendsCollection.find(filter2, options).sort({"name": 1}).toArray();
             const totalFriends = friends.concat(friends2);
-
             return totalFriends;
         } catch (error) {
-
             throw (error);
         }
     }

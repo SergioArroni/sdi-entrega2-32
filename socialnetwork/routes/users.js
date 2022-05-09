@@ -11,48 +11,42 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                         usuariosNormales.push(users[i]);
                     }
                 }
-
-
                 res.render("users/users.twig", {users: usuariosNormales, session: userA});
             }).catch(error => {
-
                 res.send("Se ha producido un error al listar los usuarios:" + error)
             });
         } else {
-
             req.session.user = null;
             res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
         }
     })
     app.post('/users/list', function (req, res) {
             let userA = req.session.user
+            let idBorrar = [];
             if (userA.rol == 'Admin') {
                 usersRepository.getUsers({}, {}).then(users => {
                         for (let i = 0; i < Object.keys(req.body).length; i++) {
                             for (let j = 0; j < users.length; j++) {
                                 if (req.body[users[j]._id]) {
-                                    let filter = {_id: users[j]._id};
-                                    usersRepository.findDeleteUser(filter, {}).then(result => {
-                                        if (result == null || result.deletedCount == 0) {
-
-                                            res.send("No se ha podido eliminar el usuario: " + users[j]._id);
-                                        }
-                                    }).catch(error => {
-
-                                        res.send("Se ha producido un error al borrar algun usuario:" + error)
-                                    });
+                                    idBorrar.push(users[j]._id);
                                 }
                             }
                         }
                     }
                 ).catch(error => {
-
-                    res.send("Se ha producido un error al listar los usuarios:" + error)
+                    res.redirect("/" + "?message=Se ha producido un error al listar los usuarios" + "&messageType=alert-danger ");
                 });
-
-                res.redirect("/users/list");
+                for (let w = 0; w < idBorrar.length; w++) {
+                    usersRepository.findDeleteUser({_id: idBorrar[w]._id}, {}).then(result => {
+                        if (result == null || result.deletedCount == 0) {
+                            res.redirect("/" + "?message=No se ha podido eliminar el usuario" + "&messageType=alert-danger ");
+                        }
+                    }).catch(error => {
+                        res.redirect("/" + "?message=Se ha producido un error al borrar algun usuario" + "&messageType=alert-danger ");
+                    });
+                }
+                res.redirect("/");
             } else {
-
                 req.session.user = null;
                 res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
             }
@@ -60,11 +54,9 @@ module.exports = function (app, usersRepository, friendsRepository, publications
     )
     app.get('/users/logout', function (req, res) {
         req.session.user = null;
-
-        res.send("El usuario se ha desconectado correctamente");
+        res.redirect("/users/login");
     })
     app.get('/users/login', function (req, res) {
-
         res.render("users/login.twig", {session: req.session.user});
     })
     app.post('/users/login', function (req, res) {
@@ -76,13 +68,11 @@ module.exports = function (app, usersRepository, friendsRepository, publications
             let options = {};
             usersRepository.findUser(filter, options).then(user => {
                 if (user == null) {
-
                     req.session.user = null;
                     res.redirect("/users/login" + "?message=Email o password incorrecto" + "&messageType=alert-danger ");
                 } else {
                     req.session.user = user;
                     if (user.rol === "Admin") {
-
                         res.redirect("/users/list");
                     } else {
 
@@ -90,28 +80,25 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                     }
                 }
             }).catch(error => {
-
                 req.session.user = null;
                 res.redirect("/users/login" + "?message=Se ha producido un error al buscar el usuario" + "&messageType=alert-danger ");
             })
         }
     );
     app.get('/users/register', function (req, res) {
-
         res.render("users/register.twig", {session: req.session.user});
     });
-    app.get("/users/listUsers",function (req,res){
-        let filter={};
-        let options={sort:{name:1}};
-        if(req.query.search!=null && typeOf(req.query.search)!=="undefined" && req.query.search!=""){
-            filter={"name":{$regex: ".*"+req.query.search+".*"}};
+    app.get("/users/listUsers", function (req, res) {
+        let filter = {};
+        let options = {sort: {name: 1}};
+        if (req.query.search != null && typeOf(req.query.search) !== "undefined" && req.query.search != "") {
+            filter = {"name": {$regex: ".*" + req.query.search + ".*"}};
         }
-        let page=parseInt(req.query.page);
-        if(typeof req.query.page === "undefined" || req.query.page===null || req.query.page === "0"){
-            page=1;
+        let page = parseInt(req.query.page);
+        if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") {
+            page = 1;
         }
-
-            usersRepository.getAllUsersPg(filter,options,page,req.session.user).then(result=>{
+        usersRepository.getAllUsersPg(filter,options,page,req.session.user).then(result=>{
 
                 let lastPage=(result.total-2)/5;
                 if((result.total-2)%5>0){
@@ -135,8 +122,6 @@ module.exports = function (app, usersRepository, friendsRepository, publications
             });
 
 
-
-
     });
     app.post('/users/register', function (req, res) {
         let filter = {
@@ -154,22 +139,17 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                         password: securePassword
                     }
                     usersRepository.insertUser(user).then(userId => {
-
                         res.redirect("/users/login");
                     }).catch(error => {
-
                         res.redirect("/users/register" + "?message=Se ha producido un error al registrar el usuario" + "&messageType=alert-danger ");
                     });
                 } else {
-
                     res.redirect("/users/register" + "?message=Las dos contraseñas no coinciden" + "&messageType=alert-danger ");
                 }
             } else {
-
                 res.redirect("/users/register" + "?message=Este email ya esta vinculado con un usuario" + "&messageType=alert-danger ");
             }
         }).catch(error => {
-
             req.session.user = null;
             res.redirect("/users/login" + "?message=Se ha producido un error al buscar el usuario" + "&messageType=alert-danger ");
         })
@@ -215,18 +195,14 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                         currentPage: page,
                         session: req.session.user
                     }
-
                     res.render("users/friends.twig", response);
                 }).catch(error => {
-
                     res.send("Se ha producido un error al cargar la lista de amigos:" + error)
                 });
             }).catch(error => {
-
                 res.send("Se ha producido un error al cargar la lista de amigos:" + error)
             });
         } else {
-
             req.session.user = null;
             res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
         }
@@ -235,10 +211,8 @@ module.exports = function (app, usersRepository, friendsRepository, publications
     app.get('/users/create/publication', function (req, res) {
         let userA = req.session.user
         if (userA.rol != 'Admin') {
-            //logger.debug("/users/create/publication GET request, render publications/createPublication.twig");
-            res.render("publications/createPublication.twig", {session: req.session.user});
+            res.render("publications/createPublication.twig", {session: userA});
         } else {
-
             req.session.user = null;
             res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
         }
@@ -262,14 +236,11 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                 fecha: insertFecha
             }
             publicationsRepository.insertPublicaction(publication).then(publicationId => {
-
                 res.redirect("/users/publications");
             }).catch(error => {
-
                 res.redirect("/users/register" + "?message=Se ha producido un error al registrar el usuario" + "&messageType=alert-danger ");
             });
         } else {
-
             req.session.user = null;
             res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
         }
@@ -295,8 +266,32 @@ module.exports = function (app, usersRepository, friendsRepository, publications
             for (let i = page - 2; i <= page + 2; i++) {
                 if (i > 0 && i <= lastPage) {
                     pages.push(i);
+                } else {
+                    req.session.user = null;
+                    res.redirect("/users/login" + "?message=No tienes amigos" + "&messageType=alert-danger ");
                 }
             }
+            publicationsRepository.getPublicationsPg(filter, options, page).then(result => {
+                let lastPage = result.total / 4;
+                if (result.total % 4 > 0) { // Sobran decimales
+                    lastPage = lastPage + 1;
+                }
+                let pages = []; // paginas mostrar
+                for (let i = page - 2; i <= page + 2; i++) {
+                    if (i > 0 && i <= lastPage) {
+                        pages.push(i);
+                    }
+                }
+                let response = {
+                    publications: result.publications,
+                    pages: pages,
+                    currentPage: page,
+                    userid: req.params.id
+                }
+                res.render("publications/friendPublications.twig", response);
+            }).catch(error => {
+                res.send("Se ha producido un error al listar las canciones del usuario " + error)
+            });
             let response = {
                 publications: result.publications,
                 pages: pages,
