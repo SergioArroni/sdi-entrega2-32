@@ -98,32 +98,28 @@ module.exports = function (app, usersRepository, friendsRepository, publications
         if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") {
             page = 1;
         }
-        usersRepository.getAllUsersPg(filter, options, page, req.session.user).then(result => {
+        usersRepository.getAllUsersPg(filter,options,page,req.session.user).then(result=>{
 
-            let lastPage = (result.total - 2) / 5;
-            if ((result.total - 2) % 5 > 0) {
-                lastPage = lastPage + 1;
-            }
-            let pages = [];
-            for (let i = page - 2; i <= page + 2; i++) {
-                if (i > 0 && i <= lastPage) {
-                    pages.push(i);
+                let lastPage=(result.total-2)/5;
+                if((result.total-2)%5>0){
+                    lastPage=lastPage+1;
                 }
-            }
-            for (let i = 0; i < result.users.length; i++) {
-                if (result.users[i].email === req.session.user.email) {
-                    result.users.splice(i, 1);
+                let pages=[];
+                for(let i=page-2;i<=page+2;i++){
+                    if(i>0 && i<=lastPage){
+                        pages.push(i);
+                    }
                 }
-            }
-            let response = {
-                users: result.users,
-                pages: pages,
-                currentPage: page
-            }
-            res.render("users/listUsers.twig", response);
-        }).catch(error => {
-            res.send("Se ha producido un error al listar los usuarios:" + error)
-        });
+
+                let response={
+                    users: result.users,
+                    pages:pages,
+                    currentPage:page
+                }
+                res.render("users/listUsers.twig", response);
+            }).catch(error => {
+                res.send("Se ha producido un error al listar los usuarios:" + error)
+            });
 
 
     });
