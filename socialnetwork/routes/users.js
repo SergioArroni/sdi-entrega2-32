@@ -1,5 +1,7 @@
-module.exports = function (app, usersRepository) {
-    app.get('/users', function (req, res) {
+const {ObjectID} = require("mongodb");
+module.exports = function (app, usersRepository, friendsRepository, publicationsRepository) {
+    app.get('/users/listAdmin' +
+        '', function (req, res) {
         let userA = req.session.user
         if (userA.rol == 'Admin') {
             usersRepository.getUsers({}, {}).then(users => {
@@ -20,7 +22,7 @@ module.exports = function (app, usersRepository) {
             res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
         }
     })
-    app.post('/users', function (req, res) {
+    app.post('/users/listAdmin', function (req, res) {
             let userA = req.session.user
             if (userA.rol == 'Admin') {
                 usersRepository.getUsers({}, {}).then(users => {
@@ -42,7 +44,8 @@ module.exports = function (app, usersRepository) {
                 ).catch(error => {
                     res.send("Se ha producido un error al listar los usuarios:" + error)
                 });
-                res.redirect("/users");
+
+                res.redirect("/");
             } else {
                 req.session.user = null;
                 res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
@@ -51,10 +54,10 @@ module.exports = function (app, usersRepository) {
     )
     app.get('/users/logout', function (req, res) {
         req.session.user = null;
-        res.send("El usuario se ha desconectado correctamente");
+        res.redirect("/users/login");
     })
     app.get('/users/login', function (req, res) {
-        res.render("users/login.twig");
+        res.render("users/login.twig", {session: req.session.user});
     })
     app.post('/users/login', function (req, res) {
             let securePassword = app.get("crypto").createHmac('sha256', app.get('clave'))
@@ -70,9 +73,10 @@ module.exports = function (app, usersRepository) {
                 } else {
                     req.session.user = user;
                     if (user.rol === "Admin") {
-                        res.redirect("/users");
+                        res.redirect("/users/listAdmin");
                     } else {
-                        res.redirect("/");
+
+                        res.redirect("/users/listUsers");
                     }
                 }
             }).catch(error => {
@@ -80,10 +84,45 @@ module.exports = function (app, usersRepository) {
                 res.redirect("/users/login" + "?message=Se ha producido un error al buscar el usuario" + "&messageType=alert-danger ");
             })
         }
-    )
+    );
     app.get('/users/register', function (req, res) {
-        res.render("users/register.twig");
-    })
+        res.render("users/register.twig", {session: req.session.user});
+    });
+    app.get("/users/listUsers", function (req, res) {
+        let filter = {};
+        let options = {sort: {name: 1}};
+        if (req.query.search != null && typeOf(req.query.search) !== "undefined" && req.query.search != "") {
+            filter = {"name": {$regex: ".*" + req.query.search + ".*"}};
+        }
+        let page = parseInt(req.query.page);
+        if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") {
+            page = 1;
+        }
+        usersRepository.getAllUsersPg(filter,options,page,req.session.user).then(result=>{
+
+                let lastPage=(result.total-2)/5;
+                if((result.total-2)%5>0){
+                    lastPage=lastPage+1;
+                }
+                let pages=[];
+                for(let i=page-2;i<=page+2;i++){
+                    if(i>0 && i<=lastPage){
+                        pages.push(i);
+                    }
+                }
+
+                let response={
+                    users: result.users,
+                    pages:pages,
+                    currentPage:page
+                }
+                res.render("users/listUsers.twig", response);
+            }).catch(error => {
+                res.send("Se ha producido un error al listar los usuarios:" + error)
+            });
+
+
+    });
     app.post('/users/register', function (req, res) {
         let filter = {
             email: req.body.email
@@ -114,6 +153,154 @@ module.exports = function (app, usersRepository) {
             req.session.user = null;
             res.redirect("/users/login" + "?message=Se ha producido un error al buscar el usuario" + "&messageType=alert-danger ");
         })
-
     });
+
+    app.get('/users/friends', function (req, res) {
+        let userA = req.session.user
+        if (userA.rol != 'Admin') {
+            let id = new ObjectID(userA._id);
+            let filter1 = {id_from: id};
+            let filter2 = {id_to: id};
+            let options = {};
+            friendsRepository.getFriends(filter1, filter2, options).then(friends => {
+                let ids = new Array();
+
+                for (let i = 0; i < friends.length; i++) {
+                    if (friends[i].accept) {
+                        if (friends[i].id_from.equals(id)) {
+                            ids.push(friends[i].id_to);
+                        } else {
+                            ids.push(friends[i].id_from);
+                        }
+                    }
+                }
+                let page = parseInt(req.query.page); // Es String !!!
+                if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") {
+                    page = 1;
+                }
+                usersRepository.getFriendsPg(ids, page).then(result => {
+                    let lastPage = result.total / 5;
+                    if (result.total % 5 > 0) { // Sobran decimales
+                        lastPage = lastPage + 1;
+                    }
+                    let pages = []; // paginas mostrar
+                    for (let i = page - 2; i <= page + 2; i++) {
+                        if (i > 0 && i <= lastPage) {
+                            pages.push(i);
+                        }
+                    }
+                    let response = {
+                        users: result.users,
+                        pages: pages,
+                        currentPage: page,
+                        session: req.session.user
+                    }
+                    res.render("users/friends.twig", response);
+                }).catch(error => {
+                    res.send("Se ha producido un error al cargar la lista de amigos:" + error)
+                });
+            }).catch(error => {
+                res.send("Se ha producido un error al cargar la lista de amigos:" + error)
+            });
+        } else {
+            req.session.user = null;
+            res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
+        }
+    })
+
+    app.get('/users/create/publication', function (req, res) {
+        let userA = req.session.user
+        if (userA.rol != 'Admin') {
+            res.render("publications/createPublication.twig", {session: userA});
+        } else {
+            req.session.user = null;
+            res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
+        }
+    })
+
+    app.post('/users/create/publication', function (req, res) {
+        let userA = req.session.user
+        let id = new ObjectID(userA._id)
+        let titulo = req.body.titulo
+        let texto = req.body.texto
+        const tiempo = Date.now();
+        let fecha = new Date(tiempo);
+        let insertFecha = fecha.toDateString();
+        console.log(insertFecha)
+        console.log("" + insertFecha)
+        if (userA.rol != 'Admin') {
+            let publication = {
+                titulo: titulo,
+                texto: texto,
+                user: id,
+                fecha: insertFecha
+            }
+            publicationsRepository.insertPublicaction(publication).then(publicationId => {
+                res.redirect("/users/publications");
+            }).catch(error => {
+                res.redirect("/users/register" + "?message=Se ha producido un error al registrar el usuario" + "&messageType=alert-danger ");
+            });
+        } else {
+            req.session.user = null;
+            res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
+        }
+    })
+
+    app.get('/users/friends/publications/:id', function (req, res) {
+        let userA = req.session.user
+        let id = new ObjectID(userA._id);
+        let idFriend = new ObjectID(req.params.id);
+        let filter = {user: idFriend}
+        let options = {}
+        let page = parseInt(req.query.page); // Es String !!!
+        if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") {
+            page = 1;
+        }
+        publicationsRepository.getPublicationsPg(filter, options, page).then(result => {
+            let lastPage = result.total / 5;
+            console.log(lastPage)
+            if (result.total % 5 > 0) { // Sobran decimales
+                lastPage = lastPage + 1;
+            }
+            let pages = []; // paginas mostrar
+            for (let i = page - 2; i <= page + 2; i++) {
+                if (i > 0 && i <= lastPage) {
+                    pages.push(i);
+                } else {
+                    req.session.user = null;
+                    res.redirect("/users/login" + "?message=No tienes amigos" + "&messageType=alert-danger ");
+                }
+            }
+            publicationsRepository.getPublicationsPg(filter, options, page).then(result => {
+                let lastPage = result.total / 4;
+                if (result.total % 4 > 0) { // Sobran decimales
+                    lastPage = lastPage + 1;
+                }
+                let pages = []; // paginas mostrar
+                for (let i = page - 2; i <= page + 2; i++) {
+                    if (i > 0 && i <= lastPage) {
+                        pages.push(i);
+                    }
+                }
+                let response = {
+                    publications: result.publications,
+                    pages: pages,
+                    currentPage: page,
+                    userid: req.params.id
+                }
+                res.render("publications/friendPublications.twig", response);
+            }).catch(error => {
+                res.send("Se ha producido un error al listar las canciones del usuario " + error)
+            });
+            let response = {
+                publications: result.publications,
+                pages: pages,
+                currentPage: page,
+                userid: req.params.id,
+                session: req.session.user
+            }
+        }).catch(error => {
+            res.send("Se ha producido un error al listar los amigos " + error)
+        })
+    })
 }

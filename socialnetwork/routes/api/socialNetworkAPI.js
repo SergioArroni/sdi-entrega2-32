@@ -85,50 +85,55 @@ module.exports = function (app, usersRepository, friendsRepository) {
         let user = res.user;
         let filter = {email: user}
         let options = {};
-        usersRepository.getUsers(filter, options).then(user => {
-            let id = user[0]._id;
-            let idFriend = ObjectId(req.params.id);
-            let filter1 = {id_from: id, id_to: idFriend};
-            let filter2 = {id_to: id, id_from: idFriend};
-            options = {};
-            friendsRepository.getFriends(filter1, filter2, options).then(friend => {
-                let sonAmigos = friend[0].accept;
-                if(friend != null) {
-                    if (sonAmigos) {
-                        let message = {
-                            id_from: id,
-                            id_to: idFriend,
-                            text: req.body.text,
-                            saw: false
-                        }
-                        usersRepository.insertMessage(message, function (messageId) {
-                            if (messageId === null) {
-                                res.status(409);
-                                res.json({error: "No se ha podido enviar el mensaje."});
-                            } else {
-                                res.status(201);
-                                res.json({
-                                    message: "Mensaje enviado correctamente.",
-                                    _id: messageId
-                                });
+        if (req.body.text.trim() == "") {
+            res.status(409);
+            res.json({error: "El texto no puede ser vacío"});
+        } else{
+            usersRepository.getUsers(filter, options).then(user => {
+                let id = user[0]._id;
+                let idFriend = ObjectId(req.params.id);
+                let filter1 = {id_from: id, id_to: idFriend};
+                let filter2 = {id_to: id, id_from: idFriend};
+                options = {};
+                friendsRepository.getFriends(filter1, filter2, options).then(friend => {
+                    let sonAmigos = friend[0].accept;
+                    if (friend != null) {
+                        if (sonAmigos) {
+                            let message = {
+                                id_from: id,
+                                id_to: idFriend,
+                                text: req.body.text,
+                                saw: false
                             }
-                        });
+                            usersRepository.insertMessage(message, function (messageId) {
+                                if (messageId === null) {
+                                    res.status(409);
+                                    res.json({error: "No se ha podido enviar el mensaje."});
+                                } else {
+                                    res.status(201);
+                                    res.json({
+                                        message: "Mensaje enviado correctamente.",
+                                        _id: messageId
+                                    });
+                                }
+                            });
+                        } else {
+                            res.status(422);
+                            res.json({error: "No sois amigos."})
+                        }
                     } else {
                         res.status(422);
                         res.json({error: "No sois amigos."})
                     }
-                }else{
-                    res.status(422);
-                    res.json({error: "No sois amigos."})
-                }
+                }).catch(error => {
+                    res.status(500);
+                    res.json({error: "Se ha producido un error al enviar el mensaje."})
+                });
             }).catch(error => {
                 res.status(500);
-                res.json({ error: "Se ha producido un error al enviar el mensaje." })
+                res.json({error: "Se ha producido un error al enviar el mensaje."})
             });
-        }).catch(error => {
-            res.status(500);
-            res.json({ error: "Se ha producido un error al enviar el mensaje." })
-        });
+        }
     });
 
     app.get("/api/v1.0/message/list/:id", function (req, res) {
@@ -163,6 +168,52 @@ module.exports = function (app, usersRepository, friendsRepository) {
         }).catch(error => {
             res.status(500);
             res.json({ error: "Se ha producido un error al enviar el mensaje." })
+        });
+    });
+
+    app.put("/api/v1.0/message/:id", function (req, res) {
+        let user = res.user
+        let filter = {email: user}
+        let options = {}
+        usersRepository.getUsers(filter, options).then(user => {
+            let id = user[0]._id;
+            let messageId = ObjectId(req.params.id);
+            filter = {_id: messageId};
+            //Si la _id NO no existe, no crea un nuevo documento.
+            const options = {upsert: false};
+
+            usersRepository.getMessage(filter,{}).then(message => {
+                let id_to = message.id_to
+                if (!id.equals(id_to)) {
+                    res.status(403);
+                    res.json({error: "No es el receptor del mensaje."});
+                } else {
+                let m = {
+                    saw: true
+                }
+                usersRepository.readMessage(m, filter, options).then(result => {
+
+                    //La _id No existe o los datos enviados no difieren de los ya almacenados.
+                    if (result.modifiedCount == 0) {
+                        res.status(409);
+                        res.json({error: "No se ha modificado ningun mensaje."});
+                    } else {
+                        res.status(200);
+                        res.json({
+                            message: "Mensaje leído correctamente."
+                        })
+                    }
+                }).catch(error => {
+                    res.status(500);
+                    res.json({error: "Se ha producido un error al leer el mensaje: "+error})
+                }).catch(error => {
+                    res.status(500);
+                    res.json({error: "Se ha producido un error al leer el mensaje: "+error})
+                });
+            }}).catch(error => {
+                res.status(500);
+                res.json({error: "Se ha producido un error al leer el mensaje: " + error})
+            });
         });
     });
 }
