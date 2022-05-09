@@ -56,12 +56,12 @@
                     "<tr id=" + messages[i]._id + ">" +
                     "<td border:none>" +
                     "</td>" +
-                    "<td bgcolor='#00FFFF' align='right'>" + messages[i].text + "</td>" +
+                    "<td bgcolor='#00FFFF' align='right'>" + messages[i].text+"<br>"+messages[i].date + "</td>" +
                     "</tr>");
             } else {
                 $("#chatTableBody").append(
                     "<tr id=" + messages[i]._id + ">" +
-                    "<td bgcolor='#FFFFFF' align='left'>" + messages[i].text + "</td>" +
+                    "<td bgcolor='#FFFFFF' align='left'>" + messages[i].text+"<br>"+messages[i].date + "</td>" +
                     "<td>" +
                     "</td>" +
                     "</tr>");

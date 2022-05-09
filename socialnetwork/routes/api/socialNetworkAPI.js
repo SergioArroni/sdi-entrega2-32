@@ -95,6 +95,8 @@ module.exports = function (app, usersRepository, friendsRepository) {
                 let filter1 = {id_from: id, id_to: idFriend};
                 let filter2 = {id_to: id, id_from: idFriend};
                 options = {};
+                const time = Date.now();
+                let date = new Date(time);
                 friendsRepository.getFriends(filter1, filter2, options).then(friend => {
                     let sonAmigos = friend[0].accept;
                     if (friend != null) {
@@ -103,7 +105,8 @@ module.exports = function (app, usersRepository, friendsRepository) {
                                 id_from: id,
                                 id_to: idFriend,
                                 text: req.body.text,
-                                saw: false
+                                saw: false,
+                                date: date
                             }
                             usersRepository.insertMessage(message, function (messageId) {
                                 if (messageId === null) {

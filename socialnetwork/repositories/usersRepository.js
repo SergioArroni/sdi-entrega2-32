@@ -121,10 +121,11 @@ module.exports = {
             const database = client.db("Cluster0");
             const collectionName = 'messages';
             const messagesCollection = database.collection(collectionName);
-            const message = await messagesCollection.find(filter1, options).toArray();
-            const message2 = await messagesCollection.find(filter2, options).toArray();
-            const totalMessages = message.concat(message2);
-            return totalMessages;
+
+            const messages = await messagesCollection.find({
+                $or:[filter1, filter2]},{}).sort({date:1}).toArray();
+
+            return messages;
         } catch (error) {
             throw (error);
         }
