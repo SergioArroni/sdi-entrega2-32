@@ -1,0 +1,46 @@
+{% extends "../layout.twig" %}
+
+{% block title %}Listado de tus publicaciones{% endblock %}
+
+{% block main_container %}
+    <h2>Listado de tus publicaciones</h2>
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thread>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Titulo</th>
+                    <th>Texto</th>
+                </tr>
+            </thread>
+            <tbody>
+            {% for publicacion in publicaciones %}
+                {% if publicacion.user == user._id %}
+                    <tr>
+                        <td>{{ publicacion.fecha }}</td>
+                        <td>{{ publicacion.titulo }}</td>
+                        <td>{{ publicacion.texto }}</td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+
+
+    <div class="row text-center">
+        <ul class="pagination">
+            {% for page in pages %}
+                <li class="page-item" id="pi-{{ page }}">
+                    <a class="page-link" href="/publications/listPublicaciones?page={{ page }}">{{ page }}</a>
+                </li>
+            {% endfor %}
+            <script>
+                $("#pi-" + "{{ currentPage }}").addClass("active");
+            </script>
+        </ul>
+    </div>
+
+{% endblock %}
