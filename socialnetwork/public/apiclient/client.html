@@ -38,6 +38,7 @@
 <script>
     let token;
     let URLbase = "http://localhost:8081/api/v1.0";
+    let currentFriendID;
     if ( Cookies.get('token') != null ){
         token = Cookies.get('token');
         $( "#main-container" ).load("widget-friends.html");
