@@ -8,7 +8,7 @@ module.exports=function (app,invitacionRepository,friendsRepository,usersReposit
         console.log(req.session.user._id);
         friendsRepository.comprobarAmistad(filter1).then(boolAmigos=>{
             if(boolAmigos){
-                res.redirect("/invitaciones" + "?mensaje=Ya es amigo de esa persona" + "&tipoMensaje=alert-danger ");
+                res.redirect("/listInvitaciones" + "?mensaje=Ya es amigo de esa persona" + "&tipoMensaje=alert-danger ");
             }else{
                 let filter2={$or:[
                         {$and: [{"id_from": req.session.user._id}, {"id_to": req.params.id}]},
@@ -29,5 +29,34 @@ module.exports=function (app,invitacionRepository,friendsRepository,usersReposit
         });
 
 
+    });
+
+    app.get("users/listInvitaciones",function (req, res){
+       let filter={id_to:req.session.user};
+       let page = parseInt(req.query.page);
+       if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") {
+           page = 1;
+       }
+       invitacionRepository.getAllInvitacionesPg(filter,page,function (invitaciones, totalInvitaciones){
+           let lastPage=(totalInvitaciones)/5;
+           if((totalInvitaciones)%5>0){
+               lastPage=lastPage+1;
+           }
+           let pages=[];
+           for(let i=page-2;i<=page+2;i++){
+               if(i>0 && i<=lastPage){
+                   pages.push(i);
+               }
+           }
+           usersRepository.getUsers({},{}).then(users=>{
+              let response={
+                  users:users,
+                  invitaciones:invitaciones,
+                  pages:pages,
+                  currentPage:page
+              }
+               res.render("users/listInvitaciones.twig", response);
+           });
+       });
     });
 }
