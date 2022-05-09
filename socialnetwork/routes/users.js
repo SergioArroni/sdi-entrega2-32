@@ -90,40 +90,46 @@ module.exports = function (app, usersRepository, friendsRepository, publications
     });
     app.get("/users/listUsers", function (req, res) {
         let filter = {};
-        let options = {sort: {name: 1}};
-        if (req.query.search != null && typeOf(req.query.search) !== "undefined" && req.query.search != "") {
-            filter = {"name": {$regex: ".*" + req.query.search + ".*"}};
+        let searchText=req.query.search;
+        if (searchText != null) {
+            filter={$or: [{"name": {$regex: ".*" + searchText + ".*"}},
+                    {"surname": {$regex: ".*" + searchText + ".*"}},
+                    {"email": {$regex: ".*" + searchText + ".*"}}]};
         }
         let page = parseInt(req.query.page);
         if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") {
             page = 1;
         }
-        usersRepository.getAllUsersPg(filter,options,page,req.session.user).then(result=>{
 
-                let lastPage=(result.total-2)/5;
-                if((result.total-2)%5>0){
-                    lastPage=lastPage+1;
+        usersRepository.getAllUsersPg(filter,page,req.session.user, function(result, usuarios){
+            let lastPage=(usuarios.length)/5;
+            if((usuarios.length)%5>0){
+                lastPage=lastPage+1;
+            }
+            let pages=[];
+            for(let i=page-2;i<=page+2;i++){
+                if(i>0 && i<=lastPage){
+                    pages.push(i);
                 }
-                let pages=[];
-                for(let i=page-2;i<=page+2;i++){
-                    if(i>0 && i<=lastPage){
-                        pages.push(i);
-                    }
-                }
-
+            }
+            friendsRepository.getAllFriends().then(amigos=>{
                 let response={
                     users: result.users,
+                    friends:amigos,
+                    search:searchText,
                     pages:pages,
                     currentPage:page,
                     session: req.session.user
                 }
                 res.render("users/listUsers.twig", response);
-            }).catch(error => {
-                res.send("Se ha producido un error al listar los usuarios:" + error)
-            });
+            })
 
+        }).catch(error => {
+            res.send("Se ha producido un error al listar los usuarios:" + error)
+        });
 
     });
+
     app.post('/users/register', function (req, res) {
         let filter = {
             email: req.body.email
