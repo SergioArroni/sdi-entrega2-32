@@ -242,6 +242,9 @@ class SdiEntrega132ApplicationTests {
         content.get(0).click();
 
         //Hay que comprobar que se añade
+        SeleniumUtils.textIsPresentOnPage(driver, "Mon May 09 2022");
+        SeleniumUtils.textIsPresentOnPage(driver, "Prueba título");
+        SeleniumUtils.textIsPresentOnPage(driver, "Prueba contenido");
     }
 
     // PR27. Probar que se muestran todas las publicaciones de un amigo
