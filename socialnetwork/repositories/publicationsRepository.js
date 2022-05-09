@@ -39,5 +39,23 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    },
+    }, getAllPublicacionesPg : async function (filter,page, funcion) {
+    try {
+        const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
+        const database = client.db("Cluster0");
+        const collectionName = 'publications';
+        const publicacionesCollection = database.collection(collectionName);
+       ;
+        const cursor = publicacionesCollection.find(filter);
+        const publicaciones = await cursor.toArray();
+        const allPublicaciones=publicaciones;
+        const publicacionesPg=publicaciones.slice((page-1) * 5, (page * 5));
+
+        funcion(publicacionesPg,allPublicaciones);
+        //return funcion(result, invitacionesCount);
+    } catch (error) {
+        throw (error);
+    }
+
+}
 };

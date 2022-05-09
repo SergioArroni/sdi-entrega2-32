@@ -243,7 +243,7 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                 fecha: insertFecha
             }
             publicationsRepository.insertPublicaction(publication).then(publicationId => {
-                res.redirect("/users/publications");
+                res.redirect("/publications/listPublicaciones");
             }).catch(error => {
                 res.redirect("/users/register" + "?message=Se ha producido un error al registrar el usuario" + "&messageType=alert-danger ");
             });

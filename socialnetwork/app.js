@@ -102,6 +102,8 @@ invitacionRepository.init(app, MongoClient);
 
 require("./routes/users.js")(app, usersRepository, friendsRepository, publicationsRepository);
 require("./routes/invitaciones.js")(app, invitacionRepository, friendsRepository,usersRepository);
+
+require("./routes/publications.js")(app, publicationsRepository);
 require("./routes/api/socialNetworkAPI")(app, usersRepository, friendsRepository);
 
 // view engine setup
