@@ -14,12 +14,12 @@ import java.util.List;
 class SdiEntrega132ApplicationTests {
     static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
     //static String Geckodriver ="C:\\nada.exe;
-    static String GeckodriverHugo ="C:\\Users\\Hugo\\Desktop\\TERCER_CURSO_INGENIERIA\\SDI\\PRACTICA\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
+    //static String GeckodriverHugo ="C:\\Users\\Hugo\\Desktop\\TERCER_CURSO_INGENIERIA\\SDI\\PRACTICA\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
     //static String GeckodriverAndrea = "C:\\Users\\ANDREA DELGADO\\Documents\\CURSO 2021-2022\\CUATRI 2\\SDI\\geckodriver.exe";
-    //static String GeckodriverSergio = "C:\\Dev\\tools\\selenium\\geckodriver-v0.30.0-win64.exe";
+    static String GeckodriverSergio = "C:\\Dev\\tools\\selenium\\geckodriver-v0.30.0-win64.exe";
 
     //Común a Windows y a MACOSX
-    static WebDriver driver = getDriver(PathFirefox, GeckodriverHugo);
+    static WebDriver driver = getDriver(PathFirefox, GeckodriverSergio);
     static String URL = "http://localhost:8081";
 
     public static WebDriver getDriver(String PathFirefox, String Geckodriver) {
@@ -55,13 +55,9 @@ class SdiEntrega132ApplicationTests {
 
     //[Prueba1] Registro de Usuario con datos válidos.
     @Test
-    @Order(1)
+    @Order(1000)
     public void PR01() {
-        //Vamos al formulario de registro
-        PO_HomeView.clickOption(driver, "register", "class", "btn btn-primary");
-        //Rellenamos el formulario.
-        PO_SignUpView.fillForm(driver, "pruebaTest10@email.es", "Josefo", "Perez", "77777", "77777");
-        SeleniumUtils.idIsPresentOnPage(driver, "login");
+        SeleniumUtils.registerMacro(driver,"REALTEST@email.es", "Aaaa", "Maria");
     }
 
     // PR02. Registro de usuario con datos inválidos (email vacío, nombre vacío,
@@ -201,6 +197,81 @@ class SdiEntrega132ApplicationTests {
         SeleniumUtils.idIsNotPresentOnPage(driver, "logout_button");
     }
 
+    //[Prueba11] Mostrar el listado de usuarios y comprobar que se muestran todos los que existen en el sistema.
+    @Test
+    @Order(11)
+    public void PR11() {
+        PO_NavView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "admin@email.com", "admin");
+
+        SeleniumUtils.textIsPresentOnPage(driver, "user02@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver, "user03@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver, "user08@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver, "prueba5@prueba5.com");
+        SeleniumUtils.textIsPresentOnPage(driver, "user01@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver, "user04@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver, "user10@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver, "user11@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver, "pruebaTest2@email.es");
+        SeleniumUtils.textIsPresentOnPage(driver, "pruebaTestReal@email.es");
+    }
+
+    //[Prueba12] Ir a la lista de usuarios, borrar el primer usuario de la lista, comprobar que la lista se actualiza
+    //y dicho usuario desaparece.
+    @Test
+    @Order(1002)
+    public void PR12() {
+
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary"); // Rellenamos el formulario.
+        PO_LoginView.fillLoginForm(driver, "admin@email.com", "admin");
+
+        driver.findElement(By.id("1")).click();
+        driver.findElement(By.id("borrar")).click();
+        SeleniumUtils.textIsNotPresentOnPage(driver, "REALTEST@email.es");
+
+    }
+
+    //[Prueba13] Ir a la lista de usuarios, borrar el último usuario de la lista, comprobar que la lista se actualiza
+    //y dicho usuario desaparece.
+    @Test
+    @Order(1003)
+    public void PR13() {
+
+        SeleniumUtils.registerMacro(driver,"REALTEST@email.es", "Zzz", "Maria");
+
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary"); // Rellenamos el formulario.
+        PO_LoginView.fillLoginForm(driver, "admin@email.com", "admin");
+
+        driver.findElement(By.id("12")).click();
+        driver.findElement(By.id("borrar")).click();
+        SeleniumUtils.textIsNotPresentOnPage(driver, "REALTEST@email.es");
+    }
+
+    //[Prueba14] Ir a la lista de usuarios, borrar 3 usuarios, comprobar que la lista se actualiza y dichos usuarios
+    //desaparecen.
+    @Test
+    @Order(1004)
+    public void PR14() {
+
+        SeleniumUtils.registerMacro(driver,"REALTEST1@email.es", "Aaaa", "Maria");
+
+        SeleniumUtils.registerMacro(driver,"REALTEST2@email.es", "Aaa", "Maria");
+
+        SeleniumUtils.registerMacro(driver,"REALTEST3@email.es", "Aa", "Maria");
+
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary"); // Rellenamos el formulario.
+        PO_LoginView.fillLoginForm(driver, "admin@email.com", "admin");
+
+        driver.findElement(By.id("1")).click();
+        driver.findElement(By.id("2")).click();
+        driver.findElement(By.id("3")).click();
+        driver.findElement(By.id("borrar")).click();
+        SeleniumUtils.textIsNotPresentOnPage(driver, "REALTEST1@email.es");
+        SeleniumUtils.textIsNotPresentOnPage(driver, "REALTEST2@email.es");
+        SeleniumUtils.textIsNotPresentOnPage(driver, "REALTEST3@email.es");
+
+    }
+
     // PR23. Mostrar el listado de amigos de un usuario. Comprobar que el listado contiene los amigos que deben ser
     @Test
     @Order(23)
@@ -212,6 +283,7 @@ class SdiEntrega132ApplicationTests {
         PO_PrivateView.click(driver, "//a[contains(@href, '/users/friends')]", 0);
 
         SeleniumUtils.textIsPresentOnPage(driver, "user02@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver, "user03@email.com");
         SeleniumUtils.textIsPresentOnPage(driver, "Lucas");
         SeleniumUtils.textIsPresentOnPage(driver, "Preso");
         SeleniumUtils.textIsPresentOnPage(driver, "Sergio");
@@ -242,7 +314,6 @@ class SdiEntrega132ApplicationTests {
         content.get(0).click();
 
         //Hay que comprobar que se añade
-        SeleniumUtils.textIsPresentOnPage(driver, "Mon May 09 2022");
         SeleniumUtils.textIsPresentOnPage(driver, "Prueba título");
         SeleniumUtils.textIsPresentOnPage(driver, "Prueba contenido");
     }
@@ -271,12 +342,49 @@ class SdiEntrega132ApplicationTests {
         PO_NavView.clickOption(driver, "login", "class", "btn btn-primary");
         PO_LoginView.fillLoginForm(driver, "user04@email.com", "user04");
 
-        driver.get("http://localhost:8081/users/friends/publications/626b9b0958be38a6ca85cdbd");
+        driver.get("http://localhost:8081/users/friends/publications/625f3514ec93e8d1e4a0d938");
 
         // Comprobamos que no hay publicaciones
-
+        SeleniumUtils.idIsPresentOnPage(driver, "login");
 
     }
+
+    // PR29. Intentar acceder sin estar autenticado a la opción de listado de usuarios. Se deberá volver al formulario de login.
+    @Test
+    @Order(29)
+    public void PR29() {
+
+        driver.get("http://localhost:8081/users/listUsers");
+
+        SeleniumUtils.idIsPresentOnPage(driver, "login");
+
+    }
+
+    // PR30. Intentar acceder sin estar autenticado a la opción de listado de invitaciones de amistad recibida de un usuario estándar. Se deberá volver al formulario de login.
+    @Test
+    @Order(30)
+    public void PR30() {
+
+        driver.get("http://localhost:8081/invitaciones/listInvitaciones");
+
+        SeleniumUtils.idIsPresentOnPage(driver, "login");
+
+    }
+
+    // PR31. Intentar acceder estando autenticado como usuario standard a la lista de amigos de otro usuario. Se deberá mostrar un mensaje de acción indebida.
+    @Test
+    @Order(31)
+    public void PR31() {
+        PO_NavView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
+
+        driver.get("http://localhost:8081/users/friends/publications/625f3514ec93e8d1e4a0d938");
+
+        // Comprobamos que no hay publicaciones
+        SeleniumUtils.idIsPresentOnPage(driver, "login");
+
+    }
+
 /**
     //[Prueba11] Mostrar el listado de usuarios y comprobar que se muestran todos los que existen en el sistema
     @Test
