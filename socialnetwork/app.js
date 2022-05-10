@@ -77,7 +77,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //====MONGO====
 const {MongoClient} = require("mongodb");
-const url = 'mongodb+srv://admin:admin@cluster0.a1mrh.mongodb.net/Cluster0?retryWrites=true&w=majority';
+//Deploy
+//const url = 'mongodb+srv://admin:admin@cluster0.a1mrh.mongodb.net/Cluster0?retryWrites=true&w=majority';
+//Tests
+const url = 'mongodb+srv://hugo:admin@cluster0.uznrd.mongodb.net/Cluster0?retryWrites=true&w=majority';
 app.set('connectionStrings', url);
 
 //====RUTAS====
