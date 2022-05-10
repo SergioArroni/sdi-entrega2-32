@@ -150,7 +150,8 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                         email: req.body.email,
                         name: req.body.name,
                         surname: req.body.surname,
-                        password: securePassword
+                        password: securePassword,
+                        rol: 'User'
                     }
                     usersRepository.insertUser(user).then(userId => {
                         res.redirect("/users/login");

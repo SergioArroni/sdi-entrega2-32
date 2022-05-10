@@ -144,7 +144,9 @@ module.exports = function (app) {
         if (req.query.name != null && typeof (req.query.name) != "undefined")
             response += 'Name: ' + req.query.name;
         if (req.query.surname != null && typeof (req.query.surname) != "undefined")
-            response += 'Surname: ' + req.query.name;
+            response += 'Surname: ' + req.query.surname;
+        if (req.query.rol != null && typeof (req.query.rol) != "undefined")
+            response += 'Rol: ' + req.query.rol;
         res.send(response);
     });
 };
