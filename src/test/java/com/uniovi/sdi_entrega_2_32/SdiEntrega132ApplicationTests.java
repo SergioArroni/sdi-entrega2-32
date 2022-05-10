@@ -15,11 +15,13 @@ class SdiEntrega132ApplicationTests {
     static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
     //static String Geckodriver ="C:\\nada.exe;
     //static String GeckodriverHugo ="C:\\Users\\Hugo\\Desktop\\TERCER_CURSO_INGENIERIA\\SDI\\PRACTICA\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
-    //static String GeckodriverAndrea = "C:\\Users\\ANDREA DELGADO\\Documents\\CURSO 2021-2022\\CUATRI 2\\SDI\\geckodriver.exe";
-    static String GeckodriverSergio = "C:\\Dev\\tools\\selenium\\geckodriver-v0.30.0-win64.exe";
+
+    static String GeckodriverAndrea = "C:\\Users\\andre\\Documents\\CURSO 2021-2022\\CUATRI 2\\SDI\\geckodriver.exe";
+    //static String GeckodriverSergio = "C:\\Dev\\tools\\selenium\\geckodriver-v0.30.0-win64.exe";
 
     //Común a Windows y a MACOSX
-    static WebDriver driver = getDriver(PathFirefox, GeckodriverSergio);
+    static WebDriver driver = getDriver(PathFirefox, GeckodriverAndrea);
+
     static String URL = "http://localhost:8081";
 
     public static WebDriver getDriver(String PathFirefox, String Geckodriver) {
@@ -197,6 +199,9 @@ class SdiEntrega132ApplicationTests {
         SeleniumUtils.idIsNotPresentOnPage(driver, "logout_button");
     }
 
+
+
+
     //[Prueba11] Mostrar el listado de usuarios y comprobar que se muestran todos los que existen en el sistema.
     @Test
     @Order(11)
@@ -272,6 +277,152 @@ class SdiEntrega132ApplicationTests {
 
     }
 
+        //[Prueba15] Mostrar el listado de usuarios y comprobar que se muestran todos los que existen en el sistema,
+    //excepto el propio usuario y aquellos que sean Administradores
+    @Test
+    @Order(15)
+    public void PR15() {
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        //Accede directamente a la lista
+        PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
+        //Comprobamos que no esta el administrador ni el usuario registrado
+        SeleniumUtils.textIsNotPresentOnPage(driver,"user01@email.com");
+        SeleniumUtils.textIsNotPresentOnPage(driver,"admin@email.com");
+
+
+        SeleniumUtils.textIsPresentOnPage(driver,"Clara");
+        SeleniumUtils.textIsPresentOnPage(driver,"Andrea");
+        SeleniumUtils.textIsPresentOnPage(driver,"Lucas");
+        SeleniumUtils.textIsPresentOnPage(driver,"Sergio");
+        SeleniumUtils.textIsPresentOnPage(driver,"Manolo");
+    }
+
+    //[Prueba16] Hacer una búsqueda con el campo vacío y comprobar que se muestra la página que
+    //corresponde con el listado usuarios existentes en el sistema.
+    @Test
+    @Order(16)
+    public void PR16() {
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        //Accede directamente a la lista
+        PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
+        // Escribir en la barra de búsqueda
+        PO_PrivateView.fillSearch(driver,"");
+
+        SeleniumUtils.textIsPresentOnPage(driver,"Clara");
+        SeleniumUtils.textIsPresentOnPage(driver,"Andrea");
+        SeleniumUtils.textIsPresentOnPage(driver,"Lucas");
+        SeleniumUtils.textIsPresentOnPage(driver,"Sergio");
+        SeleniumUtils.textIsPresentOnPage(driver,"Manolo");
+
+    }
+
+   // [Prueba17] Hacer una búsqueda escribiendo en el campo un texto que no exista y comprobar que se
+   // muestra la página que corresponde, con la lista de usuarios vacía.
+    @Test
+    @Order(17)
+    public void PR17() {
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        //Accede directamente a la lista
+        PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
+
+        //Hacemos una búsqueda escribiendo un texto que no exista
+        PO_PrivateView.fillSearch(driver, "hola");
+
+        //Comprobamos que aparece la lista de usuarios vacía
+        List<WebElement> result = PO_View.checkElementBy(driver, "id", "tbody");
+
+        int numUsuarios=result.get(0).getSize().getHeight();
+        Assertions.assertEquals(0,numUsuarios);
+
+    }
+
+    //[Prueba18] Hacer una búsqueda con un texto específico y comprobar que se muestra la página que
+    //corresponde, con la lista de usuarios en los que el texto especificado sea parte de su nombre, apellidos o
+    //de su email
+    @Test
+    @Order(18)
+    public void PR18() {
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        //Accede directamente a la lista
+        PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
+
+        //Hacemos una búsqueda escribiendo un texto que no exista
+        PO_PrivateView.fillSearch(driver, "user");
+
+        //Comprobamos que aparece la lista de usuarios vacía
+        List<WebElement> result = PO_View.checkElementBy(driver, "class", "usersTable");
+
+        for(int i=0;i<result.size();i++){
+            Assertions.assertTrue(result.get(i).getText().contains("user"));
+
+        }
+
+    }
+   // [Prueba19] Desde el listado de usuarios de la aplicación, enviar una invitación de amistad a un usuario.
+    //Comprobar que la solicitud de amistad aparece en el listado de invitaciones (punto siguiente).
+    @Test
+    @Order(19)
+    public void PR19() {
+        //NOTA: Si lo ejecutas varias veces hay que eliminar la primera invitacion de la base de datos
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        //Accede directamente a la lista
+        PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
+        //Enviamos la peticion al user04
+        PO_PrivateView.click(driver, "//a[contains(@href, '/users/invitar/6274d39b467a68732f90f6f3')]", 0);
+        // Vamos al formulario de logeo
+        PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
+        //PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "user04@email.com", "user04");
+
+        PO_NavView.clickOption(driver, "Invitaciones", "class", "btn btn-primary");
+
+            SeleniumUtils.textIsPresentOnPage(driver,"Mongo");
+    }
+    //[Prueba20] Desde el listado de usuarios de la aplicación, enviar una invitación de amistad a un usuario al
+    //que ya le habíamos enviado la invitación previamente. No debería dejarnos enviar la invitación, se podría
+    //ocultar el botón de enviar invitación o notificar que ya había sido enviada previamente
+    @Test
+    @Order(20)
+    public void PR20() {
+        //NOTA: Si lo ejecutas varias veces hay que eliminar la primera invitacion de la base de datos
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        //Accede directamente a la lista
+        PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
+        //Enviamos la peticion otra vez al user04
+        PO_PrivateView.click(driver, "//a[contains(@href, '/users/invitar/6274d39b467a68732f90f6f3')]", 0);
+        SeleniumUtils.textIsPresentOnPage(driver,"Ya hay invitacion");
+    }
+    //[Prueba21] Mostrar el listado de invitaciones de amistad recibidas. Comprobar con un listado que
+    //contenga varias invitaciones recibidas.
+    @Test
+    @Order(21)
+    public void PR21() {
+        //NOTA: Si lo ejecutas varias veces hay que eliminar la primera invitacion de la base de datos
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        //Accede directamente a la lista
+        PO_LoginView.fillLoginForm(driver, "user02@email.com", "user02");
+        //Enviamos la peticion otra vez al user04
+        PO_PrivateView.click(driver, "//a[contains(@href, '/users/invitar/6274d39b467a68732f90f6f3')]", 0);
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "user04@email.com", "user04");
+        PO_PrivateView.click(driver, "//a[contains(@href, '/invitaciones/listInvitaciones')]", 0);
+        SeleniumUtils.textIsPresentOnPage(driver,"Mongo");
+        SeleniumUtils.textIsPresentOnPage(driver,"Lucas");
+    }
+    //[Prueba22] Sobre el listado de invitaciones recibidas. Hacer clic en el botón/enlace de una de ellas y
+    //comprobar que dicha solicitud desaparece del listado de invitaciones.
+    @Test
+    @Order(22)
+    public void PR22() {
+        //NOTA: Si lo ejecutas varias veces hay que eliminar la primera invitacion de la base de datos
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+
+        PO_LoginView.fillLoginForm(driver, "user04@email.com", "user04");
+
+        PO_PrivateView.click(driver, "//a[contains(@href, '/invitaciones/listInvitaciones')]", 0);
+        //Hay que aceptar invitacion
+    }
+  
     // PR23. Mostrar el listado de amigos de un usuario. Comprobar que el listado contiene los amigos que deben ser
     @Test
     @Order(23)
@@ -317,7 +468,17 @@ class SdiEntrega132ApplicationTests {
         SeleniumUtils.textIsPresentOnPage(driver, "Prueba título");
         SeleniumUtils.textIsPresentOnPage(driver, "Prueba contenido");
     }
-
+    //[Prueba26] Mostrar el listado de publicaciones de un usuario y comprobar que se muestran todas las que
+    //existen para dicho usuario
+    @Test
+    @Order(26)
+    public void PR26() {
+        PO_NavView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
+        PO_PrivateView.click(driver, "//a[contains(@href, '/publications/listPublicaciones')]", 0);
+        SeleniumUtils.textIsPresentOnPage(driver,"Primera publicación");
+        SeleniumUtils.textIsPresentOnPage(driver,"Otra pub");
+    }
     // PR27. Probar que se muestran todas las publicaciones de un amigo
     @Test
     @Order(27)

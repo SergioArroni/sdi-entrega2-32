@@ -12,7 +12,7 @@ public class PO_PrivateView extends PO_NavView {
     static public void listUsers(WebDriver driver) {
         enterToMenu(driver, "users-menu");
         //Pinchamos en la opción de lista de notas.
-        List<WebElement> elements = PO_View.checkElementBy(driver, "free", "//a[contains(@href, 'user/list')]");
+        List<WebElement> elements = PO_View.checkElementBy(driver, "free", "//a[contains(@href, 'user   /list')]");
         elements.get(0).click();
     }
 
@@ -49,12 +49,12 @@ public class PO_PrivateView extends PO_NavView {
     }
 
     static public void fillSearch(WebDriver driver, String textp) {
-        WebElement text = driver.findElement(By.name("searchText"));
+        WebElement text = driver.findElement(By.name("search"));
         text.click();
         text.clear();
         text.sendKeys(textp);
         //Pulsar el boton de Buscar.
-        By boton = By.className("btn"); 
+        By boton = By.id("searchButton");
         driver.findElement(boton).click();
     }
 
