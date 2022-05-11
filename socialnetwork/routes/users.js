@@ -175,6 +175,10 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                         {"email": {$regex: ".*" + searchText + ".*"}}]
                 };
             }
+            if(req.query.search){
+                req.session.user.search = req.query.search;
+            }
+
             let page = parseInt(req.query.page);
             if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") {
                 page = 1;
@@ -198,7 +202,7 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                         search: searchText,
                         pages: pages,
                         currentPage: page,
-                        session: req.session.user
+                        session: req.session.user,
                     }
                     res.render("users/listUsers.twig", response);
                 })
