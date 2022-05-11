@@ -4,6 +4,8 @@
   "version": "1.0.0",
   "dependencies": {
     "express": "^4.17.3",
+    "jsonwebtoken": "^8.5.1",
+    "log4js": "^6.4.6",
     "mongodb": "^4.5.0"
   }
 }
