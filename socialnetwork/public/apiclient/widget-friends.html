@@ -38,11 +38,19 @@
         for (let i = 0; i < users.length; i++) {
             getLastMessage(users[i])
                 .then((response) => {
-                    var m;
-                    if (response != undefined)
-                        m = response.text
-                    else
+                    var m = "<b>";
+                    if (response != undefined) {
+                        console.log(response.id_from)
+                        if (response.id_from == users[i]._id) {
+                            m += users[i].name+": "
+                        } else {
+                            m += "Tú: "
+                        }
+                        m += "</b>"+response.text
+                        m += "<br>"+new Date(response.date).toLocaleString()
+                    } else {
                         m = "No hay mensajes"
+                    }
 
                     $("#friendsTableBody").append(
                         "<tr id=" + users[i]._id + ">" +

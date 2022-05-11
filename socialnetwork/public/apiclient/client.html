@@ -39,29 +39,44 @@
     let token;
     let URLbase = "http://localhost:8081/api/v1.0";
     let currentFriendID;
-    if ( Cookies.get('token') != null ){
-        token = Cookies.get('token');
-        $( "#main-container" ).load("widget-friends.html");
-        let url = new URL(window.location.href);
-        let w = url.searchParams.get("w");
+    function loadPage() {
+        if (Cookies.get('token') != null) {
+            token = Cookies.get('token');
+            $("#main-container").load("widget-friends.html");
+            let url = new URL(window.location.href);
+            let w = url.searchParams.get("w");
 
-        if (w == "login") {
+            if (w == "login") {
+                $("#main-container").load("widget-login.html");
+            }
+            if (w == "friends") {
+                $("#main-container").load("widget-friends.html");
+            }
+            if (w == "chat") {
+                $("#main-container").load("widget-chat.html");
+            }
+
+        } else {
             $("#main-container").load("widget-login.html");
         }
-        if (w == "friends") {
-            $("#main-container").load("widget-friends.html");
-        }
-        if (w == "chat") {
-            $("#main-container").load("widget-chat.html");
-        }
-
-    }else {
-        $( "#main-container" ).load("widget-login.html");
     }
+    
+    loadPage()
 
     function widgetFriends(){
         $( "#main-container" ).load( "widget-friends.html");
     }
+
+    function onLocationChange(event) {
+        // Aqui puedes hacer acionar los cambios del site
+        loadPage()
+        console.log(`window ha detectado el cambio del url a: ${window.location.pathname}`);
+    };
+
+    window.addEventListener('popstate', onLocationChange);
+
+
+
 </script>
 </body>
 </html>
