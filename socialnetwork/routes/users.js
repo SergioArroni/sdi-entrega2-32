@@ -84,7 +84,7 @@ module.exports = function (app, usersRepository, friendsRepository, publications
      *  @param ruta de acceso /users/login
      *  @param funcion que se ejecuta cuando se acceda a dicha ruta con una peticion POST
      *          Comprueba que exista dicho usuario y comprueba su contraseña,
-     *          si todo esta correcto lo mete en sesison y depende de
+     *          si to_do esta correcto lo mete en sesison y depende de
      *          si es Admin (/users/listAdmin) o User (/users/listUsers) le envia a una u otra pagina
      */
     app.post('/users/login', function (req, res) {
@@ -127,7 +127,7 @@ module.exports = function (app, usersRepository, friendsRepository, publications
      *  @param ruta de acceso /users/register
      *  @param funcion que se ejecuta cuando se acceda a dicha ruta con una peticion POST
      *          Comprueba que no exista dicho usuario y comprueba su contraseñas que coincidan entre ellas,
-     *          si todo esta correcto lo mete en la BD
+     *          si to_do esta correcto lo mete en la BD
      *          y le envia al login
      */
     app.post('/users/register', function (req, res) {
