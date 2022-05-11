@@ -115,6 +115,18 @@ module.exports = {
             throw (error);
         }
     },
+    readMessages: async function (message, filter, options) {
+        try {
+            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
+            const database = client.db("Cluster0");
+            const collectionName = 'messages';
+            const messagesCollection = database.collection(collectionName);
+            let result = await messagesCollection.updateMany(filter, {$set: message}, options);
+            return result;
+        } catch (error) {
+            throw (error);
+        }
+    },
     getMessages: async function (filter1, filter2, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
