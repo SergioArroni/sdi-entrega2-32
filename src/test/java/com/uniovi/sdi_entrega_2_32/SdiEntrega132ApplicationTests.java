@@ -373,10 +373,9 @@ class SdiEntrega132ApplicationTests {
         PO_HomeView.clickOption(driver, "logout", "class", "btn btn-primary");
         //PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
         PO_LoginView.fillLoginForm(driver, "user04@email.com", "user04");
+        PO_PrivateView.click(driver, "//a[contains(@href, '/invitaciones/listInvitaciones')]", 0);
 
-        PO_NavView.clickOption(driver, "Invitaciones", "class", "btn btn-primary");
-
-            SeleniumUtils.textIsPresentOnPage(driver,"Mongo");
+        SeleniumUtils.textIsPresentOnPage(driver,"Mongo");
     }
     //[Prueba20] Desde el listado de usuarios de la aplicación, enviar una invitación de amistad a un usuario al
     //que ya le habíamos enviado la invitación previamente. No debería dejarnos enviar la invitación, se podría
@@ -420,7 +419,11 @@ class SdiEntrega132ApplicationTests {
         PO_LoginView.fillLoginForm(driver, "user04@email.com", "user04");
 
         PO_PrivateView.click(driver, "//a[contains(@href, '/invitaciones/listInvitaciones')]", 0);
-        //Hay que aceptar invitacion
+
+        PO_PrivateView.click(driver, "//a[contains(@href, '/invitaciones/aceptar/626b9f4d58be38a6ca85cdbe')]", 0);
+        PO_PrivateView.click(driver, "//a[contains(@href, '/invitaciones/listInvitaciones')]", 0);
+        SeleniumUtils.textIsNotPresentOnPage(driver,"Mongo");
+        SeleniumUtils.textIsPresentOnPage(driver,"Lucas");
     }
   
     // PR23. Mostrar el listado de amigos de un usuario. Comprobar que el listado contiene los amigos que deben ser
