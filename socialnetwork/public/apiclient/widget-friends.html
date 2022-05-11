@@ -1,4 +1,6 @@
 <div id="widget-friends" >
+    <input id="filter-by-name" class="form-control" placeholder="Filtrar por nombre" type="text"/>
+    <br>
     <button class="btn" onclick="loadFriends()" >Actualizar</button>
     <table class="table table-hover">
         <thead>
@@ -75,6 +77,7 @@
                 type: "GET",
                 data: {},
                 dataType: 'json',
+                async: false,
                 headers: {"token": token},
                 success: function (response) {
                    var len = response.messages.length;
@@ -91,4 +94,11 @@
         currentFriendID = user
         $( "#main-container" ).load( "widget-chat.html");
     }
+
+    $('#filter-by-name').on('input',function(e){
+        let filteredFriends = [];
+        let filterValue = $("#filter-by-name").val();
+        filteredFriends = users.filter(user => user.name.includes(filterValue));
+        updateFriendsTable(filteredFriends);
+    });
 </script>
