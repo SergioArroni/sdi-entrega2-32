@@ -9,11 +9,10 @@ module.exports = function (app, usersRepository, friendsRepository) {
             let id = user[0]._id;
             let filter1 = {id_from: id};
             let filter2 = {id_to: id};
-            options = {};
             friendsRepository.getFriends(filter1, filter2, options).then(friends => {
                 let ids = new Array();
-                for(let i = 0; i < friends.length; i++){
-                    if(friends[i].accept) {
+                for (let i = 0; i < friends.length; i++) {
+                    if (friends[i].accept) {
                         if (friends[i].id_from.equals(id)) {
                             ids.push(friends[i].id_to);
                         } else {
@@ -21,24 +20,24 @@ module.exports = function (app, usersRepository, friendsRepository) {
                         }
                     }
                 }
-                usersRepository.getFriends(ids).then(users =>{
+                usersRepository.getFriends(ids).then(users => {
                     res.status(200);
                     res.send({users: users});
                 }).catch(error => {
                     res.status(500);
-                    res.json({ error: "Se ha producido un error al cargar los usuarios." })
+                    res.json({error: "Se ha producido un error al cargar los usuarios."})
                 });
             }).catch(error => {
                 res.status(500);
-                res.json({ error: "Se ha producido un error al cargar los usuarios." })
+                res.json({error: "Se ha producido un error al cargar los usuarios."})
             });
         }).catch(error => {
             res.status(500);
-            res.json({ error: "Se ha producido un error al cargar los usuarios." })
+            res.json({error: "Se ha producido un error al cargar los usuarios."})
         });
     });
 
-    app.post('/api/v1.0/users/login',function (req, res){
+    app.post('/api/v1.0/users/login', function (req, res) {
         try {
             let securePassword = app.get("crypto").createHmac('sha256', app.get('clave'))
                 .update(req.body.password).digest('hex');
@@ -72,7 +71,7 @@ module.exports = function (app, usersRepository, friendsRepository) {
                     authenticated: false
                 })
             })
-        } catch(e){
+        } catch (e) {
             res.status(500);
             res.json({
                 message: "Se ha producido un error al verificar credenciales",
@@ -88,13 +87,15 @@ module.exports = function (app, usersRepository, friendsRepository) {
         if (req.body.text.trim() == "") {
             res.status(409);
             res.json({error: "El texto no puede ser vacío"});
-        } else{
+        } else {
             usersRepository.getUsers(filter, options).then(user => {
                 let id = user[0]._id;
                 let idFriend = ObjectId(req.params.id);
                 let filter1 = {id_from: id, id_to: idFriend};
                 let filter2 = {id_to: id, id_from: idFriend};
                 options = {};
+                const time = Date.now();
+                let date = new Date(time);
                 friendsRepository.getFriends(filter1, filter2, options).then(friend => {
                     let sonAmigos = friend[0].accept;
                     if (friend != null) {
@@ -103,7 +104,8 @@ module.exports = function (app, usersRepository, friendsRepository) {
                                 id_from: id,
                                 id_to: idFriend,
                                 text: req.body.text,
-                                saw: false
+                                saw: false,
+                                date: date
                             }
                             usersRepository.insertMessage(message, function (messageId) {
                                 if (messageId === null) {
@@ -148,7 +150,7 @@ module.exports = function (app, usersRepository, friendsRepository) {
             options = {};
             friendsRepository.getFriends(filter1, filter2, options).then(friend => {
                 let sonAmigos = friend[0].accept;
-                if(sonAmigos) {
+                if (sonAmigos) {
                     usersRepository.getMessages(filter1, filter2, options).then(messages => {
                         res.status(200);
                         res.send({messages: messages});
@@ -156,18 +158,17 @@ module.exports = function (app, usersRepository, friendsRepository) {
                         res.status(500);
                         res.json({error: "Se ha producido un error al cargar los usuarios."})
                     });
-                }
-                else{
+                } else {
                     res.status(422);
-                    res.json({ error: "No sois amigos." })
+                    res.json({error: "No sois amigos."})
                 }
             }).catch(error => {
                 res.status(500);
-                res.json({ error: "Se ha producido un error al enviar el mensaje." })
+                res.json({error: "Se ha producido un error al enviar el mensaje."})
             });
         }).catch(error => {
             res.status(500);
-            res.json({ error: "Se ha producido un error al enviar el mensaje." })
+            res.json({error: "Se ha producido un error al enviar el mensaje."})
         });
     });
 
@@ -182,16 +183,65 @@ module.exports = function (app, usersRepository, friendsRepository) {
             //Si la _id NO no existe, no crea un nuevo documento.
             const options = {upsert: false};
 
-            usersRepository.getMessage(filter,{}).then(message => {
+            usersRepository.getMessage(filter, {}).then(message => {
                 let id_to = message.id_to
                 if (!id.equals(id_to)) {
                     res.status(403);
                     res.json({error: "No es el receptor del mensaje."});
                 } else {
+                    let m = {
+                        saw: true
+                    }
+                    usersRepository.readMessage(m, filter, options).then(result => {
+
+                        //La _id No existe o los datos enviados no difieren de los ya almacenados.
+                        if (result.modifiedCount == 0) {
+                            res.status(409);
+                            res.json({error: "No se ha modificado ningun mensaje."});
+                        } else {
+                            res.status(200);
+                            res.json({
+                                message: "Mensaje leído correctamente."
+                            })
+                        }
+                    }).catch(error => {
+                        res.status(500);
+                        res.json({error: "Se ha producido un error al leer el mensaje: " + error})
+                    }).catch(error => {
+                        res.status(500);
+                        res.json({error: "Se ha producido un error al leer el mensaje: " + error})
+                    });
+                }
+            }).catch(error => {
+                res.status(500);
+                res.json({error: "Se ha producido un error al leer el mensaje: " + error})
+            });
+        });
+    });
+
+    app.put("/api/v1.0/message", function (req, res) {
+        let user = res.user
+        let filter = {email: user}
+        let options = {}
+        usersRepository.getUsers(filter, options).then(user => {
+            let id = user[0]._id;
+            //let messageId = ObjectId(req.params.id);
+            let idFriend = ObjectId(req.body.idFriend);
+            let filter = {id_to: id, id_from: idFriend};
+            //filter = {_id: messageId};
+            //Si la _id NO no existe, no crea un nuevo documento.
+            const options = {upsert: false};
+
+            usersRepository.getMessages(filter, {}).then(message => {
+                /*let id_to = message.id_to
+                if (!id.equals(id_to)) {
+                    res.status(403);
+                    res.json({error: "No es el receptor del mensaje."});*/
+               
                 let m = {
                     saw: true
                 }
-                usersRepository.readMessage(m, filter, options).then(result => {
+                usersRepository.readMessages(m, filter, options).then(result => {
 
                     //La _id No existe o los datos enviados no difieren de los ya almacenados.
                     if (result.modifiedCount == 0) {
@@ -200,17 +250,17 @@ module.exports = function (app, usersRepository, friendsRepository) {
                     } else {
                         res.status(200);
                         res.json({
-                            message: "Mensaje leído correctamente."
+                            message: "Mensajes leídos correctamente."
                         })
                     }
                 }).catch(error => {
                     res.status(500);
-                    res.json({error: "Se ha producido un error al leer el mensaje: "+error})
+                    res.json({error: "Se ha producido un error al leer el mensaje: " + error})
                 }).catch(error => {
                     res.status(500);
-                    res.json({error: "Se ha producido un error al leer el mensaje: "+error})
+                    res.json({error: "Se ha producido un error al leer el mensaje: " + error})
                 });
-            }}).catch(error => {
+            }).catch(error => {
                 res.status(500);
                 res.json({error: "Se ha producido un error al leer el mensaje: " + error})
             });

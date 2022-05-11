@@ -49,16 +49,16 @@ module.exports = {
         }
     }, getFriends: async function(ids) {
         let users = new Array();
+        let options = { sort: { "name": 1 }, projection: { email: 1,name : 1, surname : 1} };
         for(let i = 0; i < ids.length; i++) {
             try {
                 let filter = {_id: ids[i]};
-                let options = {};
                 const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
                 const database = client.db("Cluster0");
                 const collectionName = 'users';
                 const usersCollection = database.collection(collectionName);
-                const user = await usersCollection.findOne(filter, options);
-                users.push(user);
+                const user = await usersCollection.find(filter, options).toArray();
+                users.push(user[0]);
             } catch (error) {
                 throw (error);
             }
@@ -115,16 +115,29 @@ module.exports = {
             throw (error);
         }
     },
+    readMessages: async function (message, filter, options) {
+        try {
+            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
+            const database = client.db("Cluster0");
+            const collectionName = 'messages';
+            const messagesCollection = database.collection(collectionName);
+            let result = await messagesCollection.updateMany(filter, {$set: message}, options);
+            return result;
+        } catch (error) {
+            throw (error);
+        }
+    },
     getMessages: async function (filter1, filter2, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
             const collectionName = 'messages';
             const messagesCollection = database.collection(collectionName);
-            const message = await messagesCollection.find(filter1, options).toArray();
-            const message2 = await messagesCollection.find(filter2, options).toArray();
-            const totalMessages = message.concat(message2);
-            return totalMessages;
+
+            const messages = await messagesCollection.find({
+                $or:[filter1, filter2]},{}).sort({date:1}).toArray();
+
+            return messages;
         } catch (error) {
             throw (error);
         }

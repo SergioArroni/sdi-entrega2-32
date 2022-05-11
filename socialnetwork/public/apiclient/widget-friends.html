@@ -1,20 +1,23 @@
-<div id="widget-songs" >
-    <button class="btn" onclick="loadSongs()" >Actualizar</button>
+<div id="widget-friends" >
+    <button class="btn" onclick="loadFriends()" >Actualizar</button>
     <table class="table table-hover">
         <thead>
         <tr>
-            <th>Título</th>
-            <th>Género</th>
-            <th>Precio</th>
+            <th>Email</th>
+            <th>Name</th>
+            <th>Surname</th>
+            <th>Messages</th>
             <th class="col-md-1"></th>
         </tr>
         </thead>
-        <tbody id="songsTableBody"></tbody>
+        <tbody id="friendsTableBody"></tbody>
     </table>
 </div>
 <script>
+    window.history.pushState("", "", "/apiclient/client.html?w=friends");
     var users;
-    function loadSongs() {
+
+    function loadFriends() {
         $.ajax({
             url: URLbase + "/friendlist",
             type: "GET",
@@ -23,27 +26,69 @@
             headers: {"token": token},
             success: function (response) {
                 users = response.users;
-                updateSongsTable(users);
+                updateFriendsTable(users);
             },
             error: function (error) {
                 $("#main-container").load("widget-login.html");
             }
         });
     }
-    function updateSongsTable(users) {
-        $("#songsTableBody").empty(); // Vaciar la tabla
+    function updateFriendsTable(users) {
+        $("#friendsTableBody").empty(); // Vaciar la tabla
         for (let i = 0; i < users.length; i++) {
-            $("#songsTableBody").append(
-                "<tr id=" + users[i]._id + ">" +
-                "<td>" + users[i].email + "</td>" +
-                "<td>" + users[i].name + "</td>" +
-                "<td>" + users[i].surname + "</td>" +
-                "<td>" +
-                "</td>" +
-                "</tr>");
-            // Mucho cuidado con las comillas del eliminarCancion
-            //la id tiene que ir entre comillas ' '
+            getLastMessage(users[i])
+                .then((response) => {
+                    var m = "<b>";
+                    if (response != undefined) {
+                        console.log(response.id_from)
+                        if (response.id_from == users[i]._id) {
+                            m += users[i].name+": "
+                        } else {
+                            m += "Tú: "
+                        }
+                        m += "</b>"+response.text
+                        m += "<br>"+new Date(response.date).toLocaleString()
+                    } else {
+                        m = "No hay mensajes"
+                    }
+
+                    $("#friendsTableBody").append(
+                        "<tr id=" + users[i]._id + ">" +
+                        "<td>" + users[i].email + "</td>" +
+                        "<td>" + users[i].name + "</td>" +
+                        "<td>" + users[i].surname + "</td>" +
+                        "<td><a onclick=widgetChat(\""+users[i]._id+"\")>" + m + "</a></td>" +
+                        "<td>" +
+                        "</td>" +
+                        "</tr>");
+                }).catch((error) => {
+                    console.log(error)
+                })
         }
     }
-    loadSongs();
+    loadFriends();
+
+    function getLastMessage(user){
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: URLbase + "/message/list/"+user._id,
+                type: "GET",
+                data: {},
+                dataType: 'json',
+                headers: {"token": token},
+                success: function (response) {
+                   var len = response.messages.length;
+                   resolve(response.messages[len-1]);
+                },
+                error: function (error) {
+                    reject(error)
+                },
+            });
+        })
+    }
+
+    function widgetChat(user){
+        currentFriendID = user
+        $( "#main-container" ).load( "widget-chat.html");
+    }
 </script>
