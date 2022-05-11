@@ -1,19 +1,22 @@
 const {ObjectID} = require("mongodb");
+/**
+ * @param app
+ * @param usersRepository
+ * @param friendsRepository
+ * @param publicationsRepository
+ */
 module.exports = function (app, usersRepository, friendsRepository, publicationsRepository) {
-    app.get('/users/listAdmin' +
-        '', function (req, res) {
+
+    /**
+     *  @param ruta de acceso /users/listAdmin
+     *  @param funcion que se ejecuta cuando se acceda a dicha ruta con una peticion GET
+     *          Muestra todos los usuarios de la app y permite borrar a todos menos al admin
+     */
+    app.get('/users/listAdmin', function (req, res) {
         let userA = req.session.user
         if (userA.rol == 'Admin') {
             usersRepository.getUsers({}, {}).then(users => {
-                let usuariosNormales = [];
-
-                for (let i = 0; i < users.length; i++) {
-                    if (users[i].rol != 'Admin') {
-                        usuariosNormales.push(users[i]);
-                    }
-                }
-
-                res.render("users/users.twig", {users: usuariosNormales, session: req.session.user});
+                res.render("users/users.twig", {users: users, session: req.session.user});
             }).catch(error => {
                 res.send("Se ha producido un error al listar los usuarios:" + error)
             });
@@ -22,6 +25,12 @@ module.exports = function (app, usersRepository, friendsRepository, publications
             res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
         }
     })
+
+    /**
+     *  @param ruta de acceso /users/listAdmin
+     *  @param funcion que se ejecuta cuando se acceda a dicha ruta con una peticion POST
+     *          Borra a todos los usuarios seleccionados
+     */
     app.post('/users/listAdmin', function (req, res) {
             let userA = req.session.user
             if (userA.rol == 'Admin') {
@@ -52,13 +61,32 @@ module.exports = function (app, usersRepository, friendsRepository, publications
             }
         }
     )
+    /**
+     *  @param ruta de acceso /users/logout
+     *  @param funcion que se ejecuta cuando se acceda a dicha ruta con una peticion GET
+     *          Saca de la sesion al usuario actual
+     */
     app.get('/users/logout', function (req, res) {
         req.session.user = null;
         res.redirect("/users/login");
     })
+
+    /**
+     *  @param ruta de acceso /users/login
+     *  @param funcion que se ejecuta cuando se acceda a dicha ruta con una peticion GET
+     *          Renderiza la pagina de login
+     */
     app.get('/users/login', function (req, res) {
         res.render("users/login.twig", {session: req.session.user});
     })
+
+    /**
+     *  @param ruta de acceso /users/login
+     *  @param funcion que se ejecuta cuando se acceda a dicha ruta con una peticion POST
+     *          Comprueba que exista dicho usuario y comprueba su contraseña,
+     *          si to_do esta correcto lo mete en sesison y depende de
+     *          si es Admin (/users/listAdmin) o User (/users/listUsers) le envia a una u otra pagina
+     */
     app.post('/users/login', function (req, res) {
             let securePassword = app.get("crypto").createHmac('sha256', app.get('clave'))
                 .update(req.body.password).digest('hex');
@@ -85,9 +113,56 @@ module.exports = function (app, usersRepository, friendsRepository, publications
             })
         }
     );
+    /**
+     *  @param ruta de acceso /users/register
+     *  @param funcion que se ejecuta cuando se acceda a dicha ruta con una peticion GET
+     *          Renderiza la pagina de register
+     */
     app.get('/users/register', function (req, res) {
         res.render("users/register.twig", {session: req.session.user});
     });
+
+
+    /**
+     *  @param ruta de acceso /users/register
+     *  @param funcion que se ejecuta cuando se acceda a dicha ruta con una peticion POST
+     *          Comprueba que no exista dicho usuario y comprueba su contraseñas que coincidan entre ellas,
+     *          si to_do esta correcto lo mete en la BD
+     *          y le envia al login
+     */
+    app.post('/users/register', function (req, res) {
+        let filter = {
+            email: req.body.email
+        }
+        let options = {};
+        usersRepository.findUser(filter, options).then(user => {
+            if (user == null) {
+                if (req.body.password === req.body.repeatPassword) {
+                    let securePassword = app.get("crypto").createHmac('sha256', app.get('clave')).update(req.body.password).digest('hex');
+                    let user = {
+                        email: req.body.email,
+                        name: req.body.name,
+                        surname: req.body.surname,
+                        password: securePassword,
+                        rol: 'User'
+                    }
+                    usersRepository.insertUser(user).then(userId => {
+                        res.redirect("/users/login");
+                    }).catch(error => {
+                        res.redirect("/users/register" + "?message=Se ha producido un error al registrar el usuario" + "&messageType=alert-danger ");
+                    });
+                } else {
+                    res.redirect("/users/register" + "?message=Las dos contraseñas no coinciden" + "&messageType=alert-danger ");
+                }
+            } else {
+                res.redirect("/users/register" + "?message=Este email ya esta vinculado con un usuario" + "&messageType=alert-danger ");
+            }
+        }).catch(error => {
+            req.session.user = null;
+            res.redirect("/users/login" + "?message=Se ha producido un error al buscar el usuario" + "&messageType=alert-danger ");
+        })
+    });
+
     app.get("/users/listUsers", function (req, res) {
 
         if (req.session.user) {
@@ -135,39 +210,6 @@ module.exports = function (app, usersRepository, friendsRepository, publications
             req.session.user = null;
             res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin estar autenticado" + "&messageType=alert-danger ");
         }
-    });
-
-    app.post('/users/register', function (req, res) {
-        let filter = {
-            email: req.body.email
-        }
-        let options = {};
-        usersRepository.findUser(filter, options).then(user => {
-            if (user == null) {
-                if (req.body.password === req.body.repeatPassword) {
-                    let securePassword = app.get("crypto").createHmac('sha256', app.get('clave')).update(req.body.password).digest('hex');
-                    let user = {
-                        email: req.body.email,
-                        name: req.body.name,
-                        surname: req.body.surname,
-                        password: securePassword,
-                        rol: 'User'
-                    }
-                    usersRepository.insertUser(user).then(userId => {
-                        res.redirect("/users/login");
-                    }).catch(error => {
-                        res.redirect("/users/register" + "?message=Se ha producido un error al registrar el usuario" + "&messageType=alert-danger ");
-                    });
-                } else {
-                    res.redirect("/users/register" + "?message=Las dos contraseñas no coinciden" + "&messageType=alert-danger ");
-                }
-            } else {
-                res.redirect("/users/register" + "?message=Este email ya esta vinculado con un usuario" + "&messageType=alert-danger ");
-            }
-        }).catch(error => {
-            req.session.user = null;
-            res.redirect("/users/login" + "?message=Se ha producido un error al buscar el usuario" + "&messageType=alert-danger ");
-        })
     });
 
     app.get('/users/friends', function (req, res) {
