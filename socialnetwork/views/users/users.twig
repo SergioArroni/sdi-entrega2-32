@@ -18,7 +18,9 @@
                         <td>{{ user.name }}</td>
                         <td>{{ user.surname }}</td>
                         <td>
-                            <input type="checkbox" name={{ user._id }} value={{ user._id}} id={{ loop.index}}><label for={{ user._id }}>Eliminar</label>
+                            {% if user.rol != 'Admin' %}
+                                <input type="checkbox" name={{ user._id }} value={{ user._id}} id={{ loop.index}}><label for={{ user._id }}>Eliminar</label>
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %} </tbody>
