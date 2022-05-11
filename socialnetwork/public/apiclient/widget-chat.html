@@ -1,6 +1,16 @@
 <div id="widget-chat">
 
     <div class="container">
+        <h1>Chat</h1>
+        <table class="table table-hover" style="border-collapse: separate;border-spacing: 0.5em 0.2em;">
+            <thead>
+            <tr>
+                <th class="col-md-2"></th>
+                <th class="col-md-2"></th>
+            </tr>
+            </thead>
+            <tbody id="chatTableBody"></tbody>
+        </table>
         <h2>Nuevo mensaje</h2>
         <form class="form-horizontal" method="post" action="/comments/{{ song._id }}"  enctype="multipart/form-data">
             <div class="form-group">
@@ -17,7 +27,74 @@
     </div>
 
 </div>
+<script>
+    setInterval(loadMessages, 300);
 
+    var messages
+    function loadMessages() {
+        console.log(URLbase + "/message/list/"+currentFriendID)
+        $.ajax({
+            url: URLbase + "/message/list/"+currentFriendID,
+            type: "GET",
+            data: {},
+            dataType: 'json',
+            headers: {"token": token},
+            success: function (response) {
+
+                messages = response.messages;
+                updateChatTable(messages);
+            },
+            error: function (error) {
+
+            }
+        });
+    }
+    function readMessages() {
+        $.ajax({
+            url: URLbase + "/message",
+            type: "PUT",
+            data: {idFriend:currentFriendID},
+            dataType: 'json',
+            headers: {"token": token},
+            success: function (response) {
+            },
+            error: function (error) {
+
+            }
+        });
+    }
+    function updateChatTable(messages) {
+        $("#chatTableBody").empty(); // Vaciar la tabla
+
+        let leido = ""
+        for (let i = 0; i < messages.length; i++) {
+
+            if (messages[i].saw) {
+                leido = "<br>leído✓✓"
+            } else {
+                leido =""
+            }
+            if (messages[i].id_to == currentFriendID) {
+                $("#chatTableBody").append(
+                    "<tr style='padding:5em;' id=" + messages[i]._id + " >" +
+                    "<td style='border: none'>" +
+                    "</td>" +
+                    "<td style=\"border-radius: 15px;border:none;background-color:#00FFFF;text-align:right\">" + messages[i].text+"<br><span style=\"color:gray;font-size: 0.8em;\">"+new Date(messages[i].date).toLocaleString() + leido + "</span></td>" +
+                    "</tr>");
+            } else {
+                readMessages()
+                $("#chatTableBody").append(
+                    "<tr style='padding:5em;' id=" + messages[i]._id + ">" +
+                    "<td style=\"border-radius: 15px;border:none;background-color:#F0D7EE;text-align:left\">" + messages[i].text+"<br><span style=\"color:gray;font-size: 0.8em;\">"+new Date(messages[i].date).toLocaleString() + leido + "</span></td>" +
+                    "<td style='border: none'>" +
+                    "</td>" +
+                    "</tr>");
+            }
+            console.log(messages[i])
+        }
+    }
+    loadMessages();
+</script>
 <script>
     window.history.pushState("", "", "/apiclient/client.html?w=chat");
     var messages;
