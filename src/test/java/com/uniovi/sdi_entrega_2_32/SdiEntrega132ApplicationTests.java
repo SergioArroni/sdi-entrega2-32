@@ -549,6 +549,30 @@ class SdiEntrega132ApplicationTests {
 
     }
 
+    //[Prueba32] Inicio de sesión con datos válidos.
+    @Test
+    @Order(32)
+    public void PR32() {
+        driver.navigate().to(URL+"/apiclient/client.html");
+
+        PO_LoginView.fillLoginForm(driver, "user04@email.com", "user04");
+
+        SeleniumUtils.idIsPresentOnPage(driver, "widget-friends");
+    }
+
+    //[Prueba33] Inicio de sesión con datos inválidos (usuario no existente en la aplicación).
+    @Test
+    @Order(33)
+    public void PR33() {
+        driver.navigate().to(URL+"/apiclient/client.html");
+
+        PO_LoginView.fillLoginForm(driver, "usuario@noexiste.com", "cualquiera");
+
+        SeleniumUtils.waitTextIsNotPresentOnPage(driver, "text", PO_View.getTimeout());
+    }
+
+
+
 /**
     //[Prueba11] Mostrar el listado de usuarios y comprobar que se muestran todos los que existen en el sistema
     @Test
