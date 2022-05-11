@@ -9,7 +9,6 @@ module.exports = function (app, usersRepository, friendsRepository) {
             let id = user[0]._id;
             let filter1 = {id_from: id};
             let filter2 = {id_to: id};
-            options = {};
             friendsRepository.getFriends(filter1, filter2, options).then(friends => {
                 let ids = new Array();
                 for (let i = 0; i < friends.length; i++) {

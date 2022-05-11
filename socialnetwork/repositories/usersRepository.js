@@ -49,16 +49,16 @@ module.exports = {
         }
     }, getFriends: async function(ids) {
         let users = new Array();
+        let options = { sort: { "name": 1 }, projection: { email: 1,name : 1, surname : 1} };
         for(let i = 0; i < ids.length; i++) {
             try {
                 let filter = {_id: ids[i]};
-                let options = {};
                 const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
                 const database = client.db("Cluster0");
                 const collectionName = 'users';
                 const usersCollection = database.collection(collectionName);
-                const user = await usersCollection.findOne(filter, options);
-                users.push(user);
+                const user = await usersCollection.find(filter, options).toArray();
+                users.push(user[0]);
             } catch (error) {
                 throw (error);
             }
