@@ -28,7 +28,8 @@
 
 </div>
 <script>
-    setInterval(loadMessages, 300);
+    if (intervalId == undefined)
+        intervalId = setInterval(loadMessages, 5000);
 
     var messages
     function loadMessages() {
@@ -90,7 +91,6 @@
                     "</td>" +
                     "</tr>");
             }
-            console.log(messages[i])
         }
     }
     loadMessages();
