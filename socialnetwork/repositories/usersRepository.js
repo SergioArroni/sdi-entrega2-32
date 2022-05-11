@@ -3,6 +3,11 @@ module.exports = {
     mongoClient: null, app: null, init: function (app, mongoClient) {
         this.mongoClient = mongoClient;
         this.app = app;
+
+        /**
+         *  @param funcion  devuelve una lista de usuarios donde podemos incluir filtros. La lista
+         *                  será devuelta ordenada por nombre
+         */
     }, getUsers: async function (filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
@@ -36,6 +41,9 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
+        /**
+         *  @param funcion  Busca UN usuario y lo devuelve aplicando un filtro.
+         */
     }, findUser: async function (filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
@@ -47,6 +55,10 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
+        /**
+         *  @param funcion  Dada una lista de ids, devolverá la lista de usuarios correspondiente.
+         *                  La lista no incluirá contraseñas ni roles.
+         */
     }, getFriends: async function(ids) {
         let users = new Array();
         let options = { sort: { "name": 1 }, projection: { email: 1,name : 1, surname : 1} };
@@ -64,6 +76,9 @@ module.exports = {
             }
         }
         return users;
+        /**
+         *  @param funcion  Inserta un usuario en la colección de usuarios.
+         */
     }, insertUser: async function (user) {
             try {
                 const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
@@ -76,6 +91,9 @@ module.exports = {
                 throw (error);
             }
         },
+    /**
+     *  @param funcion  Inserta un usuario en la colección de mensajes.
+     */
     insertMessage: async function (message, callbackFunction) {
         this.mongoClient.connect(this.app.get('connectionStrings'), function (err, dbClient) {
             if (err) {
@@ -91,6 +109,10 @@ module.exports = {
             }
         });
     },
+    /**
+     *  @param funcion  Devuelve una lista de mensajes. Normalmente se pasará un ID o dos para sacar
+     *                  los mensajes entre dos usuarios
+     */
     getMessage: async function (filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
@@ -171,6 +193,10 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
+        /**
+         *  @param funcion  Devuelve una lista de usuarios paginada (5 usuarios según la página)
+         *                  dada una de Ids.
+         */
     },getFriendsPg: async function(ids, page) {
         let users = new Array();
         const limit = 5;

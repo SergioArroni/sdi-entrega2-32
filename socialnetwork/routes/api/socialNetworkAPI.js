@@ -1,6 +1,13 @@
 const {ObjectId} = require("mongodb");
 module.exports = function (app, usersRepository, friendsRepository) {
 
+    /**
+     *  @param ruta de acceso /api/v1.0/users/login
+     *  @param funcion  Se ejecuta con una peticion GET y un token válido, devolverá la lista de amigos
+     *                  del usuario identificado a través del token.
+     *                  PD: La lista de usuarios devuelto solo tiene los
+     *                  IDs (ID y email), nombre y apellido.
+     */
     app.get("/api/v1.0/friendlist", function (req, res) {
         let user = res.user;
         let filter = {email: user}
@@ -37,6 +44,12 @@ module.exports = function (app, usersRepository, friendsRepository) {
         });
     });
 
+    /**
+     *  @param ruta de acceso /api/v1.0/users/login
+     *  @param funcion  Se ejecuta con una peticion POST, comprobará si las credenciales
+     *                  son correctas y, en caso de que lo sean, creará un token para que
+     *                  las siguientes peticiones puedan identificar al usuario actual.
+     */
     app.post('/api/v1.0/users/login', function (req, res) {
         try {
             let securePassword = app.get("crypto").createHmac('sha256', app.get('clave'))
@@ -80,6 +93,13 @@ module.exports = function (app, usersRepository, friendsRepository) {
         }
     });
 
+    /**
+     *  @param ruta de acceso /api/v1.0/message/:id
+     *  @param funcion  Se ejecuta con una peticion POST, creará un mensaje en la base de datos
+     *                  en caso de que el ID que recibe la URL y el identificado (por lo que
+     *                  tiene que haber un token válido) sean amigos entre ellos. El mensaje se
+     *                  crea como no leído.
+     */
     app.post("/api/v1.0/message/:id", function (req, res) {
         let user = res.user;
         let filter = {email: user}
@@ -138,6 +158,13 @@ module.exports = function (app, usersRepository, friendsRepository) {
         }
     });
 
+    /**
+     *  @param ruta de acceso /api/v1.0/message/list/:id
+     *  @param funcion  Se ejecuta con una peticion GET, devolverá una lista con los mensajes
+     *                  entre el ID recibido en la URL (se comprobará que sea amigo con el
+     *                  identificado) y el usuario identificado en la app (por lo que tiene que
+     *                  haber un token válido).
+     */
     app.get("/api/v1.0/message/list/:id", function (req, res) {
         let user = res.user;
         let filter = {email: user}
@@ -172,6 +199,13 @@ module.exports = function (app, usersRepository, friendsRepository) {
         });
     });
 
+    /**
+     *  @param ruta de acceso /api/v1.0/message/list/:id
+     *  @param funcion  Se ejecuta con una peticion GET, devolverá una lista con los mensajes
+     *                  entre el ID recibido en la URL (se comprobará que sea amigo con el
+     *                  identificado) y el usuario identificado en la app (por lo que tiene que
+     *                  haber un token válido).
+     */
     app.put("/api/v1.0/message/:id", function (req, res) {
         let user = res.user
         let filter = {email: user}

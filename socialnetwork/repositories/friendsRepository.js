@@ -2,6 +2,10 @@ module.exports = {
     mongoClient: null, app: null, init: function (app, mongoClient) {
         this.mongoClient = mongoClient;
         this.app = app;
+        /**
+         *  @param funcion  devuelve una lista de amigos dado un ID y devuelve la lista ordenada
+         *                  por nombre.
+         */
     }, getFriends: async function (filter1, filter2, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
