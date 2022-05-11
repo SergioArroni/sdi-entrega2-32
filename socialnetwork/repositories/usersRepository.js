@@ -9,7 +9,7 @@ module.exports = {
             const database = client.db("Cluster0");
             const collectionName = 'users';
             const usersCollection = database.collection(collectionName);
-            const users = await usersCollection.find(filter, options).toArray();
+            const users = await usersCollection.find(filter, options).sort({"name": 1}).toArray();
             return users;
         } catch (error) {
             throw (error);

@@ -13,7 +13,7 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                     }
                 }
 
-                res.render("users/users.twig", {users: usuariosNormales});
+                res.render("users/users.twig", {users: usuariosNormales, session: req.session.user});
             }).catch(error => {
                 res.send("Se ha producido un error al listar los usuarios:" + error)
             });
@@ -89,45 +89,52 @@ module.exports = function (app, usersRepository, friendsRepository, publications
         res.render("users/register.twig", {session: req.session.user});
     });
     app.get("/users/listUsers", function (req, res) {
-        let filter = {};
-        let searchText=req.query.search;
-        if (searchText != null) {
-            filter={$or: [{"name": {$regex: ".*" + searchText + ".*"}},
-                    {"surname": {$regex: ".*" + searchText + ".*"}},
-                    {"email": {$regex: ".*" + searchText + ".*"}}]};
-        }
-        let page = parseInt(req.query.page);
-        if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") {
-            page = 1;
-        }
 
-        usersRepository.getAllUsersPg(filter,page,req.session.user, function(result, usuarios){
-            let lastPage=(usuarios.length)/5;
-            if((usuarios.length)%5>0){
-                lastPage=lastPage+1;
+        if (req.session.user) {
+            let filter = {};
+            let searchText = req.query.search;
+            if (searchText != null) {
+                filter = {
+                    $or: [{"name": {$regex: ".*" + searchText + ".*"}},
+                        {"surname": {$regex: ".*" + searchText + ".*"}},
+                        {"email": {$regex: ".*" + searchText + ".*"}}]
+                };
             }
-            let pages=[];
-            for(let i=page-2;i<=page+2;i++){
-                if(i>0 && i<=lastPage){
-                    pages.push(i);
-                }
+            let page = parseInt(req.query.page);
+            if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") {
+                page = 1;
             }
-            friendsRepository.getAllFriends().then(amigos=>{
-                let response={
-                    users: result.users,
-                    friends:amigos,
-                    search:searchText,
-                    pages:pages,
-                    currentPage:page,
-                    session:req.session.user
+
+            usersRepository.getAllUsersPg(filter, page, req.session.user, function (result, usuarios) {
+                let lastPage = (usuarios.length) / 5;
+                if ((usuarios.length) % 5 > 0) {
+                    lastPage = lastPage + 1;
                 }
-                res.render("users/listUsers.twig", response);
-            })
+                let pages = [];
+                for (let i = page - 2; i <= page + 2; i++) {
+                    if (i > 0 && i <= lastPage) {
+                        pages.push(i);
+                    }
+                }
+                friendsRepository.getAllFriends().then(amigos => {
+                    let response = {
+                        users: result.users,
+                        friends: amigos,
+                        search: searchText,
+                        pages: pages,
+                        currentPage: page,
+                        session: req.session.user
+                    }
+                    res.render("users/listUsers.twig", response);
+                })
 
-        }).catch(error => {
-            res.send("Se ha producido un error al listar los usuarios:" + error)
-        });
-
+            }).catch(error => {
+                res.send("Se ha producido un error al listar los usuarios:" + error)
+            });
+        } else {
+            req.session.user = null;
+            res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin estar autenticado" + "&messageType=alert-danger ");
+        }
     });
 
     app.post('/users/register', function (req, res) {
@@ -143,7 +150,8 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                         email: req.body.email,
                         name: req.body.name,
                         surname: req.body.surname,
-                        password: securePassword
+                        password: securePassword,
+                        rol: 'User'
                     }
                     usersRepository.insertUser(user).then(userId => {
                         res.redirect("/users/login");
@@ -257,54 +265,49 @@ module.exports = function (app, usersRepository, friendsRepository, publications
         let userA = req.session.user
         let id = new ObjectID(userA._id);
         let idFriend = new ObjectID(req.params.id);
+        let filter1 = {id_from: id};
+        let filter2 = {id_to: id};
+        let aux = false;
         let filter = {user: idFriend}
         let options = {}
-        let page = parseInt(req.query.page); // Es String !!!
-        if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") {
-            page = 1;
-        }
-        publicationsRepository.getPublicationsPg(filter, options, page).then(result => {
-            let lastPage = result.total / 5;
-            console.log(lastPage)
-            if (result.total % 5 > 0) { // Sobran decimales
-                lastPage = lastPage + 1;
-            }
-            let pages = []; // paginas mostrar
-            for (let i = page - 2; i <= page + 2; i++) {
-                if (i > 0 && i <= lastPage) {
-                    pages.push(i);
-                } else {
-                    req.session.user = null;
-                    res.redirect("/users/login" + "?message=No tienes amigos" + "&messageType=alert-danger ");
+        let page = parseInt(req.query.page);
+        friendsRepository.getFriends(filter1, filter2, options).then(friends => {
+            for (let i = 0; i < friends.length; i++) {
+                if (("" + friends[i].id_from === req.params.id || "" + friends[i].id_to === req.params.id) && friends[i].accept) {
+                    aux = true;
+                    break;
                 }
             }
-            publicationsRepository.getPublicationsPg(filter, options, page).then(result => {
-                let lastPage = result.total / 4;
-                if (result.total % 4 > 0) { // Sobran decimales
-                    lastPage = lastPage + 1;
+            if (aux) {
+                if (typeof req.query.page === "undefined" || req.query.page === null || req.query.page === "0") {
+                    page = 1;
                 }
-                let pages = []; // paginas mostrar
-                for (let i = page - 2; i <= page + 2; i++) {
-                    if (i > 0 && i <= lastPage) {
-                        pages.push(i);
+                publicationsRepository.getPublicationsPg(filter, options, page).then(result => {
+                    let lastPage = result.total / 5;
+                    console.log(lastPage)
+                    if (result.total % 5 > 0) { // Sobran decimales
+                        lastPage = lastPage + 1;
                     }
-                }
-                let response = {
-                    publications: result.publications,
-                    pages: pages,
-                    currentPage: page,
-                    userid: req.params.id
-                }
-                res.render("publications/friendPublications.twig", response);
-            }).catch(error => {
-                res.send("Se ha producido un error al listar las canciones del usuario " + error)
-            });
-            let response = {
-                publications: result.publications,
-                pages: pages,
-                currentPage: page,
-                userid: req.params.id,
-                session: req.session.user
+                    let pages = []; // paginas mostrar
+                    for (let i = page - 2; i <= page + 2; i++) {
+                        if (i > 0 && i <= lastPage) {
+                            pages.push(i);
+                        }
+                    }
+                    let response = {
+                        publications: result.publications,
+                        pages: pages,
+                        currentPage: page,
+                        userid: req.params.id,
+                        session: req.session.user
+                    }
+                    res.render("publications/friendPublications.twig", response);
+                }).catch(error => {
+                    res.send("Se ha producido un error al listar las canciones del usuario " + error)
+                });
+            } else {
+                req.session.user = null;
+                res.redirect("/users/login" + "?message=No tienes amigos" + "&messageType=alert-danger ");
             }
         }).catch(error => {
             res.send("Se ha producido un error al listar los amigos " + error)
