@@ -16,11 +16,11 @@ class SdiEntrega132ApplicationTests {
     //static String Geckodriver ="C:\\nada.exe;
     //static String GeckodriverHugo ="C:\\Users\\Hugo\\Desktop\\TERCER_CURSO_INGENIERIA\\SDI\\PRACTICA\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
-    static String GeckodriverAndrea = "C:\\Users\\andre\\Documents\\CURSO 2021-2022\\CUATRI 2\\SDI\\geckodriver.exe";
-    //static String GeckodriverSergio = "C:\\Dev\\tools\\selenium\\geckodriver-v0.30.0-win64.exe";
+    //static String GeckodriverAndrea = "C:\\Users\\andre\\Documents\\CURSO 2021-2022\\CUATRI 2\\SDI\\geckodriver.exe";
+    static String GeckodriverSergio = "C:\\Dev\\tools\\selenium\\geckodriver-v0.30.0-win64.exe";
 
     //Común a Windows y a MACOSX
-    static WebDriver driver = getDriver(PathFirefox, GeckodriverAndrea);
+    static WebDriver driver = getDriver(PathFirefox, GeckodriverSergio);
 
     static String URL = "http://localhost:8081";
 
@@ -571,6 +571,58 @@ class SdiEntrega132ApplicationTests {
         SeleniumUtils.waitTextIsNotPresentOnPage(driver, "text", PO_View.getTimeout());
     }
 
+    //[Prueba34] Acceder a la lista de amigos de un usuario, que al menos tenga tres amigos.
+    @Test
+    @Order(34)
+    public void PR34() {
+        driver.navigate().to(URL+"/apiclient/client.html");
+
+        PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
+
+        SeleniumUtils.idIsPresentOnPage(driver, "widget-friends");
+
+        SeleniumUtils.waitSeconds(driver, 5);
+        SeleniumUtils.textIsPresentOnPage(driver, "user02@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver, "Lucas");
+        SeleniumUtils.textIsPresentOnPage(driver, "Preso");
+        SeleniumUtils.textIsPresentOnPage(driver, "user03@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver, "Sergio");
+        SeleniumUtils.textIsPresentOnPage(driver, "Deus");
+        SeleniumUtils.textIsPresentOnPage(driver, "user10@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver, "Carla");
+        SeleniumUtils.textIsPresentOnPage(driver, "Garcia");
+    }
+
+    //[Prueba35] Acceder a la lista de amigos de un usuario, y realizar un filtrado para encontrar a un amigo
+    //    concreto, el nombre a buscar debe coincidir con el de un amigo.
+    @Test
+    @Order(35)
+    public void PR35() {
+        driver.navigate().to(URL+"/apiclient/client.html");
+
+        PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
+
+        SeleniumUtils.idIsPresentOnPage(driver, "widget-friends");
+
+        SeleniumUtils.waitSeconds(driver, 5);
+
+        //Hacemos una búsqueda con el nombre del amigo
+        WebElement text = driver.findElement(By.id("filter-by-name"));
+        text.click();
+        text.clear();
+        text.sendKeys("Lucas");
+
+        SeleniumUtils.textIsPresentOnPage(driver, "user02@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver, "Lucas");
+        SeleniumUtils.textIsPresentOnPage(driver, "Preso");
+        SeleniumUtils.textIsNotPresentOnPage(driver, "user03@email.com");
+        SeleniumUtils.textIsNotPresentOnPage(driver, "Sergio");
+        SeleniumUtils.textIsNotPresentOnPage(driver, "Deus");
+        SeleniumUtils.textIsNotPresentOnPage(driver, "user10@email.com");
+        SeleniumUtils.textIsNotPresentOnPage(driver, "Carla");
+        SeleniumUtils.textIsNotPresentOnPage(driver, "Garcia");
+
+    }
 
 
 /**
