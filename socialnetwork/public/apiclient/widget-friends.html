@@ -48,20 +48,21 @@
     function updateFriendsTable(users) {
         $("#friendsTableBody").empty(); // Vaciar la tabla
 
+
         // Ordenar
-        /*for (let i = 0; i < users.length; i++) {
-            getLastMessage(users[i])
-                .then((response) => {
-                    if (response != undefined) {
+        if (users!=undefined) {
+            for (let i = 0; i < users.length; i++) {
+                if (users[i] != undefined) {
+                    var message = getLastMessageForUser(users[i]);
+                    if (message != undefined) {
                         users[i].fecha = response.date;
                     }
-            }).catch((error) => {
-                console.log(error)
-            })
+                }
+            }
+            users.sort(function (a, b) {
+                return a.fecha - b.fecha;
+            });
         }
-        users.sort(function (a, b) {
-            return a.fecha - b.fecha;
-        });*/
 
         for (let i = 0; i < users.length; i++) {
             console.log(users[i])
@@ -79,7 +80,8 @@
             getLastMessage(users[i])
         }
 
-        clearInterval(idIntervaloDeMensajesNoLeidos);
+        if (idIntervaloDeMensajesNoLeidos!=undefined)
+            clearInterval(idIntervaloDeMensajesNoLeidos);
         idIntervaloDeMensajesNoLeidos = setInterval(updateMessagesNotSeen, 1000);
     }
     loadFriends();
@@ -115,6 +117,31 @@
             error: function (error) {
             },
         });
+    }
+
+    /**
+     * Devuelve el último mensaje intercambiado entre el usuario en sesión y otro usuario
+     * @param user Amigo del usuario en sesión
+     */
+    function getLastMessageForUser(user) {
+        var ultimoMensaje;
+        $.ajax({
+            url: URLbase + "/message/list/" + user._id,
+            type: "GET",
+            data: {},
+            dataType: 'json',
+            headers: {"token": token},
+            success: function (response) {
+                var len = response.messages.length;
+                var message = response.messages[len - 1];
+                if (message != undefined) {
+                    ultimoMensaje = message;
+                }
+            },
+            error: function (error) {
+            },
+        });
+        return ultimoMensaje;
     }
 
     /**
