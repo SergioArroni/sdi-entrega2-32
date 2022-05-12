@@ -102,7 +102,7 @@ module.exports = {
     },
     /**
      *  @param funcion  Devuelve una lista de mensajes. Normalmente se pasará un ID o dos para sacar
-     *                  los mensajes entre dos usuarios
+     *                  los mensajes entre dos usuarios.
      */
     getMessage: async function (filter, options) {
         try {

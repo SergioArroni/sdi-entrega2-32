@@ -20,7 +20,7 @@ module.exports = {
             throw (error);
         }
         /**
-         *  @param funcion  devuelve una lista con todos los amigos registrados en la aplicación
+         *  @param funcion  devuelve una lista con todos los amigos registrados en la aplicación.
          */
     },getAllFriends: async function (){
         try {
