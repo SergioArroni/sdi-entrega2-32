@@ -13,14 +13,15 @@ import java.util.List;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class SdiEntrega132ApplicationTests {
     static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
+            //"C:\\Program Files\\Mozilla Firefox\\firefox.exe";
     //static String Geckodriver ="C:\\nada.exe;
     //static String GeckodriverHugo ="C:\\Users\\Hugo\\Desktop\\TERCER_CURSO_INGENIERIA\\SDI\\PRACTICA\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
-    //static String GeckodriverAndrea = "C:\\Users\\andre\\Documents\\CURSO 2021-2022\\CUATRI 2\\SDI\\geckodriver.exe";
-    static String GeckodriverSergio = "C:\\Dev\\tools\\selenium\\geckodriver-v0.30.0-win64.exe";
+    static String GeckodriverAndrea = "C:\\Users\\andre\\Documents\\CURSO 2021-2022\\CUATRI 2\\SDI\\geckodriver.exe";
+    //static String GeckodriverSergio = "C:\\Dev\\tools\\selenium\\geckodriver-v0.30.0-win64.exe";
 
     //Común a Windows y a MACOSX
-    static WebDriver driver = getDriver(PathFirefox, GeckodriverSergio);
+    static WebDriver driver = getDriver(PathFirefox, GeckodriverAndrea);
 
     static String URL = "http://localhost:8081";
 
@@ -210,7 +211,7 @@ class SdiEntrega132ApplicationTests {
         PO_LoginView.fillLoginForm(driver, "admin@email.com", "admin");
 
         SeleniumUtils.textIsPresentOnPage(driver, "user02@email.com");
-        SeleniumUtils.textIsPresentOnPage(driver, "user03@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver, "admin@email.com");
         SeleniumUtils.textIsPresentOnPage(driver, "user08@email.com");
         SeleniumUtils.textIsPresentOnPage(driver, "prueba5@prueba5.com");
         SeleniumUtils.textIsPresentOnPage(driver, "user01@email.com");
@@ -293,8 +294,8 @@ class SdiEntrega132ApplicationTests {
         SeleniumUtils.textIsPresentOnPage(driver,"Clara");
         SeleniumUtils.textIsPresentOnPage(driver,"Andrea");
         SeleniumUtils.textIsPresentOnPage(driver,"Lucas");
-        SeleniumUtils.textIsPresentOnPage(driver,"Sergio");
         SeleniumUtils.textIsPresentOnPage(driver,"Manolo");
+        SeleniumUtils.textIsPresentOnPage(driver,"Carla");
     }
 
     //[Prueba16] Hacer una búsqueda con el campo vacío y comprobar que se muestra la página que
@@ -308,11 +309,11 @@ class SdiEntrega132ApplicationTests {
         // Escribir en la barra de búsqueda
         PO_PrivateView.fillSearch(driver,"");
 
-        SeleniumUtils.textIsPresentOnPage(driver,"Clara");
-        SeleniumUtils.textIsPresentOnPage(driver,"Andrea");
-        SeleniumUtils.textIsPresentOnPage(driver,"Lucas");
-        SeleniumUtils.textIsPresentOnPage(driver,"Sergio");
-        SeleniumUtils.textIsPresentOnPage(driver,"Manolo");
+        SeleniumUtils.textIsPresentOnPage(driver,"user08@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver,"prueba5@prueba5.com");
+        SeleniumUtils.textIsPresentOnPage(driver,"user02@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver,"user04@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver,"user10@email.com");
 
     }
 
@@ -326,7 +327,7 @@ class SdiEntrega132ApplicationTests {
         PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
 
         //Hacemos una búsqueda escribiendo un texto que no exista
-        PO_PrivateView.fillSearch(driver, "hola");
+        PO_PrivateView.fillSearch(driver, "fhekufla");
 
         //Comprobamos que aparece la lista de usuarios vacía
         List<WebElement> result = PO_View.checkElementBy(driver, "id", "tbody");
@@ -437,11 +438,8 @@ class SdiEntrega132ApplicationTests {
         PO_PrivateView.click(driver, "//a[contains(@href, '/users/friends')]", 0);
 
         SeleniumUtils.textIsPresentOnPage(driver, "user02@email.com");
-        SeleniumUtils.textIsPresentOnPage(driver, "user03@email.com");
         SeleniumUtils.textIsPresentOnPage(driver, "Lucas");
         SeleniumUtils.textIsPresentOnPage(driver, "Preso");
-        SeleniumUtils.textIsPresentOnPage(driver, "Sergio");
-        SeleniumUtils.textIsPresentOnPage(driver, "Deus");
         PO_NavView.clickOption(driver, "logout", "class", "btn btn-primary");
     }
 
@@ -450,7 +448,7 @@ class SdiEntrega132ApplicationTests {
     @Order(24)
     public void PR24() {
         PO_NavView.clickOption(driver, "login", "class", "btn btn-primary");
-        PO_LoginView.fillLoginForm(driver, "user03@email.com", "user03");
+        PO_LoginView.fillLoginForm(driver, "user08@email.com", "user03");
 
         // Entramos en la ventana de creación
         PO_PrivateView.click(driver, "//a[contains(@href, '/users/create/publication')]", 0);
