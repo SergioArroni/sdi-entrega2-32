@@ -642,15 +642,13 @@ class SdiEntrega132ApplicationTests {
 
         SeleniumUtils.idIsPresentOnPage(driver, "widget-friends");
 
-        SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
+        SeleniumUtils.waitLoadElementsBy(driver, "id", "626b9b0958be38a6ca85cdbdmessage", PO_View.getTimeout());
 
         //Accedemos al chat de un amigo
-        //driver.navigate().to(URL+"/apiclient/client.html/message");
-
-        WebElement text = driver.findElement(By.name("626b9b0958be38a6ca85cdbdm"));
+        WebElement text = driver.findElement(By.id("626b9b0958be38a6ca85cdbdmessage"));
         text.click();
 
-        SeleniumUtils.waitSeconds(driver, 5);
+        SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
 
         SeleniumUtils.textIsPresentOnPage(driver, "que tal el dia");
         SeleniumUtils.textIsPresentOnPage(driver, "Bien!, y el tuyo?");
@@ -670,35 +668,37 @@ class SdiEntrega132ApplicationTests {
 
         PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
 
-        SeleniumUtils.idIsPresentOnPage(driver, "widget-friends");
-
-        SeleniumUtils.waitSeconds(driver, 5);
+        SeleniumUtils.waitLoadElementsBy(driver, "id", "626b9b0958be38a6ca85cdbdmessage", PO_View.getTimeout());
 
         //Accedemos al chat de un amigo
         WebElement text = driver.findElement(By.id("626b9b0958be38a6ca85cdbdmessage"));
         text.click();
 
-        SeleniumUtils.waitSeconds(driver, 5);
+        SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
 
         //Enviar mensaje
+        PO_PrivateView.fillSendMessage(driver,"Holaa!");
 
         //Comprobar que aparece en el chat
+        SeleniumUtils.waitLoadElementsBy(driver, "text", "Holaa!", PO_View.getTimeout());
+        SeleniumUtils.textIsPresentOnPage(driver, "Holaa!");
 
         //Identificarse con el otro usuario
-        driver.navigate().to(URL+"/apiclient/client.html");
+        driver.navigate().to(URL+"/apiclient/client.html?w=login");
 
         PO_LoginView.fillLoginForm(driver, "user02@email.com", "user02");
 
-        SeleniumUtils.waitSeconds(driver, 5);
+        SeleniumUtils.waitLoadElementsBy(driver, "id", "626b9f4d58be38a6ca85cdbemessage", PO_View.getTimeout());
 
         //Accedemos al chat del amigo
         text = driver.findElement(By.id("626b9f4d58be38a6ca85cdbemessage"));
         text.click();
 
-        SeleniumUtils.waitSeconds(driver, 5);
+        SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
 
         //Comprobar que el mensaje pasa a estar leído
-
+        text = driver.findElement(By.name("Holaa!"));
+        Assertions.assertTrue(text.getText().contains("leído"));
 
     }
 
