@@ -19,8 +19,8 @@ app.set('port', port);
 
 /**
  * Create HTTP server.
- * let privateKey = fs.readFileSync('bin/certificates/alice.key', 'utf8');
- * let certificate = fs.readFileSync('bin/certificates/alice.crt', 'utf8');
+ * let privateKey = fs.readFileSync('../bin/certificates/alice.key', 'utf8');
+ * let certificate = fs.readFileSync('../bin/certificates/alice.crt', 'utf8');
  */
 
 let privateKey = fs.readFileSync('../bin/certificates/alice.key', 'utf8');
