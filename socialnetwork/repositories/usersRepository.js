@@ -104,8 +104,7 @@ module.exports = {
         });
     },
     /**
-     *  @param funcion  Devuelve una lista de mensajes. Normalmente se pasará un ID o dos para sacar
-     *                  los mensajes entre dos usuarios.
+     *  @param funcion  Devuelve un mensaje.
      */
     getMessage: async function (filter, options) {
         try {
@@ -118,7 +117,15 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    }, readMessage: async function (message, filter, options) {
+    },
+    /**
+     * Método para marcar como leído un mensaje
+     * @param message
+     * @param filter
+     * @param options
+     * @returns {Promise<*>}
+     */
+    readMessage: async function (message, filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
@@ -129,7 +136,15 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    }, readMessages: async function (message, filter, options) {
+    },
+    /**
+     * Método para marcar como leídos los mensajes que cumplan el filtro filter
+     * @param message
+     * @param filter
+     * @param options
+     * @returns {Promise<*>}
+     */
+    readMessages: async function (message, filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");

@@ -201,10 +201,11 @@ module.exports = function (app, usersRepository, friendsRepository) {
     });
 
     /**
-     *  @param ruta de acceso /api/v1.0/message/list/:id
-     *  @param funcion  Se ejecuta con una peticion GET, devolverá una lista con los mensajes
-     *                  entre el ID recibido en la URL (se comprobará que sea amigo con el
-     *                  identificado) y el usuario identificado en la app (por lo que tiene que
+     *  @param ruta de acceso /api/v1.0/message/:id
+     *  @param funcion  Se ejecuta con una peticion PUT, se marcará como leído el mensaje
+     *                  cuyo ID es pasado como parámetro en la URL (se comprobará que el
+     *                  usuario identificado sea el receptor del mensaje). El usuario tiene
+     *                  que estar identificado en la app (por lo que tiene que
      *                  haber un token válido).
      */
     app.put("/api/v1.0/message/:id", function (req, res) {
@@ -254,6 +255,15 @@ module.exports = function (app, usersRepository, friendsRepository) {
         });
     });
 
+    /**
+     *  @param ruta de acceso /api/v1.0/message
+     *  @param funcion  Se ejecuta con una peticion PUT, se marcarán como leído todos los mensajes
+     *                  de un chat donde el usuario identificado es el receptor del mensaje
+     *                  donde el ID del amigo es pasado como cuerpo de la petición (se comprobará que el
+     *                  usuario identificado sea el receptor de los mensajes). El usuario tiene
+     *                  que estar identificado en la app (por lo que tiene que
+     *                  haber un token válido).
+     */
     app.put("/api/v1.0/message", function (req, res) {
         let user = res.user
         let filter = {email: user}
