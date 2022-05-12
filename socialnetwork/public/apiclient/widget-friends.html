@@ -8,7 +8,8 @@
             <th>Email</th>
             <th>Name</th>
             <th>Surname</th>
-            <th>Messages</th>
+            <th>Messages Not Seen</th>
+            <th>Last Message</th>
             <th class="col-md-1"></th>
         </tr>
         </thead>
@@ -18,6 +19,7 @@
 <script>
     window.history.pushState("", "", "/apiclient/client.html?w=friends");
     var users;
+    var idIntervaloDeMensajesNoLeidos;
 
     function loadFriends() {
         $.ajax({
@@ -28,15 +30,19 @@
             headers: {"token": token},
             success: function (response) {
                 users = response.users;
-                updateFriendsTable(users);
+                updateFriendsTable();
             },
             error: function (error) {
                 $("#main-container").load("widget-login.html");
             }
         });
     }
-    function updateFriendsTable(users) {
+
+    function updateFriendsTable() {
         $("#friendsTableBody").empty(); // Vaciar la tabla
+
+        // Ordenar
+        /*let usersWithLastPublication = {};
         for (let i = 0; i < users.length; i++) {
 
             $("#friendsTableBody").append(
@@ -50,7 +56,52 @@
                 "</tr>");
 
             getLastMessage(users[i])
+                .then((response) => {
+                    usersWithLastPublication.Id=users[i]._id;
+                    usersWithLastPublication.Date=response.date;
+            }).catch((error) => {
+                console.log(error)
+            })
         }
+        usersWithLastPublication.sort(function (a, b) {
+            return a.fecha - b.fecha;
+        });*/
+        // users = usersAux;
+
+        for (let i = 0; i < users.length; i++) {
+            getLastMessage(users[i])
+                .then((response) => {
+                    var m = "<b>";
+                    if (response != undefined) {
+                        console.log(response.id_from)
+                        if (response.id_from == users[i]._id) {
+                            m += users[i].name+": "
+                        } else {
+                            m += "Tú: "
+                        }
+                        m += "</b>"+response.text
+                        m += "<br>"+new Date(response.date).toLocaleString()
+                    } else {
+                        m = "No hay mensajes"
+                    }
+
+                    $("#friendsTableBody").append(
+                        "<tr id=" + users[i]._id + ">" +
+                        "<td>" + users[i].email + "</td>" +
+                        "<td>" + users[i].name + "</td>" +
+                        "<td>" + users[i].surname + "</td>" +
+                        "<td id='mensajesNoLeidos_" + users[i]._id + "'>" + "</td>" +
+                        "<td><a onclick=widgetChat(\""+users[i]._id+"\")>" + m + "</a></td>" +
+                        "<td>" +
+                        "</td>" +
+                        "</tr>");
+                }).catch((error) => {
+                    console.log(error)
+                })
+        }
+
+        clearInterval(idIntervaloDeMensajesNoLeidos);
+        idIntervaloDeMensajesNoLeidos = setInterval(updateMessagesNotSeen, 300);
     }
     loadFriends();
 
@@ -87,6 +138,40 @@
         currentFriendID = user
         $( "#main-container" ).load( "widget-chat.html");
     }
+
+    function updateMessagesNotSeen() {
+        for (let i=0; i<users.length; i++) {
+            var idElementoDeLaTabla = "#mensajesNoLeidos_"+users[i]._id;
+            $( idElementoDeLaTabla ).empty();
+            $( idElementoDeLaTabla ).append(""+getMessagesNotSeen(users[i]._id).length)
+        }
+    }
+
+    // No vistos
+    function getMessagesNotSeen(idUser) {
+        let allMessages;
+        let messagesNotSeen = new Array();
+        $.ajax({
+            url: URLbase + "/message/list/"+idUser,
+            type: "GET",
+            data: {},
+            dataType: 'json',
+            headers: {"token": token},
+            success: function (response) {
+                allMessages = response.messages;
+                for (let i=0; i<messagesNotSeen.length; i++) {
+                    if (messagesNotSeen[i].saw==true) {
+                        messagesNotSeen.push(allMessages[i]);
+                    }
+                }
+            },
+            error: function (error) {
+            }
+        });
+
+        return messagesNotSeen;
+    }
+
 
     $('#filter-by-name').on('input',function(e){
         let filteredFriends = [];
