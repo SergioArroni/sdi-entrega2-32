@@ -547,7 +547,9 @@ class SdiEntrega132ApplicationTests {
 
     }
 
-    //[Prueba32] Inicio de sesión con datos válidos.
+    /**
+     * [Prueba32] Inicio de sesión con datos válidos.
+     */
     @Test
     @Order(32)
     public void PR32() {
@@ -558,7 +560,9 @@ class SdiEntrega132ApplicationTests {
         SeleniumUtils.idIsPresentOnPage(driver, "widget-friends");
     }
 
-    //[Prueba33] Inicio de sesión con datos inválidos (usuario no existente en la aplicación).
+    /**
+     * [Prueba33] Inicio de sesión con datos inválidos (usuario no existente en la aplicación).
+     */
     @Test
     @Order(33)
     public void PR33() {
@@ -569,7 +573,10 @@ class SdiEntrega132ApplicationTests {
         SeleniumUtils.waitTextIsNotPresentOnPage(driver, "text", PO_View.getTimeout());
     }
 
-    //[Prueba34] Acceder a la lista de amigos de un usuario, que al menos tenga tres amigos.
+    /**
+     * [Prueba34] Acceder a la lista de amigos de un usuario, que al menos tenga tres amigos.
+     */
+
     @Test
     @Order(34)
     public void PR34() {
@@ -583,16 +590,18 @@ class SdiEntrega132ApplicationTests {
         SeleniumUtils.textIsPresentOnPage(driver, "user02@email.com");
         SeleniumUtils.textIsPresentOnPage(driver, "Lucas");
         SeleniumUtils.textIsPresentOnPage(driver, "Preso");
-        SeleniumUtils.textIsPresentOnPage(driver, "user03@email.com");
-        SeleniumUtils.textIsPresentOnPage(driver, "Sergio");
-        SeleniumUtils.textIsPresentOnPage(driver, "Deus");
+        SeleniumUtils.textIsPresentOnPage(driver, "pruebaTestReal@email.es");
+        SeleniumUtils.textIsPresentOnPage(driver, "Ave");
+        SeleniumUtils.textIsPresentOnPage(driver, "Maria");
         SeleniumUtils.textIsPresentOnPage(driver, "user10@email.com");
         SeleniumUtils.textIsPresentOnPage(driver, "Carla");
         SeleniumUtils.textIsPresentOnPage(driver, "Garcia");
     }
 
-    //[Prueba35] Acceder a la lista de amigos de un usuario, y realizar un filtrado para encontrar a un amigo
-    //    concreto, el nombre a buscar debe coincidir con el de un amigo.
+    /**
+     * [Prueba35] Acceder a la lista de amigos de un usuario, y realizar un filtrado para encontrar a un amigo
+     *         concreto, el nombre a buscar debe coincidir con el de un amigo.
+     */
     @Test
     @Order(35)
     public void PR35() {
@@ -613,14 +622,16 @@ class SdiEntrega132ApplicationTests {
         SeleniumUtils.textIsPresentOnPage(driver, "user02@email.com");
         SeleniumUtils.textIsPresentOnPage(driver, "Lucas");
         SeleniumUtils.textIsPresentOnPage(driver, "Preso");
-        SeleniumUtils.textIsNotPresentOnPage(driver, "user03@email.com");
-        SeleniumUtils.textIsNotPresentOnPage(driver, "Sergio");
-        SeleniumUtils.textIsNotPresentOnPage(driver, "Deus");
+        SeleniumUtils.textIsPresentOnPage(driver, "pruebaTestReal@email.es");
+        SeleniumUtils.textIsPresentOnPage(driver, "Ave");
+        SeleniumUtils.textIsPresentOnPage(driver, "Maria");
         SeleniumUtils.textIsNotPresentOnPage(driver, "user10@email.com");
         SeleniumUtils.textIsNotPresentOnPage(driver, "Carla");
         SeleniumUtils.textIsNotPresentOnPage(driver, "Garcia");
 
     }
+
+    
 
 
 /**
