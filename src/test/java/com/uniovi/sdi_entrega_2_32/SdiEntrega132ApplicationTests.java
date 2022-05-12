@@ -624,6 +624,35 @@ class SdiEntrega132ApplicationTests {
 
     }
 
+    @Test
+    @Order(37)
+    public void PR37() {
+        driver.navigate().to(URL+"/apiclient/client.html");
+
+        PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
+
+
+    }
+
+    @Test
+    @Order(39)
+    public void PR39() {
+        driver.navigate().to(URL+"/apiclient/client.html");
+
+        PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
+
+
+    }
+
+    @Test
+    @Order(40)
+    public void PR40() {
+        driver.navigate().to(URL+"/apiclient/client.html");
+
+        PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
+
+
+    }
 
 /**
     //[Prueba11] Mostrar el listado de usuarios y comprobar que se muestran todos los que existen en el sistema
