@@ -34,7 +34,7 @@
             headers: {"token": token},
             success: function (response) {
                 users = response.users;
-                updateFriendsTable();
+                updateFriendsTable(users);
             },
             error: function (error) {
                 $("#main-container").load("widget-login.html");
@@ -45,11 +45,11 @@
     /**
      * Actualiza la tabla de amigos
      */
-    function updateFriendsTable() {
+    function updateFriendsTable(users) {
         $("#friendsTableBody").empty(); // Vaciar la tabla
 
         // Ordenar
-        for (let i = 0; i < users.length; i++) {
+        /*for (let i = 0; i < users.length; i++) {
             getLastMessage(users[i])
                 .then((response) => {
                     if (response != undefined) {
@@ -61,10 +61,10 @@
         }
         users.sort(function (a, b) {
             return a.fecha - b.fecha;
-        });
+        });*/
 
         for (let i = 0; i < users.length; i++) {
-
+            console.log(users[i])
             $("#friendsTableBody").append(
                 "<tr id=" + users[i]._id + ">" +
                 "<td>" + users[i].email + "</td>" +
@@ -77,13 +77,23 @@
                 "</tr>");
 
             getLastMessage(users[i])
+            getMessagesNotSeen(users[i])
         }
 
         clearInterval(idIntervaloDeMensajesNoLeidos);
-        idIntervaloDeMensajesNoLeidos = setInterval(updateMessagesNotSeen, 1000);
+        idIntervaloDeMensajesNoLeidos = setInterval(updateNumberNotSeenMessages, 1000);
+
     }
     loadFriends();
 
+    /**
+     * Actualiza el número de mensajes no leídos la tabla de amigos
+     */
+    function updateNumberNotSeenMessages(){
+        for (let i = 0; i < users.length; i++) {
+            getMessagesNotSeen(users[i]._id)
+        }
+    }
     /**
      * Obtiene el último mensaje de una conversación
      * @param user
@@ -110,7 +120,7 @@
                 } else {
                     m = "Enviar mensajes"
                 }
-                $('#' + user._id + 'message').append(m)
+                $('#' + user._id + 'message').html(m)
             },
             error: function (error) {
             },
@@ -127,18 +137,6 @@
     }
 
     /**
-     * Actualiza el número de mensajes no leídos la tabla de amigos
-     */
-    function updateMessagesNotSeen() {
-        for (let i=0; i<users.length; i++) {
-            var idElementoDeLaTabla = "#mensajesNoLeidos_"+users[i]._id;
-            $( idElementoDeLaTabla ).empty();
-            $( idElementoDeLaTabla ).append(""+getMessagesNotSeen(users[i]._id).length)
-        }
-    }
-
-
-    /**
      * Busca y devuelve los mensajes enviados entre el usuario que ha iniciado sesión y un amigo que no han sido
      * leídos.
      * @param idUser ID del amigo del usuario
@@ -146,7 +144,7 @@
      */
     function getMessagesNotSeen(idUser) {
         let allMessages;
-        let messagesNotSeen = new Array();
+        let messagesNotSeen = [];
         $.ajax({
             url: URLbase + "/message/list/"+idUser,
             type: "GET",
@@ -155,17 +153,21 @@
             headers: {"token": token},
             success: function (response) {
                 allMessages = response.messages;
-                for (let i=0; i<messagesNotSeen.length; i++) {
-                    if (messagesNotSeen[i].saw==true) {
+                for (let i=0; i<allMessages.length; i++) {
+                    if (allMessages[i].saw==false && allMessages[i].id_from==idUser) {
                         messagesNotSeen.push(allMessages[i]);
                     }
                 }
+                var idElementoDeLaTabla = "#mensajesNoLeidos_"+idUser;
+                console.log("En ajax: "+messagesNotSeen)
+                console.log("En ajax: "+messagesNotSeen.length)
+                $(idElementoDeLaTabla).html(messagesNotSeen.length)
+
             },
             error: function (error) {
             }
         });
 
-        return messagesNotSeen;
     }
 
     /**
