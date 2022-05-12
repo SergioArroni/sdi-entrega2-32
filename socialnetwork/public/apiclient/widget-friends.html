@@ -40,19 +40,20 @@
         $("#friendsTableBody").empty(); // Vaciar la tabla
 
         // Ordenar
-        /*let usersWithLastPublication = {};
+        let usersWithLastPublication = {};
         for (let i = 0; i < users.length; i++) {
             getLastMessage(users[i])
                 .then((response) => {
-                    usersWithLastPublication.Id=users[i]._id;
-                    usersWithLastPublication.Date=response.date;
+                    if (response != undefined) {
+                        users[i].fecha = response.date;
+                    }
             }).catch((error) => {
                 console.log(error)
             })
         }
-        usersWithLastPublication.sort(function (a, b) {
+        users.sort(function (a, b) {
             return a.fecha - b.fecha;
-        });*/
+        });
         // users = usersAux;
 
         for (let i = 0; i < users.length; i++) {
