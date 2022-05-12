@@ -162,7 +162,11 @@ module.exports = function (app, usersRepository, friendsRepository, publications
             res.redirect("/users/login" + "?message=Se ha producido un error al buscar el usuario" + "&messageType=alert-danger ");
         })
     });
-
+    /**
+     * @param ruta de acceso /users/register
+     * @param funcion que se ejecuta cuando se acceda a dicha ruta con una peticion POST
+     *          Carga la lista de usuarios del sistema
+     */
     app.get("/users/listUsers", function (req, res) {
 
         if (req.session.user) {

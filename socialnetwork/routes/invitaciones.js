@@ -1,4 +1,9 @@
 module.exports = function (app, invitacionRepository, friendsRepository, usersRepository) {
+    /**
+     * @param ruta de acceso /users/register
+     * @param funcion que se ejecuta cuando se acceda a dicha ruta con una peticion POST
+     *          Envia la invitacion al usuario id
+     */
     app.get("/users/invitar/:id", function (req, res) {
 
         let filter1 = {
@@ -33,7 +38,11 @@ module.exports = function (app, invitacionRepository, friendsRepository, usersRe
 
 
     });
-
+    /**
+     * @param ruta de acceso /users/register
+     * @param funcion que se ejecuta cuando se acceda a dicha ruta con una peticion POST
+     *          Carga la lista de invitaciones del usuario
+     */
     app.get("/invitaciones/listInvitaciones", function (req, res) {
         if (req.session.user) {
             let filter = {id_to: req.session.user._id};
@@ -69,7 +78,11 @@ module.exports = function (app, invitacionRepository, friendsRepository, usersRe
             res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin estar autenticado" + "&messageType=alert-danger ");
         }
     });
-
+    /**
+     * @param ruta de acceso /users/register
+     * @param funcion que se ejecuta cuando se acceda a dicha ruta con una peticion POST
+     *          Acepta la invitacion del usuario con id
+     */
     app.get("/invitaciones/aceptar/:id", function (req, res) {
         let filter = {"_id": req.params.id};
         usersRepository.getUsers(filter, {}).then(() => {

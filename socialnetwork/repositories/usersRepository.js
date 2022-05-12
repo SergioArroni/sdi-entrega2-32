@@ -19,7 +19,10 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    }, findDeleteUser: async function (filter, options) {
+    },/**
+     *  @param funcion  Busca UN usuario y lo elimina
+     */
+    findDeleteUser: async function (filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
@@ -156,7 +159,10 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    }, getAllUsersPg: async function (filter, page, user, funcion) {
+    }, /**
+     *  @param funcion  Busca los usuarios, y pone cinco por pagina
+     */
+    getAllUsersPg: async function (filter, page, user, funcion) {
         try {
             const limit = 5;
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));

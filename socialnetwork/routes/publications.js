@@ -1,6 +1,11 @@
 const {ObjectID} = require("mongodb");
 const {all} = require("express/lib/application");
 module.exports=function (app,publicationsRepository) {
+    /**
+     * @param ruta de acceso /users/register
+     * @param funcion que se ejecuta cuando se acceda a dicha ruta con una peticion POST
+     *          Carga la lista de publicaciones propias del usuario
+     */
     app.get("/publications/listPublicaciones", function (req, res) {
         let filter = {user: new ObjectID(req.session.user._id)};
         let page = parseInt(req.query.page);
