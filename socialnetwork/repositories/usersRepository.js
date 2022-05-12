@@ -3,6 +3,11 @@ module.exports = {
     mongoClient: null, app: null, init: function (app, mongoClient) {
         this.mongoClient = mongoClient;
         this.app = app;
+
+        /**
+         *  @param funcion  devuelve una lista de usuarios donde podemos incluir filtros. La lista
+         *                  será devuelta ordenada por nombre
+         */
     }, getUsers: async function (filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
@@ -14,18 +19,10 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    }, deleteUser: async function (filter, options) {
-        try {
-            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
-            const database = client.db("Cluster0");
-            const collectionName = 'users';
-            const usersCollection = database.collection(collectionName);
-            const result = await usersCollection.deleteOne(filter, options);
-            return result;
-        } catch (error) {
-            throw (error);
-        }
-    }, findDeleteUser: async function (filter, options) {
+    },/**
+     *  @param funcion  Busca UN usuario y lo elimina
+     */
+    findDeleteUser: async function (filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
@@ -36,6 +33,9 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
+        /**
+         *  @param funcion  Busca UN usuario y lo devuelve aplicando un filtro.
+         */
     }, findUser: async function (filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
@@ -47,8 +47,13 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
+
+        /**
+         *  @param funcion  Dada una lista de ids, devolverá la lista de usuarios correspondiente.
+         *                  La lista no incluirá contraseñas ni roles.
+         */
     }, getFriends: async function(ids) {
-        let users = new Array();
+        let users = [];
         let options = { sort: { "name": 1 }, projection: { email: 1,name : 1, surname : 1} };
         for(let i = 0; i < ids.length; i++) {
             try {
@@ -64,7 +69,11 @@ module.exports = {
             }
         }
         return users;
+        /**
+         *  @param funcion  Inserta un usuario en la colección de usuarios.
+         */
     }, insertUser: async function (user) {
+
             try {
                 const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
                 const database = client.db("Cluster0");
@@ -76,6 +85,9 @@ module.exports = {
                 throw (error);
             }
         },
+    /**
+     *  @param funcion  Inserta un usuario en la colección de mensajes.
+     */
     insertMessage: async function (message, callbackFunction) {
         this.mongoClient.connect(this.app.get('connectionStrings'), function (err, dbClient) {
             if (err) {
@@ -91,6 +103,10 @@ module.exports = {
             }
         });
     },
+    /**
+     *  @param funcion  Devuelve una lista de mensajes. Normalmente se pasará un ID o dos para sacar
+     *                  los mensajes entre dos usuarios.
+     */
     getMessage: async function (filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
@@ -102,8 +118,7 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    },
-    readMessage: async function (message, filter, options) {
+    }, readMessage: async function (message, filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
@@ -114,8 +129,7 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    },
-    readMessages: async function (message, filter, options) {
+    }, readMessages: async function (message, filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
@@ -126,8 +140,11 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    },
-    getMessages: async function (filter1, filter2, options) {
+        /**
+         *  @param funcion  Devuelve una lista de mensajes. Recibe dos filtros ya que los mensajes tienen emisor y
+         *                  receptor.
+         */
+    }, getMessages: async function (filter1, filter2, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
@@ -135,13 +152,17 @@ module.exports = {
             const messagesCollection = database.collection(collectionName);
 
             const messages = await messagesCollection.find({
-                $or:[filter1, filter2]},{}).sort({date:1}).toArray();
+                $or: [filter1, filter2]
+            }, {}).sort({date: 1}).toArray();
 
             return messages;
         } catch (error) {
             throw (error);
         }
-    },getAllUsersPg: async function (filter, page,user,funcion) {
+    }, /**
+     *  @param funcion  Busca los usuarios, y pone cinco por pagina
+     */
+    getAllUsersPg: async function (filter, page, user, funcion) {
         try {
             const limit = 5;
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
@@ -154,23 +175,27 @@ module.exports = {
             const cursor = usersCollection.find(filter);
             const users = await cursor.toArray();
 
-            for(let i=0;i<users.length;i++){
-                if(users[i].email===user.email){
-                    users.splice(i,1);
-                }else if(users[i].email==='admin@email.com'){
-                    users.splice(i,1);
+            for (let i = 0; i < users.length; i++) {
+                if (users[i].email === user.email) {
+                    users.splice(i, 1);
+                } else if (users[i].email === 'admin@email.com') {
+                    users.splice(i, 1);
                 }
             }
-            const allusers=users;
-            const usersFilter=users.slice((page-1) * limit, (page * limit));
+            const allusers = users;
+            const usersFilter = users.slice((page - 1) * limit, (page * limit));
 
             const result = {users: usersFilter, total: usersCollectionCount};
-            funcion(result,allusers);
+            funcion(result, allusers);
 
 
         } catch (error) {
             throw (error);
         }
+        /**
+         *  @param funcion  Devuelve una lista de usuarios paginada (5 usuarios según la página)
+         *                  dada una de Ids.
+         */
     },getFriendsPg: async function(ids, page) {
         let users = new Array();
         const limit = 5;
@@ -189,7 +214,6 @@ module.exports = {
             }
         }
         const cursor = users.slice((page - 1) * limit, limit + 1);
-        const result = {users: cursor, total: users.length};
-        return result;
+        return {users: cursor, total: users.length};
     }
 };

@@ -13,7 +13,7 @@
                     <input id="inputSearchText" type="text" class="search-query form-control"
                     placeholder="Buscar por nombre, apellidos o email del usuario" name="search"/>
                     <span class="input-group-btn">
-                        <button class="btn" type="submit">
+                        <button id="searchButton" class="btn" type="submit">
                             <span class="glyphicon glyphicon-search"></span>
                         </button>
                     </span>
@@ -23,17 +23,18 @@
     </div>
     <div class="table-responsive">
         <table class="table table-hover">
-            <thread>
+            <thead>
                 <tr>
                     <th>Nombre</th>
                     <th>Apellidos</th>
                     <th>Email</th>
                     <th>Solicitar amistad</th>
                 </tr>
-            </thread>
-            <tbody>
+
+            </thead>
+            <tbody id="tbody">
                 {% for user in users %}
-                <tr>
+                <tr class="usersTable">
                     {% if user.email != "admin@email.com" %}
                     <td>{{ user.name }}</td>
                     <td>{{ user.surname }}</td>
