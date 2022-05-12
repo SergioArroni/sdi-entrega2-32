@@ -24,6 +24,9 @@
     if (intervalId!=0)
         clearInterval(intervalId)
 
+    /**
+     * Se ejecuta al hacer click en el botón de login. Se encarga de hacer una petición POST para iniciar sesión
+     */
     $("#boton-login").click(function(){
         $.ajax({
             url:URLbase + "/users/login",
