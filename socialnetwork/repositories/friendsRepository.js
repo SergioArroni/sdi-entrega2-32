@@ -1,3 +1,4 @@
+const {ObjectID} = require("mongodb");
 module.exports = {
     mongoClient: null, app: null, init: function (app, mongoClient) {
         this.mongoClient = mongoClient;
@@ -52,7 +53,7 @@ module.exports = {
             const database = client.db("Cluster0");
             const collectionName = 'friends';
             const friendsCollection = database.collection(collectionName);
-            var friend={id_from: id_from, id_to:id_to, accept:true};
+            var friend={id_from: new ObjectID(id_from), id_to: new ObjectID(id_to), accept:true};
             const result=await friendsCollection.insertOne(friend);
 
             return result.insertedId;
