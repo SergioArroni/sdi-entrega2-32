@@ -14,7 +14,7 @@ module.exports = function (app, usersRepository, friendsRepository, publications
      */
     app.get('/users/listAdmin', function (req, res) {
         let userA = req.session.user
-        if (userA.rol == 'Admin') {
+        if (userA.rol === 'Admin') {
             usersRepository.getUsers({}, {}).then(users => {
                 res.render("users/users.twig", {users: users, session: req.session.user});
             }).catch(error => {
@@ -33,14 +33,14 @@ module.exports = function (app, usersRepository, friendsRepository, publications
      */
     app.post('/users/listAdmin', function (req, res) {
             let userA = req.session.user
-            if (userA.rol == 'Admin') {
+            if (userA.rol === 'Admin') {
                 usersRepository.getUsers({}, {}).then(users => {
                         for (let i = 0; i < Object.keys(req.body).length; i++) {
                             for (let j = 0; j < users.length; j++) {
                                 if (req.body[users[j]._id]) {
                                     let filter = {_id: users[j]._id};
                                     usersRepository.findDeleteUser(filter, {}).then(result => {
-                                        if (result == null || result.deletedCount == 0) {
+                                        if (result === null || result.deletedCount === 0) {
                                             res.send("No se ha podido eliminar el usuario: " + users[j]._id);
                                         }
                                     }).catch(error => {
@@ -107,7 +107,7 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                         res.redirect("/users/listUsers");
                     }
                 }
-            }).catch(error => {
+            }).catch(() => {
                 req.session.user = null;
                 res.redirect("/users/login" + "?message=Se ha producido un error al buscar el usuario" + "&messageType=alert-danger ");
             })
@@ -146,9 +146,9 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                         password: securePassword,
                         rol: 'User'
                     }
-                    usersRepository.insertUser(user).then(userId => {
+                    usersRepository.insertUser(user).then(() => {
                         res.redirect("/users/login");
-                    }).catch(error => {
+                    }).catch(() => {
                         res.redirect("/users/register" + "?message=Se ha producido un error al registrar el usuario" + "&messageType=alert-danger ");
                     });
                 } else {
@@ -157,7 +157,7 @@ module.exports = function (app, usersRepository, friendsRepository, publications
             } else {
                 res.redirect("/users/register" + "?message=Este email ya esta vinculado con un usuario" + "&messageType=alert-danger ");
             }
-        }).catch(error => {
+        }).catch(() => {
             req.session.user = null;
             res.redirect("/users/login" + "?message=Se ha producido un error al buscar el usuario" + "&messageType=alert-danger ");
         })
@@ -224,7 +224,7 @@ module.exports = function (app, usersRepository, friendsRepository, publications
      */
     app.get('/users/friends', function (req, res) {
         let userA = req.session.user
-        if (userA.rol != 'Admin') {
+        if (userA.rol !== 'Admin') {
             let id = new ObjectID(userA._id);
             let filter1 = {id_from: id};
             let filter2 = {id_to: id};
@@ -283,7 +283,7 @@ module.exports = function (app, usersRepository, friendsRepository, publications
      */
     app.get('/users/create/publication', function (req, res) {
         let userA = req.session.user
-        if (userA.rol != 'Admin') {
+        if (userA.rol !== 'Admin') {
             res.render("publications/createPublication.twig", {session: userA});
         } else {
             req.session.user = null;
@@ -308,16 +308,16 @@ module.exports = function (app, usersRepository, friendsRepository, publications
         let insertFecha = fecha.toDateString();
         console.log(insertFecha)
         console.log("" + insertFecha)
-        if (userA.rol != 'Admin') {
+        if (userA.rol !== 'Admin') {
             let publication = {
                 titulo: titulo,
                 texto: texto,
                 user: id,
                 fecha: insertFecha
             }
-            publicationsRepository.insertPublicaction(publication).then(publicationId => {
+            publicationsRepository.insertPublicaction(publication).then(() => {
                 res.redirect("/publications/listPublicaciones");
-            }).catch(error => {
+            }).catch(() => {
                 res.redirect("/users/register" + "?message=Se ha producido un error al registrar el usuario" + "&messageType=alert-danger ");
             });
         } else {
