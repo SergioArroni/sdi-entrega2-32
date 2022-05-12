@@ -79,7 +79,7 @@ const {MongoClient} = require("mongodb");
 //Deploy
 //const url = 'mongodb+srv://admin:admin@cluster0.a1mrh.mongodb.net/Cluster0?retryWrites=true&w=majority';
 //Tests
-const url = 'mongodb://SergioArroni:julio321@localhost:27017/SDI?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false';
+const url = 'mongodb+srv://hugo:admin@cluster0.uznrd.mongodb.net/Cluster0?retryWrites=true&w=majority';
 app.set('connectionStrings', url);
 
 //====RUTAS====
