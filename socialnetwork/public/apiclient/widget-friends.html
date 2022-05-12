@@ -42,19 +42,7 @@
         $("#friendsTableBody").empty(); // Vaciar la tabla
 
         // Ordenar
-        let usersWithLastPublication = {};
         for (let i = 0; i < users.length; i++) {
-
-            $("#friendsTableBody").append(
-                "<tr id=" + users[i]._id + ">" +
-                "<td>" + users[i].email + "</td>" +
-                "<td>" + users[i].name + "</td>" +
-                "<td>" + users[i].surname + "</td>" +
-                "<td><a id=" + users[i]._id + "message" + " onclick=widgetChat(\"" + users[i]._id + "\")>" + "</a></td>" +
-                "<td>" +
-                "</td>" +
-                "</tr>");
-
             getLastMessage(users[i])
                 .then((response) => {
                     if (response != undefined) {
@@ -67,7 +55,6 @@
         users.sort(function (a, b) {
             return a.fecha - b.fecha;
         });
-        // users = usersAux;
 
         for (let i = 0; i < users.length; i++) {
             getLastMessage(users[i])
