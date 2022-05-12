@@ -17,11 +17,11 @@ class SdiEntrega132ApplicationTests {
     //static String Geckodriver ="C:\\nada.exe;
     //static String GeckodriverHugo ="C:\\Users\\Hugo\\Desktop\\TERCER_CURSO_INGENIERIA\\SDI\\PRACTICA\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
-    static String GeckodriverAndrea = "C:\\Users\\andre\\Documents\\CURSO 2021-2022\\CUATRI 2\\SDI\\geckodriver.exe";
-    //static String GeckodriverSergio = "C:\\Dev\\tools\\selenium\\geckodriver-v0.30.0-win64.exe";
+    //static String GeckodriverAndrea = "C:\\Users\\andre\\Documents\\CURSO 2021-2022\\CUATRI 2\\SDI\\geckodriver.exe";
+    static String GeckodriverSergio = "C:\\Dev\\tools\\selenium\\geckodriver-v0.30.0-win64.exe";
 
     //Común a Windows y a MACOSX
-    static WebDriver driver = getDriver(PathFirefox, GeckodriverAndrea);
+    static WebDriver driver = getDriver(PathFirefox, GeckodriverSergio);
 
     static String URL = "http://localhost:8081";
 
@@ -213,7 +213,6 @@ class SdiEntrega132ApplicationTests {
         SeleniumUtils.textIsPresentOnPage(driver, "user02@email.com");
         SeleniumUtils.textIsPresentOnPage(driver, "admin@email.com");
         SeleniumUtils.textIsPresentOnPage(driver, "user08@email.com");
-        SeleniumUtils.textIsPresentOnPage(driver, "prueba5@prueba5.com");
         SeleniumUtils.textIsPresentOnPage(driver, "user01@email.com");
         SeleniumUtils.textIsPresentOnPage(driver, "user04@email.com");
         SeleniumUtils.textIsPresentOnPage(driver, "user10@email.com");
@@ -243,12 +242,12 @@ class SdiEntrega132ApplicationTests {
     @Order(1003)
     public void PR13() {
 
-        SeleniumUtils.registerMacro(driver,"REALTEST@email.es", "Zzz", "Maria");
+//        SeleniumUtils.registerMacro(driver,"REALTEST@email.es", "Zzz", "Maria");
 
         PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary"); // Rellenamos el formulario.
         PO_LoginView.fillLoginForm(driver, "admin@email.com", "admin");
 
-        driver.findElement(By.id("12")).click();
+        driver.findElement(By.id("11")).click();
         driver.findElement(By.id("borrar")).click();
         SeleniumUtils.textIsNotPresentOnPage(driver, "REALTEST@email.es");
     }
@@ -259,9 +258,9 @@ class SdiEntrega132ApplicationTests {
     @Order(1004)
     public void PR14() {
 
-        SeleniumUtils.registerMacro(driver,"REALTEST1@email.es", "Aaaa", "Maria");
+       SeleniumUtils.registerMacro(driver,"REALTEST1@email.es", "Aaaa", "Maria");
 
-        SeleniumUtils.registerMacro(driver,"REALTEST2@email.es", "Aaa", "Maria");
+       SeleniumUtils.registerMacro(driver,"REALTEST2@email.es", "Aaa", "Maria");
 
         SeleniumUtils.registerMacro(driver,"REALTEST3@email.es", "Aa", "Maria");
 
@@ -291,11 +290,11 @@ class SdiEntrega132ApplicationTests {
         SeleniumUtils.textIsNotPresentOnPage(driver,"admin@email.com");
 
 
-        SeleniumUtils.textIsPresentOnPage(driver,"Clara");
-        SeleniumUtils.textIsPresentOnPage(driver,"Andrea");
-        SeleniumUtils.textIsPresentOnPage(driver,"Lucas");
-        SeleniumUtils.textIsPresentOnPage(driver,"Manolo");
-        SeleniumUtils.textIsPresentOnPage(driver,"Carla");
+        SeleniumUtils.textIsPresentOnPage(driver,"user08@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver,"user11@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver,"user02@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver,"user04@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver,"user10@email.com");
     }
 
     //[Prueba16] Hacer una búsqueda con el campo vacío y comprobar que se muestra la página que
@@ -310,7 +309,7 @@ class SdiEntrega132ApplicationTests {
         PO_PrivateView.fillSearch(driver,"");
 
         SeleniumUtils.textIsPresentOnPage(driver,"user08@email.com");
-        SeleniumUtils.textIsPresentOnPage(driver,"prueba5@prueba5.com");
+        SeleniumUtils.textIsPresentOnPage(driver,"user11@email.com");
         SeleniumUtils.textIsPresentOnPage(driver,"user02@email.com");
         SeleniumUtils.textIsPresentOnPage(driver,"user04@email.com");
         SeleniumUtils.textIsPresentOnPage(driver,"user10@email.com");
@@ -448,7 +447,7 @@ class SdiEntrega132ApplicationTests {
     @Order(24)
     public void PR24() {
         PO_NavView.clickOption(driver, "login", "class", "btn btn-primary");
-        PO_LoginView.fillLoginForm(driver, "user08@email.com", "user03");
+        PO_LoginView.fillLoginForm(driver, "user04@email.com", "user04");
 
         // Entramos en la ventana de creación
         PO_PrivateView.click(driver, "//a[contains(@href, '/users/create/publication')]", 0);
@@ -576,7 +575,6 @@ class SdiEntrega132ApplicationTests {
     /**
      * [Prueba34] Acceder a la lista de amigos de un usuario, que al menos tenga tres amigos.
      */
-
     @Test
     @Order(34)
     public void PR34() {
@@ -586,7 +584,7 @@ class SdiEntrega132ApplicationTests {
 
         SeleniumUtils.idIsPresentOnPage(driver, "widget-friends");
 
-        SeleniumUtils.waitSeconds(driver, 5);
+        SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
         SeleniumUtils.textIsPresentOnPage(driver, "user02@email.com");
         SeleniumUtils.textIsPresentOnPage(driver, "Lucas");
         SeleniumUtils.textIsPresentOnPage(driver, "Preso");
@@ -611,7 +609,7 @@ class SdiEntrega132ApplicationTests {
 
         SeleniumUtils.idIsPresentOnPage(driver, "widget-friends");
 
-        SeleniumUtils.waitSeconds(driver, 5);
+        SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
 
         //Hacemos una búsqueda con el nombre del amigo
         WebElement text = driver.findElement(By.id("filter-by-name"));
@@ -619,15 +617,42 @@ class SdiEntrega132ApplicationTests {
         text.clear();
         text.sendKeys("Lucas");
 
+        SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
         SeleniumUtils.textIsPresentOnPage(driver, "user02@email.com");
         SeleniumUtils.textIsPresentOnPage(driver, "Lucas");
         SeleniumUtils.textIsPresentOnPage(driver, "Preso");
-        SeleniumUtils.textIsPresentOnPage(driver, "pruebaTestReal@email.es");
-        SeleniumUtils.textIsPresentOnPage(driver, "Ave");
-        SeleniumUtils.textIsPresentOnPage(driver, "Maria");
+        SeleniumUtils.textIsNotPresentOnPage(driver, "pruebaTestReal@email.es");
+        SeleniumUtils.textIsNotPresentOnPage(driver, "Ave");
+        SeleniumUtils.textIsNotPresentOnPage(driver, "Maria");
         SeleniumUtils.textIsNotPresentOnPage(driver, "user10@email.com");
         SeleniumUtils.textIsNotPresentOnPage(driver, "Carla");
         SeleniumUtils.textIsNotPresentOnPage(driver, "Garcia");
+
+    }
+
+    /**
+     * [Prueba36] Acceder a la lista de mensajes de un amigo, la lista debe contener al menos tres mensajes.
+     */
+    @Test
+    @Order(36)
+    public void PR36() {
+        driver.navigate().to(URL+"/apiclient/client.html");
+
+        PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
+
+        SeleniumUtils.idIsPresentOnPage(driver, "widget-friends");
+
+        SeleniumUtils.waitLoadElementsBy(driver, "id", "626b9b0958be38a6ca85cdbdmessage", PO_View.getTimeout());
+
+        //Accedemos al chat de un amigo
+        WebElement text = driver.findElement(By.id("626b9b0958be38a6ca85cdbdmessage"));
+        text.click();
+
+        SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
+
+        SeleniumUtils.textIsPresentOnPage(driver, "que tal el dia");
+        SeleniumUtils.textIsPresentOnPage(driver, "Bien!, y el tuyo?");
+        SeleniumUtils.textIsPresentOnPage(driver, "Tuve un mal día :(");
 
     }
 
@@ -647,6 +672,53 @@ class SdiEntrega132ApplicationTests {
 
         List<WebElement> elements2 = PO_View.checkElementBy(driver, "text", "Mensaje de 1 a 4");
         Assertions.assertTrue(elements2.size()>0);
+
+    }
+
+    /**
+     * [Prueba38] Identificarse en la aplicación y enviar un mensaje a un amigo. Validar que el mensaje enviado
+     *     aparece en el chat. Identificarse después con el usuario que recibió el mensaje y validar que tiene un
+     *     mensaje sin leer. Entrar en el chat y comprobar que el mensaje pasa a tener el estado leído.
+     */
+    @Test
+    @Order(38)
+    public void PR38() {
+        driver.navigate().to(URL+"/apiclient/client.html");
+
+        PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
+
+        SeleniumUtils.waitLoadElementsBy(driver, "id", "626b9b0958be38a6ca85cdbdmessage", PO_View.getTimeout());
+
+        //Accedemos al chat de un amigo
+        WebElement text = driver.findElement(By.id("626b9b0958be38a6ca85cdbdmessage"));
+        text.click();
+
+        SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
+
+        //Enviar mensaje
+        PO_PrivateView.fillSendMessage(driver,"Holaa!");
+
+        //Comprobar que aparece en el chat
+        SeleniumUtils.waitLoadElementsBy(driver, "text", "Holaa!", PO_View.getTimeout());
+        SeleniumUtils.textIsPresentOnPage(driver, "Holaa!");
+
+        //Identificarse con el otro usuario
+        driver.navigate().to(URL+"/apiclient/client.html?w=login");
+
+        PO_LoginView.fillLoginForm(driver, "user02@email.com", "user02");
+
+        SeleniumUtils.waitLoadElementsBy(driver, "id", "626b9f4d58be38a6ca85cdbemessage", PO_View.getTimeout());
+
+        //Accedemos al chat del amigo
+        text = driver.findElement(By.id("626b9f4d58be38a6ca85cdbemessage"));
+        text.click();
+
+        SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
+
+        //Comprobar que el mensaje pasa a estar leído
+        List<WebElement> elements = SeleniumUtils.waitLoadElementsBy(driver, "text", "Holaa!", PO_View.getTimeout());
+
+        Assertions.assertTrue(elements.get(0).getText().contains("leído"));
 
     }
 

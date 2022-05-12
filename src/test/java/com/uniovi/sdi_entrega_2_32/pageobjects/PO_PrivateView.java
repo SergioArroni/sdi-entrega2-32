@@ -58,4 +58,14 @@ public class PO_PrivateView extends PO_NavView {
         driver.findElement(boton).click();
     }
 
+    static public void fillSendMessage(WebDriver driver, String textp) {
+        WebElement text = driver.findElement(By.name("texto"));
+        text.click();
+        text.clear();
+        text.sendKeys(textp);
+        //Pulsar el boton de Enviar.
+        By boton = By.id("boton-add");
+        driver.findElement(boton).click();
+    }
+
 }
