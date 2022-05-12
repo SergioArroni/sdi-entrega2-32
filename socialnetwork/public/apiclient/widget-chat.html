@@ -28,6 +28,8 @@
 
 </div>
 <script>
+
+    window.history.pushState("", "", "/apiclient/client.html?w=chat");
     setInterval(loadMessages, 300);
 
     var messages
@@ -93,15 +95,10 @@
             console.log(messages[i])
         }
     }
-    loadMessages();
-</script>
-<script>
-    window.history.pushState("", "", "/apiclient/client.html?w=chat");
-    var messages;
 
     function addMessage() {
         $.ajax({
-            url: URLbase + "/message",
+            url: URLbase + "/message/"+currentFriendID,
             type: "POST",
             data: {
                 text: $("#texto").val()
@@ -119,4 +116,5 @@
         });
     }
 
+    loadMessages();
 </script>
