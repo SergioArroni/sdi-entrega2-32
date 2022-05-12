@@ -95,7 +95,7 @@
                     "<tr style='padding:5em;' id=" + messages[i]._id + " >" +
                     "<td style='border: none'>" +
                     "</td>" +
-                    "<td style=\"border-radius: 15px;border:none;background-color:#00FFFF;text-align:right\">" + messages[i].text+"<br><span style=\"color:gray;font-size: 0.8em;\">"+new Date(messages[i].date).toLocaleString() + leido + "</span></td>" +
+                    "<td style=\"border-radius: 15px;border:none;background-color:#00FFFF;text-align:right\">" + messages[i].text+"<br><span name="+messages[i].text+" style=\"color:gray;font-size: 0.8em;\">"+new Date(messages[i].date).toLocaleString() + leido + "</span></td>" +
                     "</tr>");
             } else {
                 readMessages()
