@@ -667,14 +667,14 @@ class SdiEntrega132ApplicationTests {
 
         PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
 
-        List<WebElement> elements = PO_View.checkElementBy(driver, "text", "Mensaje de 1 a 4");
+        List<WebElement> elements = PO_View.checkElementBy(driver, "text", "Mensaje de 1 a 10");
         elements.get(0).click();
 
         WebElement nuevo = driver.findElement(By.name("texto"));
-        nuevo.sendKeys("Mensaje de 1 a 4");
+        nuevo.sendKeys("Mensaje de 1 a 10");
         nuevo.click();
 
-        List<WebElement> elements2 = PO_View.checkElementBy(driver, "text", "Mensaje de 1 a 4");
+        List<WebElement> elements2 = PO_View.checkElementBy(driver, "text", "Mensaje de 1 a 10");
         Assertions.assertTrue(elements2.size()>0);
 
     }
@@ -700,11 +700,11 @@ class SdiEntrega132ApplicationTests {
         SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
 
         //Enviar mensaje
-        PO_PrivateView.fillSendMessage(driver,"Holaa!");
+        PO_PrivateView.fillSendMessage(driver,"Mensaje de 1 a 10");
 
         //Comprobar que aparece en el chat
-        SeleniumUtils.waitLoadElementsBy(driver, "text", "Holaa!", PO_View.getTimeout());
-        SeleniumUtils.textIsPresentOnPage(driver, "Holaa!");
+        SeleniumUtils.waitLoadElementsBy(driver, "text", "Mensaje de 1 a 10", PO_View.getTimeout());
+        SeleniumUtils.textIsPresentOnPage(driver, "Mensaje de 1 a 10");
 
         //Identificarse con el otro usuario
         driver.navigate().to(URL+"/apiclient/client.html?w=login");
@@ -720,7 +720,7 @@ class SdiEntrega132ApplicationTests {
         SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
 
         //Comprobar que el mensaje pasa a estar leído
-        List<WebElement> elements = SeleniumUtils.waitLoadElementsBy(driver, "text", "Holaa!", PO_View.getTimeout());
+        List<WebElement> elements = SeleniumUtils.waitLoadElementsBy(driver, "text", "Mensaje de 1 a 10", PO_View.getTimeout());
 
         Assertions.assertTrue(elements.get(0).getText().contains("leído"));
 
