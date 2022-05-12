@@ -137,6 +137,10 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
+        /**
+         *  @param funcion  Devuelve una lista de mensajes. Recibe dos filtros ya que los mensajes tienen emisor y
+         *                  receptor.
+         */
     }, getMessages: async function (filter1, filter2, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
