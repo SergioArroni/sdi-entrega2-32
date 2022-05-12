@@ -54,7 +54,7 @@ module.exports = function (app, usersRepository, friendsRepository, publications
                     res.send("Se ha producido un error al listar los usuarios:" + error)
                 });
 
-                res.redirect("/");
+                res.redirect("/users/login");
             } else {
                 req.session.user = null;
                 res.redirect("/users/login" + "?message=No puedes acceder a esa pagina sin permisos" + "&messageType=alert-danger ");
