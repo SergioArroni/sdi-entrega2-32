@@ -3,6 +3,11 @@ module.exports = {
     mongoClient: null, app: null, init: function (app, mongoClient) {
         this.mongoClient = mongoClient;
         this.app = app;
+
+        /**
+         *  @param funcion  devuelve una lista de usuarios donde podemos incluir filtros. La lista
+         *                  será devuelta ordenada por nombre
+         */
     }, getUsers: async function (filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
@@ -25,6 +30,9 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
+        /**
+         *  @param funcion  Busca UN usuario y lo devuelve aplicando un filtro.
+         */
     }, findUser: async function (filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
@@ -36,10 +44,15 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    }, getFriends: async function (ids) {
+
+        /**
+         *  @param funcion  Dada una lista de ids, devolverá la lista de usuarios correspondiente.
+         *                  La lista no incluirá contraseñas ni roles.
+         */
+    }, getFriends: async function(ids) {
         let users = [];
-        let options = {sort: {"name": 1}, projection: {email: 1, name: 1, surname: 1}};
-        for (let i = 0; i < ids.length; i++) {
+        let options = { sort: { "name": 1 }, projection: { email: 1,name : 1, surname : 1} };
+        for(let i = 0; i < ids.length; i++) {
             try {
                 let filter = {_id: ids[i]};
                 const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
@@ -53,18 +66,26 @@ module.exports = {
             }
         }
         return users;
+        /**
+         *  @param funcion  Inserta un usuario en la colección de usuarios.
+         */
     }, insertUser: async function (user) {
-        try {
-            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
-            const database = client.db("Cluster0");
-            const collectionName = 'users';
-            const usersCollection = database.collection(collectionName);
-            const result = await usersCollection.insertOne(user);
-            return result.insertedId;
-        } catch (error) {
-            throw (error);
-        }
-    }, insertMessage: async function (message, callbackFunction) {
+
+            try {
+                const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
+                const database = client.db("Cluster0");
+                const collectionName = 'users';
+                const usersCollection = database.collection(collectionName);
+                const result = await usersCollection.insertOne(user);
+                return result.insertedId;
+            } catch (error) {
+                throw (error);
+            }
+        },
+    /**
+     *  @param funcion  Inserta un usuario en la colección de mensajes.
+     */
+    insertMessage: async function (message, callbackFunction) {
         this.mongoClient.connect(this.app.get('connectionStrings'), function (err, dbClient) {
             if (err) {
                 callbackFunction(null)
@@ -78,7 +99,12 @@ module.exports = {
                     .catch(err => callbackFunction({error: err.message}));
             }
         });
-    }, getMessage: async function (filter, options) {
+    },
+    /**
+     *  @param funcion  Devuelve una lista de mensajes. Normalmente se pasará un ID o dos para sacar
+     *                  los mensajes entre dos usuarios
+     */
+    getMessage: async function (filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
@@ -156,7 +182,11 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    }, getFriendsPg: async function (ids, page) {
+        /**
+         *  @param funcion  Devuelve una lista de usuarios paginada (5 usuarios según la página)
+         *                  dada una de Ids.
+         */
+    },getFriendsPg: async function(ids, page) {
         let users = new Array();
         const limit = 5;
         for (let i = 0; i < ids.length; i++) {

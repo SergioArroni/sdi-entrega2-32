@@ -1,4 +1,6 @@
 <div id="widget-friends" >
+    <input id="filter-by-name" class="form-control" placeholder="Filtrar por nombre" type="text"/>
+    <br>
     <button class="btn" onclick="loadFriends()" >Actualizar</button>
     <table class="table table-hover">
         <thead>
@@ -40,20 +42,19 @@
         $("#friendsTableBody").empty(); // Vaciar la tabla
 
         // Ordenar
-        /*let usersWithLastPublication = {};
         for (let i = 0; i < users.length; i++) {
             getLastMessage(users[i])
                 .then((response) => {
-                    usersWithLastPublication.Id=users[i]._id;
-                    usersWithLastPublication.Date=response.date;
+                    if (response != undefined) {
+                        users[i].fecha = response.date;
+                    }
             }).catch((error) => {
                 console.log(error)
             })
         }
-        usersWithLastPublication.sort(function (a, b) {
+        users.sort(function (a, b) {
             return a.fecha - b.fecha;
-        });*/
-        // users = usersAux;
+        });
 
         for (let i = 0; i < users.length; i++) {
             getLastMessage(users[i])
@@ -92,23 +93,33 @@
     }
     loadFriends();
 
-    function getLastMessage(user){
-        return new Promise((resolve, reject) => {
-            $.ajax({
-                url: URLbase + "/message/list/"+user._id,
-                type: "GET",
-                data: {},
-                dataType: 'json',
-                headers: {"token": token},
-                success: function (response) {
-                   var len = response.messages.length;
-                   resolve(response.messages[len-1]);
-                },
-                error: function (error) {
-                    reject(error)
-                },
-            });
-        })
+    function getLastMessage(user) {
+        $.ajax({
+            url: URLbase + "/message/list/" + user._id,
+            type: "GET",
+            data: {},
+            dataType: 'json',
+            headers: {"token": token},
+            success: function (response) {
+                var len = response.messages.length;
+                var message = response.messages[len - 1];
+                var m = "<b>";
+                if (message != undefined) {
+                    if (message.id_from == user._id) {
+                        m += users[i].name + ": "
+                    } else {
+                        m += "Tú: "
+                    }
+                    m += "</b>" + message.text
+                    m += "<br>" + new Date(message.date).toLocaleString()
+                } else {
+                    m = "Enviar mensajes"
+                }
+                $('#' + user._id + 'message').append(m)
+            },
+            error: function (error) {
+            },
+        });
     }
 
     function widgetChat(user){
@@ -116,6 +127,9 @@
         $( "#main-container" ).load( "widget-chat.html");
     }
 
+    /**
+     * Actualiza el número de mensajes no leídos la tabla de amigos
+     */
     function updateMessagesNotSeen() {
         for (let i=0; i<users.length; i++) {
             var idElementoDeLaTabla = "#mensajesNoLeidos_"+users[i]._id;
@@ -124,7 +138,13 @@
         }
     }
 
-    // No vistos
+
+    /**
+     * Busca y devuelve los mensajes enviados entre el usuario que ha iniciado sesión y un amigo que no han sido
+     * leídos.
+     * @param idUser ID del amigo del usuario
+     * @returns {any[]} Una lista con los mensajes no leídos
+     */
     function getMessagesNotSeen(idUser) {
         let allMessages;
         let messagesNotSeen = new Array();
@@ -149,4 +169,11 @@
         return messagesNotSeen;
     }
 
+
+    $('#filter-by-name').on('input',function(e){
+        let filteredFriends = [];
+        let filterValue = $("#filter-by-name").val();
+        filteredFriends = users.filter(user => user.name.includes(filterValue));
+        updateFriendsTable(filteredFriends);
+    });
 </script>

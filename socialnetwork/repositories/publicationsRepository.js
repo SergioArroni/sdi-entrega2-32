@@ -2,6 +2,9 @@ module.exports = {
     mongoClient: null, app: null, init: function (app, mongoClient,) {
         this.mongoClient = mongoClient;
         this.app = app;
+        /**
+         *  @param funcion  Inserta una publicación en la lista de publicaciones.
+         */
     }, insertPublicaction: async function (publication) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
@@ -13,6 +16,9 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
+        /**
+         *  @param funcion  Devuelve una lista de publicaciones.
+         */
     }, getPublications: async function (filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
@@ -24,6 +30,9 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
+        /**
+         *  @param funcion  Devuelve una lista de publicaciones paginada (5 publicaciones según la página)
+         */
     }, getPublicationsPg: async function (filter, options, page) {
         try {
             const limit = 5;
