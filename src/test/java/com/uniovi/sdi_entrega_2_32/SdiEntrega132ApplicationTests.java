@@ -697,8 +697,9 @@ class SdiEntrega132ApplicationTests {
         SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
 
         //Comprobar que el mensaje pasa a estar leído
-        text = driver.findElement(By.name("Holaa!"));
-        Assertions.assertTrue(text.getText().contains("leído"));
+        List<WebElement> elements = SeleniumUtils.waitLoadElementsBy(driver, "text", "Holaa!", PO_View.getTimeout());
+
+        Assertions.assertTrue(elements.get(0).getText().contains("leído"));
 
     }
 
