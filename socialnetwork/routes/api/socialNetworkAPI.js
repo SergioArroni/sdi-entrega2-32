@@ -11,6 +11,7 @@ module.exports = function (app, usersRepository, friendsRepository) {
             let filter2 = {id_to: id};
             friendsRepository.getFriends(filter1, filter2, options).then(friends => {
                 let ids = new Array();
+
                 for (let i = 0; i < friends.length; i++) {
                     if (friends[i].accept) {
                         if (friends[i].id_from.equals(id)) {
