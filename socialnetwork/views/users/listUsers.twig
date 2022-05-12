@@ -31,9 +31,9 @@
                     <th>Solicitar amistad</th>
                 </tr>
             </thread>
-            <tbody>
+            <tbody id="tbody">
                 {% for user in users %}
-                <tr>
+                <tr class="usersTable">
                     {% if user.email != "admin@email.com" %}
                     <td>{{ user.name }}</td>
                     <td>{{ user.surname }}</td>

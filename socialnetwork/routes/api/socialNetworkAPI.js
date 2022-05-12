@@ -226,18 +226,11 @@ module.exports = function (app, usersRepository, friendsRepository) {
         let options = {}
         usersRepository.getUsers(filter, options).then(user => {
             let id = user[0]._id;
-            //let messageId = ObjectId(req.params.id);
             let idFriend = ObjectId(req.body.idFriend);
             let filter = {id_to: id, id_from: idFriend};
-            //filter = {_id: messageId};
-            //Si la _id NO no existe, no crea un nuevo documento.
             const options = {upsert: false};
 
             usersRepository.getMessages(filter, {}).then(message => {
-                /*let id_to = message.id_to
-                if (!id.equals(id_to)) {
-                    res.status(403);
-                    res.json({error: "No es el receptor del mensaje."});*/
                
                 let m = {
                     saw: true
@@ -246,8 +239,8 @@ module.exports = function (app, usersRepository, friendsRepository) {
 
                     //La _id No existe o los datos enviados no difieren de los ya almacenados.
                     if (result.modifiedCount == 0) {
-                        res.status(409);
-                        res.json({error: "No se ha modificado ningun mensaje."});
+                        res.status(202);
+                        res.json({message: "No hay mensajes que leer."});
                     } else {
                         res.status(200);
                         res.json({

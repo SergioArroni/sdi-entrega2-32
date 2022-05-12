@@ -30,7 +30,8 @@
 <script>
 
     window.history.pushState("", "", "/apiclient/client.html?w=chat");
-    setInterval(loadMessages, 300);
+    if (intervalId == undefined)
+        intervalId = setInterval(loadMessages, 5000);
 
     var messages
     function loadMessages() {
@@ -92,7 +93,6 @@
                     "</td>" +
                     "</tr>");
             }
-            console.log(messages[i])
         }
     }
 
