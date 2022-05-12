@@ -34,7 +34,7 @@
             headers: {"token": token},
             success: function (response) {
                 users = response.users;
-                updateFriendsTable();
+                updateFriendsTable(users);
             },
             error: function (error) {
                 $("#main-container").load("widget-login.html");
@@ -45,11 +45,11 @@
     /**
      * Actualiza la tabla de amigos
      */
-    function updateFriendsTable() {
+    function updateFriendsTable(users) {
         $("#friendsTableBody").empty(); // Vaciar la tabla
 
         // Ordenar
-        for (let i = 0; i < users.length; i++) {
+        /*for (let i = 0; i < users.length; i++) {
             getLastMessage(users[i])
                 .then((response) => {
                     if (response != undefined) {
@@ -61,17 +61,17 @@
         }
         users.sort(function (a, b) {
             return a.fecha - b.fecha;
-        });
+        });*/
 
         for (let i = 0; i < users.length; i++) {
-
+            console.log(users[i])
             $("#friendsTableBody").append(
                 "<tr id=" + users[i]._id + ">" +
                 "<td>" + users[i].email + "</td>" +
                 "<td>" + users[i].name + "</td>" +
                 "<td>" + users[i].surname + "</td>" +
                 "<td id='mensajesNoLeidos_" + users[i]._id + "'>" + "</td>" +
-                "<td><a id=" + users[i]._id + "message" + " onclick=widgetChat(\"" + users[i]._id + "\")>" + "</a></td>" +
+                "<td id='"+users[i]._id+"m'><a id=" + users[i]._id + "message" + " onclick=widgetChat(\"" + users[i]._id + "\")>" + "</a></td>" +
                 "<td>" +
                 "</td>" +
                 "</tr>");
