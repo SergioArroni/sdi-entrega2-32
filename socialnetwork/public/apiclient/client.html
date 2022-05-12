@@ -57,6 +57,7 @@
             let w = url.searchParams.get("w");
 
             if (w == "login") {
+                Cookies.remove('token')
                 $("#main-container").load("widget-login.html");
             }
             if (w == "friends") {

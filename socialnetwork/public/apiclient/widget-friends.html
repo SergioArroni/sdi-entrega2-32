@@ -78,6 +78,7 @@
                 "</tr>");
 
             getLastMessage(users[i])
+            getMessagesNotSeen(users[i])
         }
 
         if (idIntervaloDeMensajesNoLeidos!=undefined)
@@ -86,6 +87,14 @@
     }
     loadFriends();
 
+    /**
+     * Actualiza el número de mensajes no leídos la tabla de amigos
+     */
+    function updateNumberNotSeenMessages(){
+        for (let i = 0; i < users.length; i++) {
+            getMessagesNotSeen(users[i]._id)
+        }
+    }
     /**
      * Obtiene el último mensaje de una conversación
      * @param user
@@ -112,7 +121,7 @@
                 } else {
                     m = "Enviar mensajes"
                 }
-                $('#' + user._id + 'message').append(m)
+                $('#' + user._id + 'message').html(m)
             },
             error: function (error) {
             },
@@ -154,18 +163,6 @@
     }
 
     /**
-     * Actualiza el número de mensajes no leídos la tabla de amigos
-     */
-    function updateMessagesNotSeen() {
-        for (let i=0; i<users.length; i++) {
-            var idElementoDeLaTabla = "#mensajesNoLeidos_"+users[i]._id;
-            $( idElementoDeLaTabla ).empty();
-            $( idElementoDeLaTabla ).append(""+getMessagesNotSeen(users[i]._id).length)
-        }
-    }
-
-
-    /**
      * Busca y devuelve los mensajes enviados entre el usuario que ha iniciado sesión y un amigo que no han sido
      * leídos.
      * @param idUser ID del amigo del usuario
@@ -173,7 +170,7 @@
      */
     function getMessagesNotSeen(idUser) {
         let allMessages;
-        let messagesNotSeen = new Array();
+        let messagesNotSeen = [];
         $.ajax({
             url: URLbase + "/message/list/"+idUser,
             type: "GET",
@@ -182,17 +179,19 @@
             headers: {"token": token},
             success: function (response) {
                 allMessages = response.messages;
-                for (let i=0; i<messagesNotSeen.length; i++) {
-                    if (messagesNotSeen[i].saw==true) {
+                for (let i=0; i<allMessages.length; i++) {
+                    if (allMessages[i].saw==false && allMessages[i].id_from==idUser) {
                         messagesNotSeen.push(allMessages[i]);
                     }
                 }
+                var idElementoDeLaTabla = "#mensajesNoLeidos_"+idUser;
+                $(idElementoDeLaTabla).html(messagesNotSeen.length)
+
             },
             error: function (error) {
             }
         });
 
-        return messagesNotSeen;
     }
 
     /**
