@@ -22,7 +22,9 @@
     if (intervalId!=0)
         clearInterval(intervalId)
 
-
+    /**
+     * Carga los amigos haciendo una petición que devuelve la lista de amigos
+     */
     function loadFriends() {
         $.ajax({
             url: URLbase + "/friendlist",
@@ -40,6 +42,9 @@
         });
     }
 
+    /**
+     * Actualiza la tabla de amigos
+     */
     function updateFriendsTable() {
         $("#friendsTableBody").empty(); // Vaciar la tabla
 
@@ -91,6 +96,10 @@
     }
     loadFriends();
 
+    /**
+     * Obtiene el último mensaje de una conversación
+     * @param user
+     */
     function getLastMessage(user) {
         $.ajax({
             url: URLbase + "/message/list/" + user._id,
@@ -120,6 +129,10 @@
         });
     }
 
+    /**
+     * Carga la vista del chat
+     * @param user
+     */
     function widgetChat(user){
         currentFriendID = user
         $( "#main-container" ).load( "widget-chat.html");
@@ -167,7 +180,9 @@
         return messagesNotSeen;
     }
 
-
+    /**
+     * Filtra por nombre de amigo, se ejecuta al haber modificaciones en el input de búsqueda
+     */
     $('#filter-by-name').on('input',function(e){
         let filteredFriends = [];
         let filterValue = $("#filter-by-name").val();
