@@ -96,6 +96,10 @@
         }
     }
 
+    /**
+     * Lanza una petición POST a /message/currentFrienID, donde currentFriendId es el id del amigo al que se le
+     * va a enviar el mensaje
+     */
     function addMessage() {
         $.ajax({
             url: URLbase + "/message/"+currentFriendID,
