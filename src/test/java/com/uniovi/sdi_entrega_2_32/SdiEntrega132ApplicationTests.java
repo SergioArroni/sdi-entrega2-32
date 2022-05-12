@@ -656,6 +656,10 @@ class SdiEntrega132ApplicationTests {
 
     }
 
+    /**
+     * [Prueba37] Acceder a la lista de mensajes de un amigo “chat” y crear un nuevo mensaje, validar que el mensaje
+     * aparece en la lista de mensajes.
+     */
     @Test
     @Order(37)
     public void PR37() {
@@ -722,6 +726,10 @@ class SdiEntrega132ApplicationTests {
 
     }
 
+    /**
+     * [Prueba39] Identificarse en la aplicación y enviar tres mensajes a un amigo, validar que los mensajes enviados
+     * aparecen en el chat.
+     */
     @Test
     @Order(39)
     public void PR39() {
@@ -744,6 +752,11 @@ class SdiEntrega132ApplicationTests {
 
     }
 
+    /**
+     * [Prueba40] Identificarse con un usuario A que al menos tenga 3 amigos, ir al chat del ultimo amigo de la lista
+     * y enviarle un mensaje, volver a la lista de amigos y comprobar que el usuario al que se le ha enviado el
+     * mensaje esta en primera posición.
+     */
     @Test
     @Order(40)
     public void PR40() {
