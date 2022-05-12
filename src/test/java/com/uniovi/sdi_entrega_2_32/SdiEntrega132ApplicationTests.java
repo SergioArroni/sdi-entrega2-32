@@ -15,13 +15,13 @@ class SdiEntrega132ApplicationTests {
     static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
             //"C:\\Program Files\\Mozilla Firefox\\firefox.exe";
     //static String Geckodriver ="C:\\nada.exe;
-    static String GeckodriverHugo ="C:\\Users\\Hugo\\Desktop\\TERCER_CURSO_INGENIERIA\\SDI\\PRACTICA\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
+    //static String GeckodriverHugo ="C:\\Users\\Hugo\\Desktop\\TERCER_CURSO_INGENIERIA\\SDI\\PRACTICA\\sesion06\\PL-SDI-Sesión5-material\\PL-SDI-Sesión5-material\\geckodriver-v0.30.0-win64.exe";
 
     //static String GeckodriverAndrea = "C:\\Users\\andre\\Documents\\CURSO 2021-2022\\CUATRI 2\\SDI\\geckodriver.exe";
-    //static String GeckodriverSergio = "C:\\Dev\\tools\\selenium\\geckodriver-v0.30.0-win64.exe";
+    static String GeckodriverSergio = "C:\\Dev\\tools\\selenium\\geckodriver-v0.30.0-win64.exe";
 
     //Común a Windows y a MACOSX
-    static WebDriver driver = getDriver(PathFirefox, GeckodriverHugo);
+    static WebDriver driver = getDriver(PathFirefox, GeckodriverSergio);
 
     static String URL = "http://localhost:8081";
 
@@ -575,7 +575,6 @@ class SdiEntrega132ApplicationTests {
     /**
      * [Prueba34] Acceder a la lista de amigos de un usuario, que al menos tenga tres amigos.
      */
-
     @Test
     @Order(34)
     public void PR34() {
@@ -585,7 +584,7 @@ class SdiEntrega132ApplicationTests {
 
         SeleniumUtils.idIsPresentOnPage(driver, "widget-friends");
 
-        SeleniumUtils.waitSeconds(driver, 5);
+        SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
         SeleniumUtils.textIsPresentOnPage(driver, "user02@email.com");
         SeleniumUtils.textIsPresentOnPage(driver, "Lucas");
         SeleniumUtils.textIsPresentOnPage(driver, "Preso");
@@ -610,7 +609,7 @@ class SdiEntrega132ApplicationTests {
 
         SeleniumUtils.idIsPresentOnPage(driver, "widget-friends");
 
-        SeleniumUtils.waitSeconds(driver, 5);
+        SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
 
         //Hacemos una búsqueda con el nombre del amigo
         WebElement text = driver.findElement(By.id("filter-by-name"));
@@ -618,19 +617,90 @@ class SdiEntrega132ApplicationTests {
         text.clear();
         text.sendKeys("Lucas");
 
+        SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
         SeleniumUtils.textIsPresentOnPage(driver, "user02@email.com");
         SeleniumUtils.textIsPresentOnPage(driver, "Lucas");
         SeleniumUtils.textIsPresentOnPage(driver, "Preso");
-        SeleniumUtils.textIsPresentOnPage(driver, "pruebaTestReal@email.es");
-        SeleniumUtils.textIsPresentOnPage(driver, "Ave");
-        SeleniumUtils.textIsPresentOnPage(driver, "Maria");
+        SeleniumUtils.textIsNotPresentOnPage(driver, "pruebaTestReal@email.es");
+        SeleniumUtils.textIsNotPresentOnPage(driver, "Ave");
+        SeleniumUtils.textIsNotPresentOnPage(driver, "Maria");
         SeleniumUtils.textIsNotPresentOnPage(driver, "user10@email.com");
         SeleniumUtils.textIsNotPresentOnPage(driver, "Carla");
         SeleniumUtils.textIsNotPresentOnPage(driver, "Garcia");
 
     }
 
-    
+    /**
+     * [Prueba36] Acceder a la lista de mensajes de un amigo, la lista debe contener al menos tres mensajes.
+     */
+    @Test
+    @Order(36)
+    public void PR36() {
+        driver.navigate().to(URL+"/apiclient/client.html");
+
+        PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
+
+        SeleniumUtils.idIsPresentOnPage(driver, "widget-friends");
+
+        SeleniumUtils.waitLoadElementsBy(driver, "free", "//tbody/tr", PO_View.getTimeout());
+
+        //Accedemos al chat de un amigo
+        //driver.navigate().to(URL+"/apiclient/client.html/message");
+
+        WebElement text = driver.findElement(By.name("626b9b0958be38a6ca85cdbdm"));
+        text.click();
+
+        SeleniumUtils.waitSeconds(driver, 5);
+
+        SeleniumUtils.textIsPresentOnPage(driver, "que tal el dia");
+        SeleniumUtils.textIsPresentOnPage(driver, "Bien!, y el tuyo?");
+        SeleniumUtils.textIsPresentOnPage(driver, "Tuve un mal día :(");
+
+    }
+
+    /**
+     * [Prueba38] Identificarse en la aplicación y enviar un mensaje a un amigo. Validar que el mensaje enviado
+     *     aparece en el chat. Identificarse después con el usuario que recibió el mensaje y validar que tiene un
+     *     mensaje sin leer. Entrar en el chat y comprobar que el mensaje pasa a tener el estado leído.
+     */
+    @Test
+    @Order(38)
+    public void PR38() {
+        driver.navigate().to(URL+"/apiclient/client.html");
+
+        PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
+
+        SeleniumUtils.idIsPresentOnPage(driver, "widget-friends");
+
+        SeleniumUtils.waitSeconds(driver, 5);
+
+        //Accedemos al chat de un amigo
+        WebElement text = driver.findElement(By.id("626b9b0958be38a6ca85cdbdmessage"));
+        text.click();
+
+        SeleniumUtils.waitSeconds(driver, 5);
+
+        //Enviar mensaje
+
+        //Comprobar que aparece en el chat
+
+        //Identificarse con el otro usuario
+        driver.navigate().to(URL+"/apiclient/client.html");
+
+        PO_LoginView.fillLoginForm(driver, "user02@email.com", "user02");
+
+        SeleniumUtils.waitSeconds(driver, 5);
+
+        //Accedemos al chat del amigo
+        text = driver.findElement(By.id("626b9f4d58be38a6ca85cdbemessage"));
+        text.click();
+
+        SeleniumUtils.waitSeconds(driver, 5);
+
+        //Comprobar que el mensaje pasa a estar leído
+
+
+    }
 
 
 /**
