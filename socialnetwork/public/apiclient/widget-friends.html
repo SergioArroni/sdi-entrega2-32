@@ -18,7 +18,8 @@
 <script>
     window.history.pushState("", "", "/apiclient/client.html?w=friends");
     var users;
-
+    if (intervalId!=0)
+        clearInterval(intervalId)
     function loadFriends() {
         $.ajax({
             url: URLbase + "/friendlist",

@@ -39,7 +39,9 @@
     let token;
     let URLbase = "http://localhost:8081/api/v1.0";
     let currentFriendID;
-    let intervalId;
+    let intervalId = 0;
+    if (intervalId!=0)
+        clearInterval(intervalId)
     function loadPage() {
         if (Cookies.get('token') != null) {
             token = Cookies.get('token');
@@ -60,7 +62,6 @@
         } else {
             $("#main-container").load("widget-login.html");
         }
-        clearInterval(intervalId)
     }
     
     loadPage()
