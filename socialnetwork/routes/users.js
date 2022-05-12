@@ -216,6 +216,12 @@ module.exports = function (app, usersRepository, friendsRepository, publications
         }
     });
 
+    /**
+     *  @param ruta de acceso /users/friends
+     *  @param funcion que se ejecuta cuando se acceda a dicha ruta con una peticion GET
+     *          Carga la lista de amigos para el usuario que tiene iniciada la sesión
+     *          actual (a no ser que sea el Admin).
+     */
     app.get('/users/friends', function (req, res) {
         let userA = req.session.user
         if (userA.rol != 'Admin') {
@@ -269,6 +275,12 @@ module.exports = function (app, usersRepository, friendsRepository, publications
         }
     })
 
+    /**
+     *  @param ruta de acceso /users/create/publication
+     *  @param funcion que se ejecuta cuando se acceda a dicha ruta con una peticion GET
+     *          Carga la vista para que el usuario registrado pueda crear una nueva
+     *          publicación (si es el administrador no puede).
+     */
     app.get('/users/create/publication', function (req, res) {
         let userA = req.session.user
         if (userA.rol != 'Admin') {
@@ -279,6 +291,13 @@ module.exports = function (app, usersRepository, friendsRepository, publications
         }
     })
 
+    /**
+     *  @param ruta de acceso /users/create/publication
+     *  @param funcion que se ejecuta cuando se acceda a dicha ruta con una peticion POST
+     *          Este método se llama cuando el usuario registra una nueva publicación.
+     *          Insertará la misma en la base de datos y redirigirá al usuario a la
+     *          lista de publicaciones del usuario registrado.
+     */
     app.post('/users/create/publication', function (req, res) {
         let userA = req.session.user
         let id = new ObjectID(userA._id)
@@ -307,6 +326,13 @@ module.exports = function (app, usersRepository, friendsRepository, publications
         }
     })
 
+    /**
+     *  @param ruta de acceso /users/create/publication
+     *  @param funcion que se ejecuta cuando se acceda a dicha ruta con una peticion GET
+     *          Carga la lista de publicaciones de un amigo del usuario registrado (el id
+     *          del amigo se pasa en la propia URL). Si el ID es de un usuario que no es
+     *          amigo del usuario registrado no dejerá ver las publicaciones.
+     */
     app.get('/users/friends/publications/:id', function (req, res) {
         let userA = req.session.user
         let id = new ObjectID(userA._id);
