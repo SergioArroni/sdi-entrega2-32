@@ -2,7 +2,10 @@ module.exports = {
     mongoClient: null, app: null, init: function (app, mongoClient,) {
         this.mongoClient = mongoClient;
         this.app = app;
-    }, comprobarInvitacion: async function (filter) {
+    }, /**
+     *  @param funcion  Comprueba si un usuario tiene una aplicacion
+     */
+    comprobarInvitacion: async function (filter) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
@@ -14,7 +17,10 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    }, insertarInvitacion: async function (id_from,id_to) {
+    },/**
+     *  @param funcion  Inserta una invitacion
+     */
+    insertarInvitacion: async function (id_from,id_to) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
@@ -27,7 +33,10 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    }, getAllInvitacionesPg : async function (filter,page, funcion) {
+    },/**
+     *  @param funcion  Coge las invitaciones para listarlas
+     */
+    getAllInvitacionesPg : async function (filter,page, funcion) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
@@ -45,7 +54,10 @@ module.exports = {
             throw (error);
         }
 
-    }, getInvitaciones: async  function (filter){
+    },/**
+     *  @param funcion  Coge todas las invitaciones del sistema
+     */
+    getInvitaciones: async  function (filter){
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
@@ -58,7 +70,10 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    }, eliminarInvitacion: async  function (filter){
+    }, /**
+     *  @param funcion  Elimina invitaciones
+     */
+    eliminarInvitacion: async  function (filter){
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");

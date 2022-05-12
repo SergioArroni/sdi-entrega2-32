@@ -19,7 +19,10 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    }, findDeleteUser: async function (filter, options) {
+    },/**
+     *  @param funcion  Busca UN usuario y lo elimina
+     */
+    findDeleteUser: async function (filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
@@ -101,8 +104,7 @@ module.exports = {
         });
     },
     /**
-     *  @param funcion  Devuelve una lista de mensajes. Normalmente se pasará un ID o dos para sacar
-     *                  los mensajes entre dos usuarios
+     *  @param funcion  Devuelve un mensaje.
      */
     getMessage: async function (filter, options) {
         try {
@@ -115,7 +117,15 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    }, readMessage: async function (message, filter, options) {
+    },
+    /**
+     * Método para marcar como leído un mensaje
+     * @param message
+     * @param filter
+     * @param options
+     * @returns {Promise<*>}
+     */
+    readMessage: async function (message, filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
@@ -126,7 +136,15 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    }, readMessages: async function (message, filter, options) {
+    },
+    /**
+     * Método para marcar como leídos los mensajes que cumplan el filtro filter
+     * @param message
+     * @param filter
+     * @param options
+     * @returns {Promise<*>}
+     */
+    readMessages: async function (message, filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
@@ -137,6 +155,10 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
+        /**
+         *  @param funcion  Devuelve una lista de mensajes. Recibe dos filtros ya que los mensajes tienen emisor y
+         *                  receptor.
+         */
     }, getMessages: async function (filter1, filter2, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
@@ -152,7 +174,10 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    }, getAllUsersPg: async function (filter, page, user, funcion) {
+    }, /**
+     *  @param funcion  Busca los usuarios, y pone cinco por pagina
+     */
+    getAllUsersPg: async function (filter, page, user, funcion) {
         try {
             const limit = 5;
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));

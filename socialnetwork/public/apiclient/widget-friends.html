@@ -19,8 +19,12 @@
 <script>
     window.history.pushState("", "", "/apiclient/client.html?w=friends");
     var users;
-    var idIntervaloDeMensajesNoLeidos;
+    if (intervalId!=0)
+        clearInterval(intervalId)
 
+    /**
+     * Carga los amigos haciendo una petición que devuelve la lista de amigos
+     */
     function loadFriends() {
         $.ajax({
             url: URLbase + "/friendlist",
@@ -38,6 +42,9 @@
         });
     }
 
+    /**
+     * Actualiza la tabla de amigos
+     */
     function updateFriendsTable() {
         $("#friendsTableBody").empty(); // Vaciar la tabla
 
@@ -57,42 +64,30 @@
         });
 
         for (let i = 0; i < users.length; i++) {
-            getLastMessage(users[i])
-                .then((response) => {
-                    var m = "<b>";
-                    if (response != undefined) {
-                        console.log(response.id_from)
-                        if (response.id_from == users[i]._id) {
-                            m += users[i].name+": "
-                        } else {
-                            m += "Tú: "
-                        }
-                        m += "</b>"+response.text
-                        m += "<br>"+new Date(response.date).toLocaleString()
-                    } else {
-                        m = "No hay mensajes"
-                    }
 
-                    $("#friendsTableBody").append(
-                        "<tr id=" + users[i]._id + ">" +
-                        "<td>" + users[i].email + "</td>" +
-                        "<td>" + users[i].name + "</td>" +
-                        "<td>" + users[i].surname + "</td>" +
-                        "<td id='mensajesNoLeidos_" + users[i]._id + "'>" + "</td>" +
-                        "<td><a onclick=widgetChat(\""+users[i]._id+"\")>" + m + "</a></td>" +
-                        "<td>" +
-                        "</td>" +
-                        "</tr>");
-                }).catch((error) => {
-                    console.log(error)
-                })
+            $("#friendsTableBody").append(
+                "<tr id=" + users[i]._id + ">" +
+                "<td>" + users[i].email + "</td>" +
+                "<td>" + users[i].name + "</td>" +
+                "<td>" + users[i].surname + "</td>" +
+                "<td id='mensajesNoLeidos_" + users[i]._id + "'>" + "</td>" +
+                "<td><a id=" + users[i]._id + "message" + " onclick=widgetChat(\"" + users[i]._id + "\")>" + "</a></td>" +
+                "<td>" +
+                "</td>" +
+                "</tr>");
+
+            getLastMessage(users[i])
         }
 
         clearInterval(idIntervaloDeMensajesNoLeidos);
-        idIntervaloDeMensajesNoLeidos = setInterval(updateMessagesNotSeen, 300);
+        idIntervaloDeMensajesNoLeidos = setInterval(updateMessagesNotSeen, 1000);
     }
     loadFriends();
 
+    /**
+     * Obtiene el último mensaje de una conversación
+     * @param user
+     */
     function getLastMessage(user) {
         $.ajax({
             url: URLbase + "/message/list/" + user._id,
@@ -106,7 +101,7 @@
                 var m = "<b>";
                 if (message != undefined) {
                     if (message.id_from == user._id) {
-                        m += users[i].name + ": "
+                        m += user.name + ": "
                     } else {
                         m += "Tú: "
                     }
@@ -122,6 +117,10 @@
         });
     }
 
+    /**
+     * Carga la vista del chat
+     * @param user
+     */
     function widgetChat(user){
         currentFriendID = user
         $( "#main-container" ).load( "widget-chat.html");
@@ -169,7 +168,9 @@
         return messagesNotSeen;
     }
 
-
+    /**
+     * Filtra por nombre de amigo, se ejecuta al haber modificaciones en el input de búsqueda
+     */
     $('#filter-by-name').on('input',function(e){
         let filteredFriends = [];
         let filterValue = $("#filter-by-name").val();

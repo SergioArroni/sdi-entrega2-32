@@ -39,7 +39,16 @@
     let token;
     let URLbase = "http://localhost:8081/api/v1.0";
     let currentFriendID;
-    let intervalId;
+    let intervalId = 0;
+    let idIntervaloDeMensajesNoLeidos = 0;
+    if (intervalId!=0)
+        clearInterval(intervalId)
+    if (idIntervaloDeMensajesNoLeidos!=0)
+        clearInterval(idIntervaloDeMensajesNoLeidos)
+
+    /**
+     * Carga la página que corresponda
+     */
     function loadPage() {
         if (Cookies.get('token') != null) {
             token = Cookies.get('token');
@@ -60,21 +69,30 @@
         } else {
             $("#main-container").load("widget-login.html");
         }
-        clearInterval(intervalId)
     }
     
     loadPage()
 
+    /**
+     * Carga la vista de amigos
+     */
     function widgetFriends(){
         $( "#main-container" ).load( "widget-friends.html");
     }
 
+    /**
+     * Carga la página al detectar un cambio de localización (cambia la URL).
+     * @param event
+     */
     function onLocationChange(event) {
-        // Aqui puedes hacer acionar los cambios del site
         loadPage()
         console.log(`window ha detectado el cambio del url a: ${window.location.pathname}`);
     };
 
+    /**
+     * Añadimos el evento popstate a la función onLocationChange para que se ejecute un popstate cada vez que se detecte
+     * un cambio en la URL.
+     */
     window.addEventListener('popstate', onLocationChange);
 
 
