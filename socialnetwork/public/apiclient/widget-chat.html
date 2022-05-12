@@ -30,14 +30,12 @@
 <script>
 
     window.history.pushState("", "", "/apiclient/client.html?w=chat");
-    if (intervalId == undefined)
-        intervalId = setInterval(loadMessages, 5000);
-
     intervalId = setInterval(loadMessages, 1000);
+    if (idIntervaloDeMensajesNoLeidos!=0)
+        clearInterval(intervalId)
 
     var messages
     function loadMessages() {
-        console.log(URLbase + "/message/list/"+currentFriendID)
         $.ajax({
             url: URLbase + "/message/list/"+currentFriendID,
             type: "GET",
@@ -54,6 +52,7 @@
             }
         });
     }
+
     function readMessages() {
         $.ajax({
             url: URLbase + "/message",
