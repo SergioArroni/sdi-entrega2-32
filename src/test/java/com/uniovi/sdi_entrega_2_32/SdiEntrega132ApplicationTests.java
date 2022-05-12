@@ -638,6 +638,15 @@ class SdiEntrega132ApplicationTests {
 
         PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
 
+        List<WebElement> elements = PO_View.checkElementBy(driver, "text", "Mensaje de 1 a 4");
+        elements.get(0).click();
+
+        WebElement nuevo = driver.findElement(By.name("texto"));
+        nuevo.sendKeys("Mensaje de 1 a 4");
+        nuevo.click();
+
+        List<WebElement> elements2 = PO_View.checkElementBy(driver, "text", "Mensaje de 1 a 4");
+        Assertions.assertTrue(elements2.size()>0);
 
     }
 
@@ -648,6 +657,11 @@ class SdiEntrega132ApplicationTests {
 
         PO_LoginView.fillLoginForm(driver, "user01@email.com", "user01");
 
+
+
+        driver.navigate().to(URL+"/apiclient/client.html?w=login");
+
+        PO_LoginView.fillLoginForm(driver, "user03@email.com", "user03");
 
     }
 
