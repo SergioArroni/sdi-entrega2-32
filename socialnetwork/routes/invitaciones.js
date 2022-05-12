@@ -72,7 +72,7 @@ module.exports = function (app, invitacionRepository, friendsRepository, usersRe
 
     app.get("/invitaciones/aceptar/:id", function (req, res) {
         let filter = {"_id": req.params.id};
-        usersRepository.getUsers(filter, {}).then(users => {
+        usersRepository.getUsers(filter, {}).then(() => {
             let filter2 = {
                 $and: [
                     {id_to: req.session.user._id},
@@ -80,7 +80,7 @@ module.exports = function (app, invitacionRepository, friendsRepository, usersRe
                 ]
             };
             invitacionRepository.getInvitaciones(filter2).then(invitaciones => {
-                if (invitaciones.length == 0) {
+                if (invitaciones.length === 0) {
                     res.send("No hay invitaciones");
                 }
                 let filter1 = {

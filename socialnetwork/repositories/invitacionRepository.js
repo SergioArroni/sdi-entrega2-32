@@ -64,9 +64,7 @@ module.exports = {
             const database = client.db("Cluster0");
             const collectionName = 'invitaciones';
             const invitacionesCollection = database.collection(collectionName);
-
-            const result=invitacionesCollection.remove(filter);
-            return result;
+            return invitacionesCollection.remove(filter);
         } catch (error) {
             throw (error);
         }

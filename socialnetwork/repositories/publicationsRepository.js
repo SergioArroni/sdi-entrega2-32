@@ -34,8 +34,7 @@ module.exports = {
             const publicationsCollectionCount = await publicationsCollection.find(filter, options).toArray();
             const cursor = publicationsCollection.find(filter, options).skip((page - 1) * limit).limit(limit)
             const publications = await cursor.toArray();
-            const result = {publications: publications, total: publicationsCollectionCount.length};
-            return result;
+            return {publications: publications, total: publicationsCollectionCount.length};
         } catch (error) {
             throw (error);
         }
@@ -45,7 +44,6 @@ module.exports = {
         const database = client.db("Cluster0");
         const collectionName = 'publications';
         const publicacionesCollection = database.collection(collectionName);
-       ;
         const cursor = publicacionesCollection.find(filter);
         const publicaciones = await cursor.toArray();
         const allPublicaciones=publicaciones;

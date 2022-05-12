@@ -14,17 +14,6 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    }, deleteUser: async function (filter, options) {
-        try {
-            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
-            const database = client.db("Cluster0");
-            const collectionName = 'users';
-            const usersCollection = database.collection(collectionName);
-            const result = await usersCollection.deleteOne(filter, options);
-            return result;
-        } catch (error) {
-            throw (error);
-        }
     }, findDeleteUser: async function (filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
@@ -47,10 +36,10 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    }, getFriends: async function(ids) {
-        let users = new Array();
-        let options = { sort: { "name": 1 }, projection: { email: 1,name : 1, surname : 1} };
-        for(let i = 0; i < ids.length; i++) {
+    }, getFriends: async function (ids) {
+        let users = [];
+        let options = {sort: {"name": 1}, projection: {email: 1, name: 1, surname: 1}};
+        for (let i = 0; i < ids.length; i++) {
             try {
                 let filter = {_id: ids[i]};
                 const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
@@ -65,18 +54,17 @@ module.exports = {
         }
         return users;
     }, insertUser: async function (user) {
-            try {
-                const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
-                const database = client.db("Cluster0");
-                const collectionName = 'users';
-                const usersCollection = database.collection(collectionName);
-                const result = await usersCollection.insertOne(user);
-                return result.insertedId;
-            } catch (error) {
-                throw (error);
-            }
-        },
-    insertMessage: async function (message, callbackFunction) {
+        try {
+            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
+            const database = client.db("Cluster0");
+            const collectionName = 'users';
+            const usersCollection = database.collection(collectionName);
+            const result = await usersCollection.insertOne(user);
+            return result.insertedId;
+        } catch (error) {
+            throw (error);
+        }
+    }, insertMessage: async function (message, callbackFunction) {
         this.mongoClient.connect(this.app.get('connectionStrings'), function (err, dbClient) {
             if (err) {
                 callbackFunction(null)
@@ -90,8 +78,7 @@ module.exports = {
                     .catch(err => callbackFunction({error: err.message}));
             }
         });
-    },
-    getMessage: async function (filter, options) {
+    }, getMessage: async function (filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
@@ -102,8 +89,7 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    },
-    readMessage: async function (message, filter, options) {
+    }, readMessage: async function (message, filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
@@ -114,8 +100,7 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    },
-    readMessages: async function (message, filter, options) {
+    }, readMessages: async function (message, filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
@@ -126,8 +111,7 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    },
-    getMessages: async function (filter1, filter2, options) {
+    }, getMessages: async function (filter1, filter2, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
             const database = client.db("Cluster0");
@@ -135,13 +119,14 @@ module.exports = {
             const messagesCollection = database.collection(collectionName);
 
             const messages = await messagesCollection.find({
-                $or:[filter1, filter2]},{}).sort({date:1}).toArray();
+                $or: [filter1, filter2]
+            }, {}).sort({date: 1}).toArray();
 
             return messages;
         } catch (error) {
             throw (error);
         }
-    },getAllUsersPg: async function (filter, page,user,funcion) {
+    }, getAllUsersPg: async function (filter, page, user, funcion) {
         try {
             const limit = 5;
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
@@ -154,24 +139,24 @@ module.exports = {
             const cursor = usersCollection.find(filter);
             const users = await cursor.toArray();
 
-            for(let i=0;i<users.length;i++){
-                if(users[i].email===user.email){
-                    users.splice(i,1);
-                }else if(users[i].email==='admin@email.com'){
-                    users.splice(i,1);
+            for (let i = 0; i < users.length; i++) {
+                if (users[i].email === user.email) {
+                    users.splice(i, 1);
+                } else if (users[i].email === 'admin@email.com') {
+                    users.splice(i, 1);
                 }
             }
-            const allusers=users;
-            const usersFilter=users.slice((page-1) * limit, (page * limit));
+            const allusers = users;
+            const usersFilter = users.slice((page - 1) * limit, (page * limit));
 
             const result = {users: usersFilter, total: usersCollectionCount};
-            funcion(result,allusers);
+            funcion(result, allusers);
 
 
         } catch (error) {
             throw (error);
         }
-    },getFriendsPg: async function(ids, page) {
+    }, getFriendsPg: async function (ids, page) {
         let users = new Array();
         const limit = 5;
         for (let i = 0; i < ids.length; i++) {
@@ -189,7 +174,6 @@ module.exports = {
             }
         }
         const cursor = users.slice((page - 1) * limit, limit + 1);
-        const result = {users: cursor, total: users.length};
-        return result;
+        return {users: cursor, total: users.length};
     }
 };
