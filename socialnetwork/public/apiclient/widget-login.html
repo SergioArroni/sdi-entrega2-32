@@ -21,6 +21,9 @@
 </div>
 <script>
     window.history.pushState("", "", "/apiclient/client.html?w=login");
+    if (intervalId!=0)
+        clearInterval(intervalId)
+
     $("#boton-login").click(function(){
         $.ajax({
             url:URLbase + "/users/login",

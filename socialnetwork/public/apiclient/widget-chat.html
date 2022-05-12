@@ -30,12 +30,16 @@
 <script>
 
     window.history.pushState("", "", "/apiclient/client.html?w=chat");
-    if (intervalId == undefined)
-        intervalId = setInterval(loadMessages, 5000);
+    intervalId = setInterval(loadMessages, 1000);
+    if (idIntervaloDeMensajesNoLeidos!=0)
+        clearInterval(idIntervaloDeMensajesNoLeidos)
 
     var messages
+
+    /**
+     * Carga todos los mensajes entre 2 usuarios
+     */
     function loadMessages() {
-        console.log(URLbase + "/message/list/"+currentFriendID)
         $.ajax({
             url: URLbase + "/message/list/"+currentFriendID,
             type: "GET",
@@ -52,6 +56,10 @@
             }
         });
     }
+
+    /**
+     * Lee todos los mensajes de un chat donde el usuario de la sesión es el receptor
+     */
     function readMessages() {
         $.ajax({
             url: URLbase + "/message",
@@ -66,6 +74,11 @@
             }
         });
     }
+
+    /**
+     * Actualiza la tabla de los mensajes (chat)
+     * @param messages
+     */
     function updateChatTable(messages) {
         $("#chatTableBody").empty(); // Vaciar la tabla
 
@@ -111,8 +124,9 @@
             headers: {"token": token},
             success: function (response) {
                 console.log(response); // <-- Prueba
+                loadMessages()
                 // En principio no habria que poner esto:
-                $("#main-container").load("widget-chat.html");
+                //$("#main-container").load("widget-chat.html");
             },
             error: function (error) {
                 $("#main-container").load("widget-login.html");
