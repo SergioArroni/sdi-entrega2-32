@@ -30,7 +30,8 @@
 <script>
 
     window.history.pushState("", "", "/apiclient/client.html?w=chat");
-    setInterval(loadMessages, 300);
+    if (intervalId == undefined)
+        intervalId = setInterval(loadMessages, 5000);
 
     var messages
     function loadMessages() {
@@ -92,10 +93,13 @@
                     "</td>" +
                     "</tr>");
             }
-            console.log(messages[i])
         }
     }
 
+    /**
+     * Lanza una petición POST a /message/currentFrienID, donde currentFriendId es el id del amigo al que se le
+     * va a enviar el mensaje
+     */
     function addMessage() {
         $.ajax({
             url: URLbase + "/message/"+currentFriendID,
