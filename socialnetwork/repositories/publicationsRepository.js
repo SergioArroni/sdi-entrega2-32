@@ -47,7 +47,10 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
-    }, getAllPublicacionesPg : async function (filter,page, funcion) {
+    },/**
+     *  @param funcion  Busca publicaciones para la paginacion
+     */
+    getAllPublicacionesPg : async function (filter,page, funcion) {
     try {
         const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
         const database = client.db("Cluster0");
