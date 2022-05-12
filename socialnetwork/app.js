@@ -1,4 +1,3 @@
-
 /*
                                                                               ,--.
   .--.--.                                             ,--,                  ,--.'|              ___             .---.                         ,-.
@@ -32,8 +31,8 @@ let fileUpload = require('express-fileupload');
 let indexRouter = require('./routes');
 const logger = require('morgan');
 log4js.configure({
-    appenders: { cheese: { type: 'file', filename: 'socialNetwork.log' } },
-    categories: { default: { appenders: ['cheese'], level: 'all' } }
+    appenders: {cheese: {type: 'file', filename: 'socialNetwork.log'}},
+    categories: {default: {appenders: ['cheese'], level: 'all'}}
 });
 
 //====VARIABLES====
@@ -47,7 +46,7 @@ app.set('logger', log4js.getLogger('tunder'));
 //====INICIALIZACIÓN====
 app.use(logger('dev'));
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Credentials", "true");
     res.header("Access-Control-Allow-Methods", "POST, GET, DELETE, UPDATE, PUT");
@@ -104,7 +103,7 @@ const invitacionRepository = require("./repositories/invitacionRepository.js");
 invitacionRepository.init(app, MongoClient);
 
 require("./routes/users.js")(app, usersRepository, friendsRepository, publicationsRepository);
-require("./routes/invitaciones.js")(app, invitacionRepository, friendsRepository,usersRepository);
+require("./routes/invitaciones.js")(app, invitacionRepository, friendsRepository, usersRepository);
 
 require("./routes/publications.js")(app, publicationsRepository);
 require("./routes/api/socialNetworkAPI")(app, usersRepository, friendsRepository);
