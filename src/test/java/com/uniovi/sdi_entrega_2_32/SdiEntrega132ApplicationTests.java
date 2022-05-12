@@ -213,7 +213,6 @@ class SdiEntrega132ApplicationTests {
         SeleniumUtils.textIsPresentOnPage(driver, "user02@email.com");
         SeleniumUtils.textIsPresentOnPage(driver, "admin@email.com");
         SeleniumUtils.textIsPresentOnPage(driver, "user08@email.com");
-        SeleniumUtils.textIsPresentOnPage(driver, "prueba5@prueba5.com");
         SeleniumUtils.textIsPresentOnPage(driver, "user01@email.com");
         SeleniumUtils.textIsPresentOnPage(driver, "user04@email.com");
         SeleniumUtils.textIsPresentOnPage(driver, "user10@email.com");
@@ -243,12 +242,12 @@ class SdiEntrega132ApplicationTests {
     @Order(1003)
     public void PR13() {
 
-        SeleniumUtils.registerMacro(driver,"REALTEST@email.es", "Zzz", "Maria");
+//        SeleniumUtils.registerMacro(driver,"REALTEST@email.es", "Zzz", "Maria");
 
         PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary"); // Rellenamos el formulario.
         PO_LoginView.fillLoginForm(driver, "admin@email.com", "admin");
 
-        driver.findElement(By.id("12")).click();
+        driver.findElement(By.id("11")).click();
         driver.findElement(By.id("borrar")).click();
         SeleniumUtils.textIsNotPresentOnPage(driver, "REALTEST@email.es");
     }
@@ -259,9 +258,9 @@ class SdiEntrega132ApplicationTests {
     @Order(1004)
     public void PR14() {
 
-        SeleniumUtils.registerMacro(driver,"REALTEST1@email.es", "Aaaa", "Maria");
+       SeleniumUtils.registerMacro(driver,"REALTEST1@email.es", "Aaaa", "Maria");
 
-        SeleniumUtils.registerMacro(driver,"REALTEST2@email.es", "Aaa", "Maria");
+       SeleniumUtils.registerMacro(driver,"REALTEST2@email.es", "Aaa", "Maria");
 
         SeleniumUtils.registerMacro(driver,"REALTEST3@email.es", "Aa", "Maria");
 
@@ -291,11 +290,11 @@ class SdiEntrega132ApplicationTests {
         SeleniumUtils.textIsNotPresentOnPage(driver,"admin@email.com");
 
 
-        SeleniumUtils.textIsPresentOnPage(driver,"Clara");
-        SeleniumUtils.textIsPresentOnPage(driver,"Andrea");
-        SeleniumUtils.textIsPresentOnPage(driver,"Lucas");
-        SeleniumUtils.textIsPresentOnPage(driver,"Manolo");
-        SeleniumUtils.textIsPresentOnPage(driver,"Carla");
+        SeleniumUtils.textIsPresentOnPage(driver,"user08@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver,"user11@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver,"user02@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver,"user04@email.com");
+        SeleniumUtils.textIsPresentOnPage(driver,"user10@email.com");
     }
 
     //[Prueba16] Hacer una búsqueda con el campo vacío y comprobar que se muestra la página que
@@ -310,7 +309,7 @@ class SdiEntrega132ApplicationTests {
         PO_PrivateView.fillSearch(driver,"");
 
         SeleniumUtils.textIsPresentOnPage(driver,"user08@email.com");
-        SeleniumUtils.textIsPresentOnPage(driver,"prueba5@prueba5.com");
+        SeleniumUtils.textIsPresentOnPage(driver,"user11@email.com");
         SeleniumUtils.textIsPresentOnPage(driver,"user02@email.com");
         SeleniumUtils.textIsPresentOnPage(driver,"user04@email.com");
         SeleniumUtils.textIsPresentOnPage(driver,"user10@email.com");
