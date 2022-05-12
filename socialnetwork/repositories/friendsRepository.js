@@ -2,6 +2,10 @@ module.exports = {
     mongoClient: null, app: null, init: function (app, mongoClient) {
         this.mongoClient = mongoClient;
         this.app = app;
+        /**
+         *  @param funcion  devuelve una lista de amigos dado un ID y devuelve la lista ordenada
+         *                  por nombre.
+         */
     }, getFriends: async function (filter1, filter2, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
@@ -15,6 +19,9 @@ module.exports = {
         } catch (error) {
             throw (error);
         }
+        /**
+         *  @param funcion  devuelve una lista con todos los amigos registrados en la aplicación.
+         */
     },getAllFriends: async function (){
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
@@ -45,7 +52,7 @@ module.exports = {
             const database = client.db("Cluster0");
             const collectionName = 'friends';
             const friendsCollection = database.collection(collectionName);
-            var friend={id_from: id_from, id_to:id_to};
+            var friend={id_from: id_from, id_to:id_to, accept:true};
             const result=await friendsCollection.insertOne(friend);
 
             return result.insertedId;

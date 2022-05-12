@@ -1,20 +1,31 @@
-<div id="widget-songs" >
-    <button class="btn" onclick="loadSongs()" >Actualizar</button>
+<div id="widget-friends" >
+    <input id="filter-by-name" class="form-control" placeholder="Filtrar por nombre" type="text"/>
+    <br>
+    <button class="btn" onclick="loadFriends()" >Actualizar</button>
     <table class="table table-hover">
         <thead>
         <tr>
-            <th>Título</th>
-            <th>Género</th>
-            <th>Precio</th>
+            <th>Email</th>
+            <th>Name</th>
+            <th>Surname</th>
+            <th>Messages Not Seen</th>
+            <th>Last Message</th>
             <th class="col-md-1"></th>
         </tr>
         </thead>
-        <tbody id="songsTableBody"></tbody>
+        <tbody id="friendsTableBody"></tbody>
     </table>
 </div>
 <script>
+    window.history.pushState("", "", "/apiclient/client.html?w=friends");
     var users;
-    function loadSongs() {
+    if (intervalId!=0)
+        clearInterval(intervalId)
+
+    /**
+     * Carga los amigos haciendo una petición que devuelve la lista de amigos
+     */
+    function loadFriends() {
         $.ajax({
             url: URLbase + "/friendlist",
             type: "GET",
@@ -23,27 +34,147 @@
             headers: {"token": token},
             success: function (response) {
                 users = response.users;
-                updateSongsTable(users);
+                updateFriendsTable();
             },
             error: function (error) {
                 $("#main-container").load("widget-login.html");
             }
         });
     }
-    function updateSongsTable(users) {
-        $("#songsTableBody").empty(); // Vaciar la tabla
+
+    /**
+     * Actualiza la tabla de amigos
+     */
+    function updateFriendsTable() {
+        $("#friendsTableBody").empty(); // Vaciar la tabla
+
+        // Ordenar
         for (let i = 0; i < users.length; i++) {
-            $("#songsTableBody").append(
+            getLastMessage(users[i])
+                .then((response) => {
+                    if (response != undefined) {
+                        users[i].fecha = response.date;
+                    }
+            }).catch((error) => {
+                console.log(error)
+            })
+        }
+        users.sort(function (a, b) {
+            return a.fecha - b.fecha;
+        });
+
+        for (let i = 0; i < users.length; i++) {
+
+            $("#friendsTableBody").append(
                 "<tr id=" + users[i]._id + ">" +
                 "<td>" + users[i].email + "</td>" +
                 "<td>" + users[i].name + "</td>" +
                 "<td>" + users[i].surname + "</td>" +
+                "<td id='mensajesNoLeidos_" + users[i]._id + "'>" + "</td>" +
+                "<td><a id=" + users[i]._id + "message" + " onclick=widgetChat(\"" + users[i]._id + "\")>" + "</a></td>" +
                 "<td>" +
                 "</td>" +
                 "</tr>");
-            // Mucho cuidado con las comillas del eliminarCancion
-            //la id tiene que ir entre comillas ' '
+
+            getLastMessage(users[i])
+        }
+
+        clearInterval(idIntervaloDeMensajesNoLeidos);
+        idIntervaloDeMensajesNoLeidos = setInterval(updateMessagesNotSeen, 1000);
+    }
+    loadFriends();
+
+    /**
+     * Obtiene el último mensaje de una conversación
+     * @param user
+     */
+    function getLastMessage(user) {
+        $.ajax({
+            url: URLbase + "/message/list/" + user._id,
+            type: "GET",
+            data: {},
+            dataType: 'json',
+            headers: {"token": token},
+            success: function (response) {
+                var len = response.messages.length;
+                var message = response.messages[len - 1];
+                var m = "<b>";
+                if (message != undefined) {
+                    if (message.id_from == user._id) {
+                        m += user.name + ": "
+                    } else {
+                        m += "Tú: "
+                    }
+                    m += "</b>" + message.text
+                    m += "<br>" + new Date(message.date).toLocaleString()
+                } else {
+                    m = "Enviar mensajes"
+                }
+                $('#' + user._id + 'message').append(m)
+            },
+            error: function (error) {
+            },
+        });
+    }
+
+    /**
+     * Carga la vista del chat
+     * @param user
+     */
+    function widgetChat(user){
+        currentFriendID = user
+        $( "#main-container" ).load( "widget-chat.html");
+    }
+
+    /**
+     * Actualiza el número de mensajes no leídos la tabla de amigos
+     */
+    function updateMessagesNotSeen() {
+        for (let i=0; i<users.length; i++) {
+            var idElementoDeLaTabla = "#mensajesNoLeidos_"+users[i]._id;
+            $( idElementoDeLaTabla ).empty();
+            $( idElementoDeLaTabla ).append(""+getMessagesNotSeen(users[i]._id).length)
         }
     }
-    loadSongs();
+
+
+    /**
+     * Busca y devuelve los mensajes enviados entre el usuario que ha iniciado sesión y un amigo que no han sido
+     * leídos.
+     * @param idUser ID del amigo del usuario
+     * @returns {any[]} Una lista con los mensajes no leídos
+     */
+    function getMessagesNotSeen(idUser) {
+        let allMessages;
+        let messagesNotSeen = new Array();
+        $.ajax({
+            url: URLbase + "/message/list/"+idUser,
+            type: "GET",
+            data: {},
+            dataType: 'json',
+            headers: {"token": token},
+            success: function (response) {
+                allMessages = response.messages;
+                for (let i=0; i<messagesNotSeen.length; i++) {
+                    if (messagesNotSeen[i].saw==true) {
+                        messagesNotSeen.push(allMessages[i]);
+                    }
+                }
+            },
+            error: function (error) {
+            }
+        });
+
+        return messagesNotSeen;
+    }
+
+    /**
+     * Filtra por nombre de amigo, se ejecuta al haber modificaciones en el input de búsqueda
+     */
+    $('#filter-by-name').on('input',function(e){
+        let filteredFriends = [];
+        let filterValue = $("#filter-by-name").val();
+        filteredFriends = users.filter(user => user.name.includes(filterValue));
+        updateFriendsTable(filteredFriends);
+    });
 </script>

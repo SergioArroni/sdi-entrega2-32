@@ -18,14 +18,16 @@
                         <td>{{ user.name }}</td>
                         <td>{{ user.surname }}</td>
                         <td>
-                            <input type="checkbox" name={{ user._id }} value={{ user._id }}>Eliminar</input><br>
+                            {% if user.rol != 'Admin' %}
+                                <input type="checkbox" name={{ user._id }} value={{ user._id}} id={{ loop.index}}><label for={{ user._id }}>Eliminar</label>
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %} </tbody>
             </table>
             <div class="form-group">
                 <div class="col-sm-offset-2 col-sm-10">
-                    <button type="submit" class="btn btn-primary">Eliminar usuarios seleccionados</button>
+                    <button type="submit" class="btn btn-primary" id="borrar">Eliminar usuarios seleccionados</button>
                 </div>
             </div>
         </form>

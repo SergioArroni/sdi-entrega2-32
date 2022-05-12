@@ -24,7 +24,7 @@
         </div>
         <div class="collapse navbar-collapse" id="myNavbar">
             <ul class="nav navbar-nav" id="barra-menu">
-                <li><a onclick=widgetSongs()>Canciones</a></li>
+                <li><a onclick=widgetFriends()>Amigos</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right" id="barra-menu-derecha">
                 <!-- Opciones de menú aqui -->
@@ -38,19 +38,65 @@
 <script>
     let token;
     let URLbase = "http://localhost:8081/api/v1.0";
-    if ( Cookies.get('token') != null ){
-        token = Cookies.get('token');
-        $( "#main-container" ).load("widget-friends.html");
-        let url = new URL(window.location.href);
-        let w = url.searchParams.get("w");
+    let currentFriendID;
+    let intervalId = 0;
+    let idIntervaloDeMensajesNoLeidos = 0;
+    if (intervalId!=0)
+        clearInterval(intervalId)
+    if (idIntervaloDeMensajesNoLeidos!=0)
+        clearInterval(idIntervaloDeMensajesNoLeidos)
 
-        if (w == "chat") {
-            $("#main-container").load("widget-chat.html");
+    /**
+     * Carga la página que corresponda
+     */
+    function loadPage() {
+        if (Cookies.get('token') != null) {
+            token = Cookies.get('token');
+            $("#main-container").load("widget-friends.html");
+            let url = new URL(window.location.href);
+            let w = url.searchParams.get("w");
+
+            if (w == "login") {
+                $("#main-container").load("widget-login.html");
+            }
+            if (w == "friends") {
+                $("#main-container").load("widget-friends.html");
+            }
+            if (w == "chat") {
+                $("#main-container").load("widget-chat.html");
+            }
+
+        } else {
+            $("#main-container").load("widget-login.html");
         }
-
-    }else {
-        $( "#main-container" ).load("widget-login.html");
     }
+    
+    loadPage()
+
+    /**
+     * Carga la vista de amigos
+     */
+    function widgetFriends(){
+        $( "#main-container" ).load( "widget-friends.html");
+    }
+
+    /**
+     * Carga la página al detectar un cambio de localización (cambia la URL).
+     * @param event
+     */
+    function onLocationChange(event) {
+        loadPage()
+        console.log(`window ha detectado el cambio del url a: ${window.location.pathname}`);
+    };
+
+    /**
+     * Añadimos el evento popstate a la función onLocationChange para que se ejecute un popstate cada vez que se detecte
+     * un cambio en la URL.
+     */
+    window.addEventListener('popstate', onLocationChange);
+
+
+
 </script>
 </body>
 </html>
